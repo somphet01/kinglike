@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike - Premium Mattress</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <a class="brand" href="#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#home">ໜ້າຫຼັກ</a>
+        <a href="#products">ທີ່ນອນ</a>
+        <a href="#categories">ໝອນ</a>
+        <a href="#promotion">ໂປຣໂມຊັນ</a>
+        <a href="#about">ກ່ຽວກັບເຮົາ</a>
+        <a href="#contact">ຕິດຕໍ່</a>
+      </nav>
+      <div class="header-actions">
+        <label class="header-search" aria-label="Search products">
+          <span>⌕</span>
+          <input type="search" data-search-input placeholder="ຄົ້ນຫາສິນຄ້າ..." />
+        </label>
+        <button class="icon-btn" type="button" data-open-wishlist aria-label="Wishlist">
+          <span>♡</span><small data-wishlist-count>0</small>
+        </button>
+        <button class="icon-btn" type="button" data-open-cart aria-label="Cart">
+          <span>🛒</span><small data-cart-count>0</small>
+        </button>
+        <button class="line-btn" type="button">LINE</button>
+        <a class="admin-link" href="admin.html">Admin</a>
+        <button class="lang-btn" type="button">LO / EN</button>
+      </div>
+    </header>
+
+    <main id="home">
+      <section class="hero">
+        <div class="gold-particles" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <p class="eyebrow">KINGLIKE PREMIUM SLEEP</p>
+          <h1>Sleep in <span>Luxury</span> Every Night</h1>
+          <p>
+            ທີ່ນອນພຣີມຽມສຳລັບການພັກຜ່ອນທີ່ເລິກກວ່າ ນຸ່ມກວ່າ
+            ແລະຫຼູຫຼາກວ່າທຸກຄືນ.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#products">ເລືອກຊື້ທີ່ນອນ</a>
+            <a class="secondary-btn" href="#promotion">ເບິ່ງໂປຣໂມຊັນ</a>
+          </div>
+        </div>
+        <div class="hero-stage" aria-label="Animated mattress preview">
+          <div class="mattress-model">
+            <div class="mattress-top"></div>
+            <div class="mattress-side"></div>
+            <div class="mattress-shadow"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="benefits" aria-label="Highlights">
+        <article>
+          <span>✦</span>
+          <h2>ສົ່ງຟຣີທົ່ວປະເທດ</h2>
+          <p>ຈັດສົ່ງໄວ ແພັກດີ ພ້ອມດູແລຫຼັງການຂາຍ.</p>
+        </article>
+        <article>
+          <span>0%</span>
+          <h2>ຜ່ອນ 0%</h2>
+          <p>ຕົວເລືອກຊຳລະແບບຍືດຫຍຸ່ນສຳລັບລູກຄ້າ.</p>
+        </article>
+        <article>
+          <span>10Y</span>
+          <h2>ຮັບປະກັນສິນຄ້າ</h2>
+          <p>ມັ່ນໃຈໄດ້ກັບມາດຕະຖານຄຸນນະພາບລະດັບໂຮງແຮມ.</p>
+        </article>
+        <article>
+          <span>LINE</span>
+          <h2>ປຶກສາແອດມິນ</h2>
+          <p>ຊ່ວຍເລືອກຄວາມນຸ່ມ ຂະໜາດ ແລະຮຸ່ນທີ່ເໝາະກັບທ່ານ.</p>
+        </article>
+      </section>
+
+      <section class="section" id="categories">
+        <div class="section-heading">
+          <p class="eyebrow">SHOP BY CATEGORY</p>
+          <h2>ໝວດສິນຄ້າ</h2>
+        </div>
+        <div class="category-grid">
+          <article class="category-card mattress-card">
+            <span>ທີ່ນອນ</span>
+          </article>
+          <article class="category-card pillow-card">
+            <span>ໝອນ</span>
+          </article>
+          <article class="category-card topper-card">
+            <span>ທັອບເປີ</span>
+          </article>
+          <article class="category-card bedding-card">
+            <span>ອຸປະກອນການນອນ</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="section products-section" id="products">
+        <div class="section-heading">
+          <p class="eyebrow">BEST SELLER</p>
+          <h2>ສິນຄ້າຂາຍດີ</h2>
+        </div>
+        <div class="shop-layout">
+          <aside class="filters">
+            <label>
+              ຂະໜາດ
+              <select data-size-filter>
+                <option value="">ທັງໝົດ</option>
+                <option value="3.5 ຟຸດ">3.5 ຟຸດ</option>
+                <option value="5 ຟຸດ">5 ຟຸດ</option>
+                <option value="6 ຟຸດ">6 ຟຸດ</option>
+              </select>
+            </label>
+            <label>
+              ຄວາມນຸ່ມ
+              <select data-firmness-filter>
+                <option value="">ທັງໝົດ</option>
+                <option value="ນຸ່ມ">ນຸ່ມ</option>
+                <option value="ນຸ່ມແນ່ນ">ນຸ່ມແນ່ນ</option>
+                <option value="ແນ່ນ">ແນ່ນ</option>
+              </select>
+            </label>
+            <label>
+              ຈັດລຽງ
+              <select data-sort>
+                <option value="popular">ຍອດນິຍົມ</option>
+                <option value="low">ລາຄາຕ່ຳໄປສູງ</option>
+                <option value="high">ລາຄາສູງໄປຕ່ຳ</option>
+                <option value="discount">ສ່ວນຫຼຸດຫຼາຍສຸດ</option>
+              </select>
+            </label>
+          </aside>
+          <div class="product-grid" data-products></div>
+        </div>
+      </section>
+
+      <section class="promo" id="promotion">
+        <div>
+          <p class="eyebrow">HOT DEAL</p>
+          <h2 data-promo-title>ຊຸດນອນຫຼູ ປະຢັດກວ່າ</h2>
+          <p data-promo-text>ຊື້ທີ່ນອນພ້ອມໝອນ ແລະທັອບເປີ ຮັບສ່ວນຫຼຸດພິເສດ.</p>
+        </div>
+        <a class="primary-btn" href="#products" data-promo-button>ເລືອກຊຸດສິນຄ້າ</a>
+      </section>
+
+      <section class="section about-contact" id="about">
+        <div>
+          <p class="eyebrow">ABOUT KINGLIKE</p>
+          <h2>ຫຼູຫຼາ ນຸ່ມສະບາຍ ແລະເຊື່ອຖືໄດ້</h2>
+          <p>
+            Kinglike ຖືກອອກແບບເພື່ອມອບປະສົບການການນອນແບບພຣີມຽມ
+            ໃຫ້ກັບບ້ານຂອງທ່ານ ດ້ວຍວັດສະດຸທີ່ເລືອກຢ່າງພິຖີພິຖັນ.
+          </p>
+        </div>
+        <div class="contact-box" id="contact">
+          <h3>ຕິດຕໍ່ຮ້ານ</h3>
+          <p>LINE: ຈະໃສ່ລິ້ງຈິງພາຍຫຼັງ</p>
+          <p>ເວລາໃຫ້ບໍລິການ: 09:00 - 20:00</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+      <div>
+        <h3>Kinglike™</h3>
+        <p>Premium mattress for a better night.</p>
+      </div>
+      <div>
+        <a href="#products">ສິນຄ້າ</a>
+        <a href="#contact">ຕິດຕໍ່</a>
+        <a href="admin.html">Admin</a>
+        <a href="#">ນະໂຍບາຍຈັດສົ່ງ</a>
+        <a href="#">ຮັບປະກັນ</a>
+      </div>
+    </footer>
+
+    <button class="floating-line" type="button">LINE</button>
+
+    <aside class="drawer" data-cart-drawer>
+      <div class="drawer-head">
+        <h2>ລົດເຂັນ</h2>
+        <button class="close-btn" type="button" data-close-cart>×</button>
+      </div>
+      <div class="drawer-list" data-cart-items></div>
+      <div class="drawer-total">
+        <span>ລວມ</span>
+        <strong data-cart-total>0 ₭</strong>
+      </div>
+      <button class="primary-btn full-btn" type="button">Checkout</button>
+    </aside>
+
+    <aside class="drawer" data-wishlist-drawer>
+      <div class="drawer-head">
+        <h2>Wishlist</h2>
+        <button class="close-btn" type="button" data-close-wishlist>×</button>
+      </div>
+      <div class="drawer-list" data-wishlist-items></div>
+    </aside>
+
+    <div class="overlay detail-overlay" data-detail-overlay>
+      <article class="detail-panel">
+        <button class="close-btn" type="button" data-close-detail>×</button>
+        <div data-product-detail></div>
+      </article>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

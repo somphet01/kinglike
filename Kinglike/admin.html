@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-body">
+    <header class="admin-header">
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+      </a>
+      <nav class="admin-nav">
+        <a href="index.html#products">ເບິ່ງໜ້າຮ້ານ</a>
+        <button class="secondary-btn" type="button" data-reset-demo>Reset demo</button>
+      </nav>
+    </header>
+
+    <main class="admin-shell">
+      <section class="admin-hero">
+        <p class="eyebrow">KINGLIKE ADMIN</p>
+        <h1>ຈັດການສິນຄ້າ ແລະໂປຣໂມຊັນ</h1>
+        <p>ເພີ່ມ ແກ້ໄຂ ລຶບສິນຄ້າ ແລະປ່ຽນ banner promotion ໄດ້ຈາກໜ້ານີ້.</p>
+      </section>
+
+      <section class="admin-grid">
+        <form class="admin-card product-form" data-product-form>
+          <div class="admin-card-head">
+            <div>
+              <p class="eyebrow">PRODUCT</p>
+              <h2 data-form-title>ເພີ່ມສິນຄ້າໃໝ່</h2>
+            </div>
+            <button class="secondary-btn" type="button" data-clear-form>ລ້າງຟອມ</button>
+          </div>
+
+          <input type="hidden" name="id" />
+
+          <label>
+            ຊື່ສິນຄ້າ
+            <input name="name" required placeholder="Kinglike Royal Cloud" />
+          </label>
+
+          <div class="form-row">
+            <label>
+              SKU
+              <input name="sku" placeholder="KL-RC-1201" />
+            </label>
+            <label>
+              Badge
+              <input name="badge" placeholder="Best Seller" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              ປະເພດ
+              <select name="category">
+                <option>Hybrid</option>
+                <option>Latex</option>
+                <option>Memory Foam</option>
+                <option>Pocket Spring</option>
+              </select>
+            </label>
+            <label>
+              ຄວາມນຸ່ມ
+              <select name="firmness">
+                <option>ນຸ່ມ</option>
+                <option>ນຸ່ມແນ່ນ</option>
+                <option>ແນ່ນ</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              ຄວາມໜາ
+              <input name="thickness" placeholder="12 ນິ້ວ" />
+            </label>
+            <label>
+              ຂະໜາດ
+              <input name="sizes" placeholder="3.5 ຟຸດ, 5 ຟຸດ, 6 ຟຸດ" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              ລາຄາເຕັມ (₭)
+              <input name="price" type="number" min="0" required placeholder="7800000" />
+            </label>
+            <label>
+              ລາຄາຂາຍ (₭)
+              <input name="salePrice" type="number" min="0" required placeholder="5290000" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              Rating
+              <input name="rating" type="number" min="0" max="5" step="0.1" placeholder="4.9" />
+            </label>
+            <label>
+              Stock
+              <input name="stock" placeholder="ມີສິນຄ້າ" />
+            </label>
+          </div>
+
+          <label>
+            Warranty
+            <input name="warranty" placeholder="10 ປີ" />
+          </label>
+
+          <label>
+            Materials / ຄຸນສົມບັດ
+            <textarea name="materials" rows="3" placeholder="Premium fabric, Natural latex, Pocket spring"></textarea>
+          </label>
+
+          <label>
+            ລາຍລະອຽດ
+            <textarea name="description" rows="4" placeholder="ລາຍລະອຽດສິນຄ້າ..."></textarea>
+          </label>
+
+          <button class="primary-btn admin-submit" type="submit">ບັນທຶກສິນຄ້າ</button>
+        </form>
+
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <div>
+              <p class="eyebrow">CATALOG</p>
+              <h2>ລາຍການສິນຄ້າ</h2>
+            </div>
+            <span class="admin-count" data-product-count>0</span>
+          </div>
+          <div class="admin-list" data-admin-products></div>
+        </section>
+      </section>
+
+      <section class="admin-card promo-admin">
+        <div class="admin-card-head">
+          <div>
+            <p class="eyebrow">PROMOTION</p>
+            <h2>ແກ້ໄຂໂປຣໂມຊັນໜ້າຮ້ານ</h2>
+          </div>
+        </div>
+        <form class="promo-form" data-promo-form>
+          <label>
+            ຫົວຂໍ້
+            <input name="title" placeholder="ຊຸດນອນຫຼູ ປະຢັດກວ່າ" />
+          </label>
+          <label>
+            ຂໍ້ຄວາມ
+            <input name="text" placeholder="ຊື້ທີ່ນອນພ້ອມໝອນ ຮັບສ່ວນຫຼຸດພິເສດ" />
+          </label>
+          <label>
+            ຂໍ້ຄວາມປຸ່ມ
+            <input name="button" placeholder="ເລືອກຊຸດສິນຄ້າ" />
+          </label>
+          <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
+        </form>
+      </section>
+    </main>
+
+    <div class="admin-toast" data-toast></div>
+    <script src="admin.js"></script>
+  </body>
+</html>
