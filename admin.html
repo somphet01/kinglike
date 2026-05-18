@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-body">
+    <header class="admin-header">
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+      </a>
+      <nav class="admin-nav">
+        <a href="index.html#products">ເບິ່ງໜ້າຮ້ານ</a>
+        <button class="secondary-btn" type="button" data-reset-demo>Reset demo</button>
+      </nav>
+    </header>
+
+    <main class="admin-shell">
+      <section class="admin-dashboard-hero">
+        <div>
+          <p class="eyebrow">KINGLIKE ADMIN</p>
+          <h1>Dashboard ຈັດການໜ້າຮ້ານ</h1>
+          <p>ແກ້ສິນຄ້າ ອັບຮູບ ປ່ຽນ cover ແລະເບິ່ງ preview ກ່ອນບັນທຶກ.</p>
+        </div>
+        <div class="admin-stats">
+          <article>
+            <span data-product-count>0</span>
+            <small>ສິນຄ້າ</small>
+          </article>
+          <article>
+            <span data-sale-count>0</span>
+            <small>ມີໂປຣ</small>
+          </article>
+          <article>
+            <span>₭</span>
+            <small>ລາຄາກີບ</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="admin-tabs" aria-label="Admin sections">
+        <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
+        <button type="button" data-admin-tab="promotion">Cover / Promotion</button>
+        <button type="button" data-admin-tab="help">ຄູ່ມືຈຸດທີ່ຈະໂຊว์</button>
+      </section>
+
+      <section class="admin-panel is-active" data-admin-panel="products">
+        <div class="admin-workspace">
+          <aside class="admin-card admin-catalog">
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">CATALOG</p>
+                <h2>ລາຍການສິນຄ້າ</h2>
+              </div>
+              <div class="admin-head-actions">
+                <button class="secondary-btn mini-btn" type="button" data-add-sample>+ ສິນຄ້າຕົວຢ່າງ</button>
+                <button class="primary-btn mini-btn" type="button" data-new-product>+ ເພີ່ມ</button>
+              </div>
+            </div>
+            <input class="admin-search" type="search" data-admin-search placeholder="ຄົ້ນຫາສິນຄ້າ..." />
+            <div class="admin-list" data-admin-products></div>
+          </aside>
+
+          <form class="admin-card product-form" data-product-form>
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">EDITOR</p>
+                <h2 data-form-title>ເພີ່ມສິນຄ້າໃໝ່</h2>
+              </div>
+              <button class="secondary-btn" type="button" data-clear-form>ລ້າງຟອມ</button>
+            </div>
+
+            <input type="hidden" name="id" />
+            <input type="hidden" name="image" data-product-image-value />
+
+            <div class="admin-hint">
+              <strong>Preview:</strong> ຂໍ້ມູນດ້ານລຸ່ມຈະໄປສະແດງຢູ່ product card ແລະຫນ້າລາຍລະອຽດສິນຄ້າ.
+            </div>
+
+            <label>
+              ຮູບສິນຄ້າ
+              <input name="imageUpload" type="file" accept="image/*" data-product-image-upload />
+              <small>ຮູບນີ້ຈະໄປໂຊว์ຢູ່ card ສິນຄ້າ ແລະ gallery.</small>
+            </label>
+
+            <label>
+              ຊື່ສິນຄ້າ
+              <input name="name" required placeholder="Kinglike Royal Cloud" />
+              <small>ໂຊว์ເປັນຫົວຂໍ້ໃນ card.</small>
+            </label>
+
+            <div class="form-row">
+              <label>
+                SKU
+                <input name="sku" placeholder="KL-RC-1201" />
+              </label>
+              <label>
+                Badge
+                <input name="badge" placeholder="Best Seller / Promotion" />
+                <small>ປ້າຍສີທອງມຸມຊ້າຍ card.</small>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                ປະເພດ
+                <select name="category">
+                  <option>Hybrid</option>
+                  <option>Latex</option>
+                  <option>Memory Foam</option>
+                  <option>Pocket Spring</option>
+                  <option>Pillow</option>
+                  <option>Topper</option>
+                </select>
+              </label>
+              <label>
+                ຄວາມນຸ່ມ
+                <select name="firmness">
+                  <option>ນຸ່ມ</option>
+                  <option>ນຸ່ມແນ່ນ</option>
+                  <option>ແນ່ນ</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                ຄວາມໜາ
+                <input name="thickness" placeholder="12 ນິ້ວ" />
+              </label>
+              <label>
+                ຂະໜາດ
+                <input name="sizes" placeholder="3.5 ຟຸດ, 5 ຟຸດ, 6 ຟຸດ" />
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                ລາຄາເຕັມ (₭)
+                <input name="price" type="number" min="0" required placeholder="7800000" />
+              </label>
+              <label>
+                ລາຄາຂາຍ (₭)
+                <input name="salePrice" type="number" min="0" required placeholder="5290000" />
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                Rating
+                <input name="rating" type="number" min="0" max="5" step="0.1" placeholder="4.9" />
+              </label>
+              <label>
+                Stock
+                <input name="stock" placeholder="ມີສິນຄ້າ" />
+              </label>
+            </div>
+
+            <label>
+              Warranty
+              <input name="warranty" placeholder="10 ປີ" />
+            </label>
+
+            <label>
+              Materials / ຄຸນສົມບັດ
+              <textarea name="materials" rows="3" placeholder="Premium fabric, Natural latex, Pocket spring"></textarea>
+            </label>
+
+            <label>
+              ລາຍລະອຽດ
+              <textarea name="description" rows="4" placeholder="ລາຍລະອຽດສິນຄ້າ..."></textarea>
+            </label>
+
+            <button class="primary-btn admin-submit" type="submit">ບັນທຶກສິນຄ້າ</button>
+          </form>
+
+          <aside class="admin-card admin-preview-card">
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">LIVE PREVIEW</p>
+                <h2>ຕົວຢ່າງທີ່ລູກຄ້າເຫັນ</h2>
+              </div>
+            </div>
+            <div data-product-preview></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="promotion">
+        <div class="admin-workspace promo-workspace">
+          <form class="admin-card promo-admin" data-promo-form>
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">COVER / PROMOTION</p>
+                <h2>ແກ້ໄຂແຖບໂປຣໂມຊັນ</h2>
+              </div>
+            </div>
+            <input type="hidden" name="coverImage" data-cover-image-value />
+            <label>
+              ຮູບ Cover
+              <input name="coverUpload" type="file" accept="image/*" data-cover-image-upload />
+              <small>ຮູບນີ້ຈະໄປໂຊว์ໃນແຖບ promotion / cover.</small>
+            </label>
+            <label>
+              ຫົວຂໍ້
+              <input name="title" placeholder="ຊຸດນອນຫຼູ ປະຢັດກວ່າ" />
+            </label>
+            <label>
+              ຂໍ້ຄວາມ
+              <input name="text" placeholder="ຊື້ທີ່ນອນພ້ອມໝອນ ຮັບສ່ວນຫຼຸດພິເສດ" />
+            </label>
+            <label>
+              ຂໍ້ຄວາມປຸ່ມ
+              <input name="button" placeholder="ເລືອກຊຸດສິນຄ້າ" />
+            </label>
+            <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
+          </form>
+
+          <aside class="admin-card">
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">PREVIEW</p>
+                <h2>ຕົວຢ່າງ Cover</h2>
+              </div>
+            </div>
+            <div class="promo-preview" data-promo-preview></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="help">
+        <div class="admin-card admin-map">
+          <p class="eyebrow">WHERE IT SHOWS</p>
+          <h2>ແຜນທີ່ການແກ້ໄຂ</h2>
+          <div class="map-grid">
+            <article><strong>ຮູບສິນຄ້າ</strong><span>Product card + gallery detail</span></article>
+            <article><strong>Badge</strong><span>ป้ายสีทองบน card</span></article>
+            <article><strong>ລາຄາ</strong><span>ราคาทอง + ราคาเต็มขีดฆ่า</span></article>
+            <article><strong>Cover</strong><span>แถบ promotion หน้าแรก</span></article>
+            <article><strong>Materials</strong><span>หัวข้อคุณสมบัติใน detail</span></article>
+            <article><strong>Stock/Warranty</strong><span>กล่องซื้อและข้อมูลรับประกัน</span></article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="admin-toast" data-toast></div>
+    <script src="admin.js"></script>
+  </body>
+</html>

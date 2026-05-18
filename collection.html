@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike Collection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="collection-page">
+    <header class="site-header" data-header>
+      <button class="menu-btn" type="button" data-open-menu aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="index.html#home">ໜ້າຫຼັກ</a>
+        <a href="index.html#products">ທີ່ນອນ</a>
+        <a href="collection.html?category=pillows">ໝອນ</a>
+        <a href="collection.html?category=toppers">ທັອບເປີ</a>
+        <a href="index.html#promotion">ໂປຣໂມຊັນ</a>
+        <a href="index.html#contact">ຕິດຕໍ່</a>
+      </nav>
+      <div class="header-actions">
+        <label class="header-search" aria-label="Search products">
+          <span>⌕</span>
+          <input type="search" data-search-input placeholder="ຄົ້ນຫາສິນຄ້າ..." />
+        </label>
+        <button class="icon-btn" type="button" data-open-wishlist aria-label="Wishlist">
+          <span>♡</span><small data-wishlist-count>0</small>
+        </button>
+        <button class="icon-btn" type="button" data-open-cart aria-label="Cart">
+          <span>🛒</span><small data-cart-count>0</small>
+        </button>
+      </div>
+    </header>
+
+    <aside class="mobile-menu" data-mobile-menu>
+      <div class="mobile-menu-head">
+        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+        <button class="close-btn" type="button" data-close-menu>×</button>
+      </div>
+      <nav aria-label="Mobile navigation">
+        <a href="index.html#home">ໜ້າຫຼັກ</a>
+        <a href="index.html#products">ທີ່ນອນ</a>
+        <a href="collection.html?category=pillows">ໝອນ</a>
+        <a href="collection.html?category=toppers">ທັອບເປີ</a>
+        <a href="collection.html?category=bedding">ອຸປະກອນການນອນ</a>
+        <a href="index.html#promotion">ໂປຣໂມຊັນ</a>
+      </nav>
+    </aside>
+    <div class="menu-backdrop" data-menu-backdrop></div>
+
+    <main>
+      <section class="collection-cover" data-collection-cover>
+        <div>
+          <p class="eyebrow" data-collection-kicker>KINGLIKE COLLECTION</p>
+          <h1 data-collection-title>ໝອນ</h1>
+          <p data-collection-copy>ສິນຄ້າພຣີມຽມສຳລັບການນອນທີ່ສະບາຍກວ່າ.</p>
+        </div>
+        <div class="collection-art" data-collection-art></div>
+      </section>
+
+      <section class="section products-section collection-products">
+        <div class="collection-toolbar">
+          <div>
+            <p class="eyebrow">SHOP COLLECTION</p>
+            <h2 data-list-title>ສິນຄ້າ</h2>
+          </div>
+          <select data-sort>
+            <option value="popular">ຍອດນິຍົມ</option>
+            <option value="low">ລາຄາຕ່ຳໄປສູງ</option>
+            <option value="high">ລາຄາສູງໄປຕ່ຳ</option>
+            <option value="discount">ສ່ວນຫຼຸດຫຼາຍສຸດ</option>
+          </select>
+        </div>
+        <div class="product-grid" data-products></div>
+      </section>
+    </main>
+
+    <button class="floating-line" type="button">LINE</button>
+
+    <aside class="drawer" data-cart-drawer>
+      <div class="drawer-head">
+        <h2>ລົດເຂັນ</h2>
+        <button class="close-btn" type="button" data-close-cart>×</button>
+      </div>
+      <div class="drawer-list" data-cart-items></div>
+      <div class="drawer-total">
+        <span>ລວມ</span>
+        <strong data-cart-total>0 ₭</strong>
+      </div>
+      <button class="primary-btn full-btn" type="button">Checkout</button>
+    </aside>
+
+    <aside class="drawer" data-wishlist-drawer>
+      <div class="drawer-head">
+        <h2>Wishlist</h2>
+        <button class="close-btn" type="button" data-close-wishlist>×</button>
+      </div>
+      <div class="drawer-list" data-wishlist-items></div>
+    </aside>
+
+    <script src="collection.js"></script>
+  </body>
+</html>
