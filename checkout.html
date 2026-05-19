@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike - Checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
+      </a>
+      <nav class="main-nav" aria-label="Checkout navigation">
+        <a href="index.html#products">ກັບໄປເລືອກສິນຄ້າ</a>
+        <a href="order.html">ເຊັກສະຖານະ</a>
+      </nav>
+    </header>
+
+    <main class="checkout-page">
+      <section class="checkout-hero">
+        <p class="eyebrow">KINGLIKE CHECKOUT</p>
+        <h1>ຢືນຢັນການສັ່ງຊື້</h1>
+        <p>ກວດລາຍການ ໂອນເງິນຕາມ QR ແລ້ວອັບໂຫຼດສະລິບ. ແອດມິນຈະກວດສອບແລະຕິດຕໍ່ກັບທາງ WhatsApp.</p>
+      </section>
+
+      <section class="checkout-layout">
+        <form class="checkout-card checkout-form" data-checkout-form>
+          <div>
+            <p class="eyebrow">CUSTOMER</p>
+            <h2>ຂໍ້ມູນລູກຄ້າ</h2>
+          </div>
+          <label>
+            ຊື່ລູກຄ້າ
+            <input name="customerName" required placeholder="ຊື່ ແລະ ນາມສະກຸນ" />
+          </label>
+          <label>
+            ເບີໂທ / WhatsApp
+            <input name="customerPhone" required inputmode="tel" placeholder="020 5937 9231" />
+          </label>
+          <label>
+            ທີ່ຢູ່ຈັດສົ່ງ
+            <textarea name="customerAddress" required rows="4" placeholder="ບ້ານ, ເມືອງ, ແຂວງ, ຈຸດສັງເກດ"></textarea>
+          </label>
+          <label>
+            ໝາຍເຫດ
+            <textarea name="note" rows="3" placeholder="ຂະໜາດລິຟ, ເວລາສະດວກຮັບສິນຄ້າ, ຫຼືຂໍ້ຄວາມເພີ່ມເຕີມ"></textarea>
+          </label>
+
+          <div class="checkout-payment">
+            <div>
+              <p class="eyebrow">PAYMENT QR</p>
+              <h2>ໂອນຕາມຍອດລວມ</h2>
+              <p>ໃຊ້ QR ນີ້ເພື່ອຊຳລະເງິນ. ຫາກມີ QR ຮ້ານຈິງ ສາມາດປ່ຽນຮູບໃນພາຍຫຼັງໄດ້.</p>
+            </div>
+            <div class="payment-qr" aria-label="Payment QR placeholder">
+              <span>KINGLIKE</span>
+              <strong data-checkout-total>0 ₭</strong>
+            </div>
+          </div>
+
+          <label>
+            ອັບໂຫຼດສະລິບ
+            <input name="slip" type="file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" required />
+            <small>ຮອງຮັບ JPG, PNG, PDF ຂະໜາດບໍ່ເກີນ 5MB.</small>
+          </label>
+
+          <p class="checkout-alert" data-checkout-message></p>
+          <button class="primary-btn checkout-submit" type="submit">ຢືນຢັນການສັ່ງຊື້</button>
+        </form>
+
+        <aside class="checkout-card order-summary">
+          <div>
+            <p class="eyebrow">ORDER SUMMARY</p>
+            <h2>ລາຍການສິນຄ້າ</h2>
+          </div>
+          <div class="checkout-items" data-checkout-items></div>
+          <div class="checkout-total-row">
+            <span>ຍອດລວມ</span>
+            <strong data-checkout-total>0 ₭</strong>
+          </div>
+          <a class="secondary-btn" href="index.html#products">ເພີ່ມສິນຄ້າ</a>
+        </aside>
+      </section>
+    </main>
+
+    <script src="checkout.js"></script>
+  </body>
+</html>

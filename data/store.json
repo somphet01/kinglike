@@ -1,5 +1,192 @@
 {
-  "products": [],
+  "products": [
+    {
+      "id": "royal-cloud",
+      "name": "Kinglike Royal Cloud",
+      "category": "Hybrid",
+      "firmness": "ນຸ່ມ",
+      "thickness": "12 ນິ້ວ",
+      "sizes": [
+        "3.5 ຟຸດ",
+        "5 ຟຸດ",
+        "6 ຟຸດ"
+      ],
+      "price": 7800000,
+      "salePrice": 5290000,
+      "discountPercent": 32,
+      "badge": "Best Seller",
+      "rating": 4.8,
+      "popular": 1779196619725,
+      "sku": "ROYAL-CLOUD",
+      "materials": [
+        "Premium fabric",
+        "Comfort support",
+        "Hotel grade"
+      ],
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
+      "warranty": "10 ປີ",
+      "stock": "ມີສິນຄ້າ",
+      "description": "Kinglike Royal Cloud ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+    },
+    {
+      "id": "hotel-latex",
+      "name": "Kinglike Hotel Latex",
+      "category": "Latex",
+      "firmness": "ນຸ່ມແນ່ນ",
+      "thickness": "10 ນິ້ວ",
+      "sizes": [
+        "3.5 ຟຸດ",
+        "5 ຟຸດ",
+        "6 ຟຸດ"
+      ],
+      "price": 6900000,
+      "salePrice": 4690000,
+      "discountPercent": 32,
+      "badge": "Promotion",
+      "rating": 4.8,
+      "popular": 1779196619725,
+      "sku": "HOTEL-LATEX",
+      "materials": [
+        "Premium fabric",
+        "Comfort support",
+        "Hotel grade"
+      ],
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
+      "warranty": "10 ປີ",
+      "stock": "ມີສິນຄ້າ",
+      "description": "Kinglike Hotel Latex ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+    },
+    {
+      "id": "pocket-grand",
+      "name": "Kinglike Pocket Grand",
+      "category": "Pocket Spring",
+      "firmness": "ແນ່ນ",
+      "thickness": "11 ນິ້ວ",
+      "sizes": [
+        "3.5 ຟຸດ",
+        "5 ຟຸດ",
+        "6 ຟຸດ"
+      ],
+      "price": 5900000,
+      "salePrice": 3990000,
+      "discountPercent": 32,
+      "badge": "Promotion",
+      "rating": 4.8,
+      "popular": 1779196619725,
+      "sku": "POCKET-GRAND",
+      "materials": [
+        "Premium fabric",
+        "Comfort support",
+        "Hotel grade"
+      ],
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
+      "warranty": "10 ປີ",
+      "stock": "ມີສິນຄ້າ",
+      "description": "Kinglike Pocket Grand ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+    },
+    {
+      "id": "memory-luxe",
+      "name": "Kinglike Memory Luxe",
+      "category": "Memory Foam",
+      "firmness": "ນຸ່ມ",
+      "thickness": "8 ນິ້ວ",
+      "sizes": [
+        "3.5 ຟຸດ",
+        "5 ຟຸດ",
+        "6 ຟຸດ"
+      ],
+      "price": 4500000,
+      "salePrice": 3290000,
+      "discountPercent": 27,
+      "badge": "New",
+      "rating": 4.8,
+      "popular": 1779196619725,
+      "sku": "MEMORY-LUXE",
+      "materials": [
+        "Premium fabric",
+        "Comfort support",
+        "Hotel grade"
+      ],
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
+      "warranty": "10 ປີ",
+      "stock": "ມີສິນຄ້າ",
+      "description": "Kinglike Memory Luxe ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+    },
+    {
+      "id": "gold-support",
+      "name": "Kinglike Gold Support",
+      "category": "Hybrid",
+      "firmness": "ນຸ່ມແນ່ນ",
+      "thickness": "12 ນິ້ວ",
+      "sizes": [
+        "3.5 ຟຸດ",
+        "5 ຟຸດ",
+        "6 ຟຸດ"
+      ],
+      "price": 8600000,
+      "salePrice": 6190000,
+      "discountPercent": 28,
+      "badge": "Hotel Grade",
+      "rating": 4.8,
+      "popular": 1779196619725,
+      "sku": "GOLD-SUPPORT",
+      "materials": [
+        "Premium fabric",
+        "Comfort support",
+        "Hotel grade"
+      ],
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
+      "warranty": "10 ປີ",
+      "stock": "ມີສິນຄ້າ",
+      "description": "Kinglike Gold Support ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+    },
+    {
+      "id": "classic-rest",
+      "name": "Kinglike Classic Rest",
+      "category": "Pocket Spring",
+      "firmness": "ແນ່ນ",
+      "thickness": "9 ນິ້ວ",
+      "sizes": [
+        "3.5 ຟຸດ",
+        "5 ຟຸດ",
+        "6 ຟຸດ"
+      ],
+      "price": 3900000,
+      "salePrice": 2790000,
+      "discountPercent": 28,
+      "badge": "Value",
+      "rating": 4.8,
+      "popular": 1779196619725,
+      "sku": "CLASSIC-REST",
+      "materials": [
+        "Premium fabric",
+        "Comfort support",
+        "Hotel grade"
+      ],
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
+      "warranty": "10 ປີ",
+      "stock": "ມີສິນຄ້າ",
+      "description": "Kinglike Classic Rest ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+    }
+  ],
   "promotion": {},
-  "updatedAt": null
+  "updatedAt": "2026-05-19T13:16:59.790Z"
 }

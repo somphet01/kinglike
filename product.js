@@ -2,7 +2,7 @@
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
-const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
+const WHATSAPP_PHONE = "8562059379231";
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
@@ -269,9 +269,9 @@ function renderProduct() {
         </div>
         <div class="detail-actions">
           <button class="add-cart" type="button" data-add-cart="${currentProduct.id}">ເພີ່ມລົດເຂັນ</button>
-          <button class="buy-now" type="button" data-add-cart="${currentProduct.id}">ຊື້ທັນທີ</button>
+          <button class="buy-now" type="button" data-buy-now="${currentProduct.id}">ຊື້ທັນທີ</button>
         </div>
-        <button class="line-contact" type="button" data-line-contact data-line-product="${currentProduct.id}">ປຶກສາຜ່ານ LINE</button>
+        <button class="line-contact" type="button" data-line-contact data-line-product="${currentProduct.id}">ປຶກສາຜ່ານ WhatsApp</button>
       </aside>
     </div>
     <div class="detail-benefits">
@@ -396,17 +396,9 @@ function buildOrderMessage(productId = "") {
   ].filter(Boolean).join("\n");
 }
 
-async function copyOrderMessage(message) {
-  try {
-    await navigator.clipboard.writeText(message);
-  } catch (error) {
-    window.prompt("Copy this order message for LINE:", message);
-  }
-}
-
 function openLineContact(productId = "") {
-  copyOrderMessage(buildOrderMessage(productId));
-  window.open(LINE_CONTACT_URL, "_blank", "noopener");
+  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(buildOrderMessage(productId))}`;
+  window.open(url, "_blank", "noopener");
 }
 
 function checkout() {
@@ -414,7 +406,15 @@ function checkout() {
     openDrawer(els.cartDrawer);
     return;
   }
-  openLineContact();
+  window.location.href = "checkout.html";
+}
+
+function buyNow(idToBuy) {
+  const item = state.cart.find((cartItem) => cartItem.id === idToBuy);
+  if (item) item.qty = Math.max(1, item.qty);
+  else state.cart.push({ id: idToBuy, qty: 1 });
+  saveCart();
+  window.location.href = "checkout.html";
 }
 
 function openDrawer(drawer) {
@@ -442,8 +442,13 @@ document.addEventListener("click", (event) => {
   const decreaseId = event.target.closest("[data-cart-decrease]")?.dataset.cartDecrease;
   const lineTarget = event.target.closest("[data-line-contact]");
   const shouldCheckout = event.target.closest("[data-checkout]");
+  const buyNowId = event.target.closest("[data-buy-now]")?.dataset.buyNow;
   if (lineTarget) {
     openLineContact(lineTarget.dataset.lineProduct || "");
+    return;
+  }
+  if (buyNowId) {
+    buyNow(buyNowId);
     return;
   }
   if (shouldCheckout) {

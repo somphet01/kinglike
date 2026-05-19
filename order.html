@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike - Order Status</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" data-header>
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
+      </a>
+      <nav class="main-nav" aria-label="Order navigation">
+        <a href="index.html#products">ສິນຄ້າ</a>
+        <a href="checkout.html">Checkout</a>
+      </nav>
+    </header>
+
+    <main class="order-page">
+      <section class="checkout-card order-tracker">
+        <p class="eyebrow">ORDER TRACKING</p>
+        <h1>ຕິດຕາມສະຖານະອອເດີ</h1>
+        <form class="tracking-form" data-tracking-form>
+          <input name="code" placeholder="ໃສ່ Order ID ເຊັ່ນ KL260519ABCD" />
+          <button class="primary-btn" type="submit">ຄົ້ນຫາ</button>
+        </form>
+        <div data-order-status></div>
+      </section>
+    </main>
+
+    <script src="order.js"></script>
+  </body>
+</html>

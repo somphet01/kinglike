@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike Admin - Orders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-body">
+    <header class="admin-header">
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
+      </a>
+      <nav class="admin-nav">
+        <a href="admin.html">Products</a>
+        <a href="admin-orders.html">Orders</a>
+        <a href="index.html#products">ເບິ່ງໜ້າຮ້ານ</a>
+      </nav>
+    </header>
+
+    <main class="admin-shell">
+      <section class="admin-dashboard-hero">
+        <div>
+          <p class="eyebrow">KINGLIKE ORDERS</p>
+          <h1>ກວດສອບອອເດີ ແລະ ສະລິບ</h1>
+          <p>ອອເດີໃໝ່ຈະເຂົ້າສະຖານະ checking. ແອດມິນກວດສະລິບແລ້ວປ່ຽນສະຖານະການຈ່າຍເງິນ ແລະຈັດສົ່ງ.</p>
+        </div>
+        <div class="admin-stats">
+          <article><span data-order-count>0</span><small>Orders</small></article>
+          <article><span data-checking-count>0</span><small>Checking</small></article>
+        </div>
+      </section>
+
+      <section class="admin-card order-admin-card">
+        <div class="admin-card-head">
+          <div>
+            <p class="eyebrow">ORDER LIST</p>
+            <h2>ອອເດີລ່າສຸດ</h2>
+          </div>
+          <div class="order-filters">
+            <input type="search" data-order-search placeholder="ຄົ້ນຫາ Order ID / ເບີໂທ" />
+            <select data-order-filter>
+              <option value="">All status</option>
+              <option value="checking">Checking</option>
+              <option value="paid">Paid</option>
+              <option value="rejected">Rejected</option>
+              <option value="shipping">Shipping</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="orders-layout">
+          <div class="orders-list" data-orders-list></div>
+          <aside class="order-detail" data-order-detail>
+            <p class="meta">ເລືອກອອເດີເພື່ອເບິ່ງລາຍລະອຽດ</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="admin-toast" data-toast></div>
+    <script src="admin-orders.js"></script>
+  </body>
+</html>

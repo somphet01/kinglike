@@ -2,7 +2,7 @@ const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
-const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
+const WHATSAPP_PHONE = "8562059379231";
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
@@ -411,17 +411,9 @@ function buildOrderMessage() {
   ].filter(Boolean).join("\n");
 }
 
-async function copyOrderMessage(message) {
-  try {
-    await navigator.clipboard.writeText(message);
-  } catch (error) {
-    window.prompt("Copy this order message for LINE:", message);
-  }
-}
-
 function openLineContact() {
-  copyOrderMessage(buildOrderMessage());
-  window.open(LINE_CONTACT_URL, "_blank", "noopener");
+  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(buildOrderMessage())}`;
+  window.open(url, "_blank", "noopener");
 }
 
 function checkout() {
@@ -429,7 +421,7 @@ function checkout() {
     openDrawer(els.cartDrawer);
     return;
   }
-  openLineContact();
+  window.location.href = "checkout.html";
 }
 
 function openProductDetail(id) {

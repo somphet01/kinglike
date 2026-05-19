@@ -1,10 +1,12 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const root = __dirname;
 const dataDir = path.join(root, "data");
 const storePath = path.join(dataDir, "store.json");
+const ordersPath = path.join(dataDir, "orders.json");
 const port = Number(process.env.PORT || 4173);
 
 const mime = {
@@ -53,6 +55,124 @@ function readStore() {
   }
 }
 
+function readOrders() {
+  try {
+    const data = JSON.parse(fs.readFileSync(ordersPath, "utf8"));
+    return {
+      orders: Array.isArray(data.orders) ? data.orders : [],
+      logs: Array.isArray(data.logs) ? data.logs : []
+    };
+  } catch (error) {
+    return { orders: [], logs: [] };
+  }
+}
+
+function writeOrders(data) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  const clean = {
+    orders: Array.isArray(data.orders) ? data.orders : [],
+    logs: Array.isArray(data.logs) ? data.logs : []
+  };
+  fs.writeFileSync(ordersPath, JSON.stringify(clean, null, 2));
+  return clean;
+}
+
+function orderCode() {
+  const stamp = new Date().toISOString().slice(2, 10).replace(/-/g, "");
+  return `KL${stamp}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+}
+
+function validateSlip(slip) {
+  if (!slip || typeof slip !== "object") throw new Error("Slip is required");
+  if (!["image/jpeg", "image/png", "application/pdf"].includes(slip.type)) {
+    throw new Error("Slip must be JPG, PNG, or PDF");
+  }
+  if (Number(slip.size || 0) > 5 * 1024 * 1024) {
+    throw new Error("Slip file must be 5MB or smaller");
+  }
+  if (!String(slip.dataUrl || "").startsWith(`data:${slip.type};base64,`)) {
+    throw new Error("Slip data is invalid");
+  }
+}
+
+function createOrder(payload) {
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  if (!payload.customerName || !payload.customerPhone || !payload.customerAddress) {
+    throw new Error("Name, phone, and address are required");
+  }
+  if (!items.length) throw new Error("Order items are required");
+  validateSlip(payload.slip);
+
+  const now = new Date().toISOString();
+  const normalizedItems = items.map((item) => {
+    const quantity = Math.max(1, Number(item.quantity || 1));
+    const unitPrice = Math.max(0, Number(item.unitPrice || 0));
+    return {
+      id: crypto.randomUUID(),
+      productId: String(item.productId || ""),
+      productName: String(item.productName || "Kinglike product"),
+      size: String(item.size || ""),
+      quantity,
+      unitPrice,
+      subtotal: quantity * unitPrice
+    };
+  });
+  const totalAmount = normalizedItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const order = {
+    id: crypto.randomUUID(),
+    orderCode: orderCode(),
+    customerName: String(payload.customerName).trim(),
+    customerPhone: String(payload.customerPhone).trim(),
+    customerWhatsapp: String(payload.customerWhatsapp || payload.customerPhone).trim(),
+    customerAddress: String(payload.customerAddress).trim(),
+    note: String(payload.note || "").trim(),
+    totalAmount,
+    status: "checking",
+    paymentMethod: "qr_transfer",
+    slip: payload.slip,
+    adminNote: "",
+    items: normalizedItems,
+    createdAt: now,
+    updatedAt: now
+  };
+  const data = readOrders();
+  data.orders.unshift(order);
+  data.logs.unshift({
+    id: crypto.randomUUID(),
+    orderId: order.id,
+    oldStatus: "",
+    newStatus: "checking",
+    changedBy: "customer",
+    note: "Order submitted with slip",
+    createdAt: now
+  });
+  writeOrders(data);
+  return order;
+}
+
+function updateOrderStatus(id, payload) {
+  const allowed = new Set(["checking", "paid", "rejected", "shipping", "completed", "cancelled"]);
+  if (!allowed.has(payload.status)) throw new Error("Invalid status");
+  const data = readOrders();
+  const order = data.orders.find((item) => item.id === id || item.orderCode === id);
+  if (!order) throw new Error("Order not found");
+  const oldStatus = order.status;
+  order.status = payload.status;
+  order.adminNote = String(payload.adminNote || order.adminNote || "");
+  order.updatedAt = new Date().toISOString();
+  data.logs.unshift({
+    id: crypto.randomUUID(),
+    orderId: order.id,
+    oldStatus,
+    newStatus: order.status,
+    changedBy: "admin",
+    note: order.adminNote,
+    createdAt: order.updatedAt
+  });
+  writeOrders(data);
+  return { order, logs: data.logs.filter((log) => log.orderId === order.id) };
+}
+
 function writeStore(data) {
   fs.mkdirSync(dataDir, { recursive: true });
   const clean = {
@@ -73,6 +193,7 @@ function safeStaticPath(urlPath) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    const reqUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
     if (req.url.startsWith("/api/store")) {
       if (req.method === "GET") {
         send(res, 200, JSON.stringify(readStore()), "application/json; charset=utf-8");
@@ -85,6 +206,42 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       send(res, 405, "Method not allowed");
+      return;
+    }
+
+    if (reqUrl.pathname === "/api/orders") {
+      if (req.method === "GET") {
+        const data = readOrders();
+        send(res, 200, JSON.stringify(data), "application/json; charset=utf-8");
+        return;
+      }
+      if (req.method === "POST") {
+        const body = await readBody(req);
+        const order = createOrder(JSON.parse(body || "{}"));
+        send(res, 200, JSON.stringify(order), "application/json; charset=utf-8");
+        return;
+      }
+      send(res, 405, "Method not allowed");
+      return;
+    }
+
+    const orderMatch = reqUrl.pathname.match(/^\/api\/orders\/([^/]+)$/);
+    if (orderMatch && req.method === "GET") {
+      const data = readOrders();
+      const order = data.orders.find((item) => item.id === orderMatch[1] || item.orderCode === orderMatch[1]);
+      if (!order) {
+        send(res, 404, "Order not found");
+        return;
+      }
+      send(res, 200, JSON.stringify({ order, logs: data.logs.filter((log) => log.orderId === order.id) }), "application/json; charset=utf-8");
+      return;
+    }
+
+    const statusMatch = reqUrl.pathname.match(/^\/api\/orders\/([^/]+)\/status$/);
+    if (statusMatch && req.method === "PATCH") {
+      const body = await readBody(req);
+      const result = updateOrderStatus(statusMatch[1], JSON.parse(body || "{}"));
+      send(res, 200, JSON.stringify(result), "application/json; charset=utf-8");
       return;
     }
 
