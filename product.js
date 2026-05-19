@@ -1,7 +1,10 @@
 ﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
+const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
+const SYNC_STORE_URL = "/api/store";
+const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
 const collectionProducts = {
   mattresses: [
@@ -134,9 +137,9 @@ function getProductList(category) {
 const params = new URLSearchParams(window.location.search);
 const categoryKey = params.get("category") || "pillows";
 const id = params.get("id");
-const products = getProductList(categoryKey);
-const allProducts = [...loadAdminProducts(), ...Object.values(collectionProducts).flat()].filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
-const currentProduct = products.find((item) => item.id === id) || products[0];
+let products = getProductList(categoryKey);
+let allProducts = mergedAllProducts();
+let currentProduct = products.find((item) => item.id === id) || products[0];
 const state = { cart: loadCart(), wishlist: loadWishlist() };
 const money = new Intl.NumberFormat("lo-LA").format;
 
@@ -153,6 +156,47 @@ const els = {
   mobileMenu: document.querySelector("[data-mobile-menu]"),
   menuBackdrop: document.querySelector("[data-menu-backdrop]")
 };
+
+function mergedAllProducts() {
+  return [...loadAdminProducts(), ...Object.values(collectionProducts).flat()]
+    .filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
+}
+
+async function loadSyncedStore() {
+  for (const url of [SYNC_STORE_URL, STATIC_STORE_URL]) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) continue;
+      const store = await response.json();
+      store.__source = url === STATIC_STORE_URL ? "static" : "api";
+      if (store && (Array.isArray(store.products) || store.promotion)) return store;
+    } catch (error) {
+      // Try the next source.
+    }
+  }
+  return null;
+}
+
+function shouldUseSyncedStore(store) {
+  if (!store) return false;
+  if (store.__source !== "static") return true;
+  const localTime = Date.parse(localStorage.getItem(STORE_UPDATED_KEY) || "");
+  const remoteTime = Date.parse(store.updatedAt || "");
+  return !localTime || (remoteTime && remoteTime > localTime);
+}
+
+async function hydrateSyncedStore() {
+  const store = await loadSyncedStore();
+  if (!shouldUseSyncedStore(store) || !Array.isArray(store.products) || !store.products.length) return;
+  localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(store.products));
+  if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
+  products = getProductList(categoryKey);
+  allProducts = mergedAllProducts();
+  currentProduct = products.find((item) => item.id === id) || products[0];
+  renderProduct();
+  renderCart();
+  renderWishlist();
+}
 
 function formatKip(value) {
   return `${money(value)} ₭`;
@@ -433,3 +477,4 @@ window.addEventListener("scroll", () => {
 renderProduct();
 renderCart();
 renderWishlist();
+hydrateSyncedStore();

@@ -2,7 +2,10 @@
 const PROMO_STORAGE_KEY = "kinglikePromotion";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
+const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
+const SYNC_STORE_URL = "/api/store";
+const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
 const defaultProducts = [
   {
@@ -125,6 +128,47 @@ const defaultProducts = [
 ];
 
 let products = loadProducts();
+
+async function loadSyncedStore() {
+  for (const url of [SYNC_STORE_URL, STATIC_STORE_URL]) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) continue;
+      const store = await response.json();
+      store.__source = url === STATIC_STORE_URL ? "static" : "api";
+      if (store && (Array.isArray(store.products) || store.promotion)) return store;
+    } catch (error) {
+      // Try the next source.
+    }
+  }
+  return null;
+}
+
+function shouldUseSyncedStore(store) {
+  if (!store) return false;
+  if (store.__source !== "static") return true;
+  const localTime = Date.parse(localStorage.getItem(STORE_UPDATED_KEY) || "");
+  const remoteTime = Date.parse(store.updatedAt || "");
+  return !localTime || (remoteTime && remoteTime > localTime);
+}
+
+async function hydrateSyncedStore() {
+  const store = await loadSyncedStore();
+  if (!shouldUseSyncedStore(store)) return;
+  if (Array.isArray(store.products) && store.products.length) {
+    products = store.products;
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+    if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
+    renderProducts();
+    renderCart();
+    renderWishlist();
+  }
+  if (store.promotion && typeof store.promotion === "object") {
+    localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(store.promotion));
+    if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
+    renderPromotion();
+  }
+}
 
 function loadProducts() {
   try {
@@ -653,3 +697,4 @@ renderProducts();
 renderPromotion();
 renderCart();
 renderWishlist();
+hydrateSyncedStore();

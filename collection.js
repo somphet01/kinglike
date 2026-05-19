@@ -1,7 +1,10 @@
 const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
+const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
+const SYNC_STORE_URL = "/api/store";
+const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
 const collections = {
   mattresses: {
@@ -149,7 +152,47 @@ const collectionKey = params.get("category") || "pillows";
 const typeKey = params.get("type") || "";
 const collection = collections[collectionKey] || collections.pillows;
 let products = getCollectionProducts(collectionKey, typeKey);
-const allProducts = [...loadAdminProducts(), ...Object.values(collections).flatMap((item) => item.products)].filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
+let allProducts = mergedAllProducts();
+
+function mergedAllProducts() {
+  return [...loadAdminProducts(), ...Object.values(collections).flatMap((item) => item.products)]
+    .filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
+}
+
+async function loadSyncedStore() {
+  for (const url of [SYNC_STORE_URL, STATIC_STORE_URL]) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) continue;
+      const store = await response.json();
+      store.__source = url === STATIC_STORE_URL ? "static" : "api";
+      if (store && (Array.isArray(store.products) || store.promotion)) return store;
+    } catch (error) {
+      // Try the next source.
+    }
+  }
+  return null;
+}
+
+function shouldUseSyncedStore(store) {
+  if (!store) return false;
+  if (store.__source !== "static") return true;
+  const localTime = Date.parse(localStorage.getItem(STORE_UPDATED_KEY) || "");
+  const remoteTime = Date.parse(store.updatedAt || "");
+  return !localTime || (remoteTime && remoteTime > localTime);
+}
+
+async function hydrateSyncedStore() {
+  const store = await loadSyncedStore();
+  if (!shouldUseSyncedStore(store) || !Array.isArray(store.products) || !store.products.length) return;
+  localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(store.products));
+  if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
+  products = getCollectionProducts(collectionKey, typeKey);
+  allProducts = mergedAllProducts();
+  renderProducts();
+  renderCart();
+  renderWishlist();
+}
 
 const state = {
   cart: loadCart(),
@@ -477,3 +520,4 @@ renderCollectionMeta();
 renderProducts();
 renderCart();
 renderWishlist();
+hydrateSyncedStore();

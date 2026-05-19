@@ -1,5 +1,8 @@
 const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const PROMO_STORAGE_KEY = "kinglikePromotion";
+const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
+const SYNC_STORE_URL = "/api/store";
+const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
 const defaultProducts = [
   productSeed("royal-cloud", "Kinglike Royal Cloud", "Hybrid", "ນຸ່ມ", "12 ນິ້ວ", 7800000, 5290000, "Best Seller"),
@@ -59,6 +62,7 @@ const els = {
   coverValue: document.querySelector("[data-cover-image-value]"),
   promoPreview: document.querySelector("[data-promo-preview]"),
   exportData: document.querySelector("[data-export-data]"),
+  exportPublish: document.querySelector("[data-export-publish]"),
   importData: document.querySelector("[data-import-data]"),
   backupProductCount: document.querySelector("[data-backup-product-count]"),
   backupPromoStatus: document.querySelector("[data-backup-promo-status]"),
@@ -67,6 +71,34 @@ const els = {
 
 let products = loadProducts();
 let activeProductId = products[0]?.id || "";
+
+async function loadSyncedStore() {
+  for (const url of [SYNC_STORE_URL, STATIC_STORE_URL]) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) continue;
+      const store = await response.json();
+      store.__source = url === STATIC_STORE_URL ? "static" : "api";
+      if (store && (Array.isArray(store.products) || store.promotion)) return store;
+    } catch (error) {
+      // Try the next source.
+    }
+  }
+  return null;
+}
+
+async function publishSyncedStore() {
+  try {
+    const response = await fetch(SYNC_STORE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ products, promotion: loadPromotionData(), updatedAt: localStorage.getItem(STORE_UPDATED_KEY) })
+    });
+    if (!response.ok) throw new Error("Sync server unavailable");
+  } catch (error) {
+    showToast("Saved locally. Export for GitHub Pages to update phone.");
+  }
+}
 
 function loadProducts() {
   try {
@@ -81,7 +113,9 @@ function loadProducts() {
 
 function saveProducts() {
   localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+  localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
   renderBackupSummary();
+  publishSyncedStore();
 }
 
 function money(value) {
@@ -409,6 +443,21 @@ function loadPromotionData() {
   }
 }
 
+function savePromotionData(promotion) {
+  localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promotion));
+  localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
+  renderBackupSummary();
+  publishSyncedStore();
+}
+
+function shouldUseSyncedStore(store) {
+  if (!store) return false;
+  if (store.__source !== "static") return true;
+  const localTime = Date.parse(localStorage.getItem(STORE_UPDATED_KEY) || "");
+  const remoteTime = Date.parse(store.updatedAt || "");
+  return !localTime || (remoteTime && remoteTime > localTime);
+}
+
 function renderBackupSummary() {
   if (els.backupProductCount) els.backupProductCount.textContent = products.length;
   if (els.backupPromoStatus) {
@@ -436,6 +485,23 @@ function exportBackup() {
   showToast("Export backup file ແລ້ວ");
 }
 
+function exportPublishStore() {
+  const store = {
+    products,
+    promotion: loadPromotionData(),
+    updatedAt: localStorage.getItem(STORE_UPDATED_KEY) || new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(store, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "store.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(link.href);
+  showToast("Export store.json ສຳລັບ GitHub Pages ແລ້ວ");
+}
+
 function importBackup(file) {
   if (!file) return;
   const reader = new FileReader();
@@ -447,7 +513,7 @@ function importBackup(file) {
       activeProductId = products[0]?.id || "";
       saveProducts();
       if (backup.promotion && typeof backup.promotion === "object") {
-        localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(backup.promotion));
+        savePromotionData(backup.promotion);
       }
       renderProducts();
       if (products[0]) fillForm(products[0]);
@@ -503,6 +569,7 @@ els.coverUpload.addEventListener("change", (event) => {
 });
 
 els.exportData.addEventListener("click", exportBackup);
+els.exportPublish?.addEventListener("click", exportPublishStore);
 els.importData.addEventListener("change", (event) => importBackup(event.target.files[0]));
 
 els.promoForm.addEventListener("input", renderPromoPreview);
@@ -556,17 +623,35 @@ els.resetDemo.addEventListener("click", () => {
 els.promoForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(els.promoForm);
-  localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify({
+  savePromotionData({
     title: data.get("title").trim(),
     text: data.get("text").trim(),
     button: data.get("button").trim(),
     coverImage: data.get("coverImage")
-  }));
-  renderBackupSummary();
+  });
   showToast("ບັນທຶກ Cover / Promotion ແລ້ວ");
 });
 
-renderProducts();
-if (products[0]) fillForm(products[0]);
-loadPromoForm();
-renderBackupSummary();
+async function initAdmin() {
+  const store = await loadSyncedStore();
+  if (store) {
+    if (shouldUseSyncedStore(store) && Array.isArray(store.products) && store.products.length) {
+      products = store.products;
+      activeProductId = products[0]?.id || "";
+      localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+      if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
+    } else if (products.length) {
+      publishSyncedStore();
+    }
+    if (shouldUseSyncedStore(store) && store.promotion && typeof store.promotion === "object") {
+      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(store.promotion));
+      if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
+    }
+  }
+  renderProducts();
+  if (products[0]) fillForm(products[0]);
+  loadPromoForm();
+  renderBackupSummary();
+}
+
+initAdmin();
