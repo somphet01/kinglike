@@ -112,10 +112,16 @@ function loadProducts() {
 }
 
 function saveProducts() {
-  localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
-  localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
-  renderBackupSummary();
-  publishSyncedStore();
+  try {
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+    localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
+    renderBackupSummary();
+    publishSyncedStore();
+    return true;
+  } catch (error) {
+    showToast("ຮູບໃຫຍ່ເກີນໄປ ກະລຸນາລຶບບາງຮູບ ຫຼືໃຊ້ຮູບນ້ອຍລົງ");
+    return false;
+  }
 }
 
 function money(value) {
@@ -394,21 +400,52 @@ function renderPreview() {
   `;
 }
 
-function readFileAsDataUrl(file, callback) {
+function readImageAsCompressedDataUrl(file, maxSize = 1200, quality = 0.82) {
+  if (!file || !file.type.startsWith("image/")) return Promise.resolve("");
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = reject;
+      image.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+        const width = Math.max(1, Math.round(image.width * scale));
+        const height = Math.max(1, Math.round(image.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, width, height);
+        context.drawImage(image, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function readFileAsDataUrl(file, callback, options = {}) {
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => callback(reader.result);
-  reader.readAsDataURL(file);
+  readImageAsCompressedDataUrl(file, options.maxSize || 1600, options.quality || 0.84)
+    .then((dataUrl) => {
+      if (dataUrl) callback(dataUrl);
+      showToast("ບີບອັດຮູບແລ້ວ ພ້ອມບັນທຶກ");
+    })
+    .catch(() => showToast("ອ່ານຮູບບໍ່ສຳເລັດ"));
 }
 
 function readFilesAsDataUrls(files, callback) {
   const list = [...files].filter((file) => file.type.startsWith("image/"));
   if (!list.length) return;
-  Promise.all(list.map((file) => new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.readAsDataURL(file);
-  }))).then(callback);
+  Promise.all(list.map((file) => readImageAsCompressedDataUrl(file, 1200, 0.82)))
+    .then((dataUrls) => {
+      callback(dataUrls.filter(Boolean));
+      showToast("ບີບອັດຮູບແລ້ວ ພ້ອມບັນທຶກ");
+    })
+    .catch(() => showToast("ອ່ານຮູບບໍ່ສຳເລັດ"));
 }
 
 function loadPromoForm() {
@@ -444,10 +481,16 @@ function loadPromotionData() {
 }
 
 function savePromotionData(promotion) {
-  localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promotion));
-  localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
-  renderBackupSummary();
-  publishSyncedStore();
+  try {
+    localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promotion));
+    localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
+    renderBackupSummary();
+    publishSyncedStore();
+    return true;
+  } catch (error) {
+    showToast("ຮູບ Cover ໃຫຍ່ເກີນໄປ ກະລຸນາໃຊ້ຮູບນ້ອຍລົງ");
+    return false;
+  }
 }
 
 function shouldUseSyncedStore(store) {
@@ -565,7 +608,7 @@ els.coverUpload.addEventListener("change", (event) => {
   readFileAsDataUrl(event.target.files[0], (dataUrl) => {
     els.coverValue.value = dataUrl;
     renderPromoPreview();
-  });
+  }, { maxSize: 1600, quality: 0.84 });
 });
 
 els.exportData.addEventListener("click", exportBackup);
@@ -578,10 +621,14 @@ els.form.addEventListener("submit", (event) => {
   event.preventDefault();
   const product = formToProduct();
   const index = products.findIndex((item) => item.id === product.id);
+  const previousProducts = [...products];
   if (index >= 0) products[index] = product;
   else products.unshift(product);
   activeProductId = product.id;
-  saveProducts();
+  if (!saveProducts()) {
+    products = previousProducts;
+    return;
+  }
   renderProducts();
   fillForm(product);
   showToast("ບັນທຶກສິນຄ້າແລ້ວ");
