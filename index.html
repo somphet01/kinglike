@@ -17,7 +17,7 @@
         <span></span>
       </button>
       <a class="brand" href="#home" aria-label="Kinglike home">
-        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#home">ໜ້າຫຼັກ</a>
@@ -39,7 +39,7 @@
         <button class="icon-btn" type="button" data-open-cart aria-label="Cart">
           <span>🛒</span><small data-cart-count>0</small>
         </button>
-        <button class="line-btn" type="button">LINE</button>
+        <button class="line-btn" type="button" data-line-contact>LINE</button>
         <a class="admin-link" href="admin.html">Admin</a>
         <button class="lang-btn" type="button">LO / EN</button>
       </div>
@@ -47,7 +47,7 @@
 
     <aside class="mobile-menu" data-mobile-menu>
       <div class="mobile-menu-head">
-        <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
         <button class="close-btn" type="button" data-close-menu>×</button>
       </div>
       <nav aria-label="Mobile navigation">
@@ -66,6 +66,12 @@
     <main id="home">
       <section class="hero">
         <div class="sky-motion" aria-hidden="true"></div>
+        <div class="sky-birds" aria-hidden="true">
+          <span class="bird bird-one"></span>
+          <span class="bird bird-two"></span>
+          <span class="bird bird-three"></span>
+          <span class="bird bird-four"></span>
+        </div>
         <div class="hero-copy">
           <p class="eyebrow">KINGLIKE PREMIUM SLEEP</p>
           <h1>Sleep in <span>Luxury</span> Every Night</h1>
@@ -80,7 +86,7 @@
         </div>
         <div class="hero-stage" aria-label="Animated mattress preview">
           <div class="mattress-model">
-            <img class="hero-mattress-image" src="assets/hero-mattress-transparent.png" alt="Kinglike premium mattress" />
+            <img class="hero-mattress-image" src="assets/hero-mattress-current.png" alt="Kinglike premium mattress" />
             <div class="mattress-top"></div>
             <div class="mattress-side"></div>
             <div class="mattress-shadow"></div>
@@ -214,14 +220,14 @@
         </div>
         <div class="contact-box" id="contact">
           <h3>ຕິດຕໍ່ຮ້ານ</h3>
-          <p>LINE: ຈະໃສ່ລິ້ງຈິງພາຍຫຼັງ</p>
+          <p>LINE: @kinglike</p>
           <p>ເວລາໃຫ້ບໍລິການ: 09:00 - 20:00</p>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <img src="assets/kinglike-logo-cropped.png" alt="Kinglike" />
+      <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
       <div>
         <h3>Kinglike™</h3>
         <p>Premium mattress for a better night.</p>
@@ -235,7 +241,7 @@
       </div>
     </footer>
 
-    <button class="floating-line" type="button">LINE</button>
+    <button class="floating-line" type="button" data-line-contact>LINE</button>
 
     <aside class="drawer" data-cart-drawer>
       <div class="drawer-head">
@@ -247,7 +253,7 @@
         <span>ລວມ</span>
         <strong data-cart-total>0 ₭</strong>
       </div>
-      <button class="primary-btn full-btn" type="button">Checkout</button>
+      <button class="primary-btn full-btn" type="button" data-checkout>Checkout</button>
     </aside>
 
     <aside class="drawer" data-wishlist-drawer>

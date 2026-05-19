@@ -1,5 +1,7 @@
 ﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
+const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
+const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
 
 const collectionProducts = {
   mattresses: [
@@ -133,8 +135,9 @@ const params = new URLSearchParams(window.location.search);
 const categoryKey = params.get("category") || "pillows";
 const id = params.get("id");
 const products = getProductList(categoryKey);
+const allProducts = [...loadAdminProducts(), ...Object.values(collectionProducts).flat()].filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
 const currentProduct = products.find((item) => item.id === id) || products[0];
-const state = { cart: loadCart(), wishlist: new Set() };
+const state = { cart: loadCart(), wishlist: loadWishlist() };
 const money = new Intl.NumberFormat("lo-LA").format;
 
 const els = {
@@ -166,6 +169,15 @@ function loadCart() {
 
 function saveCart() {
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+}
+
+function loadWishlist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(WISHLIST_STORAGE_KEY) || "[]");
+    return new Set(Array.isArray(saved) ? saved.filter(Boolean) : []);
+  } catch (error) {
+    return new Set();
+  }
 }
 
 function renderProduct() {
@@ -215,7 +227,7 @@ function renderProduct() {
           <button class="add-cart" type="button" data-add-cart="${currentProduct.id}">ເພີ່ມລົດເຂັນ</button>
           <button class="buy-now" type="button" data-add-cart="${currentProduct.id}">ຊື້ທັນທີ</button>
         </div>
-        <button class="line-contact" type="button">ປຶກສາຜ່ານ LINE</button>
+        <button class="line-contact" type="button" data-line-contact data-line-product="${currentProduct.id}">ປຶກສາຜ່ານ LINE</button>
       </aside>
     </div>
     <div class="detail-benefits">
@@ -268,8 +280,8 @@ function addToCart(idToAdd) {
 
 function renderCart() {
   const items = state.cart
-    .filter((item) => item.id === currentProduct.id)
-    .map((item) => ({ ...item, product: currentProduct }));
+    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
+    .filter((item) => item.product);
 
   els.cartItems.innerHTML = items.length
     ? items.map((item) => `
@@ -314,8 +326,51 @@ function updateCartQty(idToUpdate, delta) {
 }
 
 function renderWishlist() {
-  els.wishlistItems.innerHTML = `<p class="meta">ຍັງບໍ່ມີສິນຄ້າທີ່ຖືກໃຈ</p>`;
+  const list = [...state.wishlist].map((itemId) => allProducts.find((product) => product.id === itemId)).filter(Boolean);
+  els.wishlistItems.innerHTML = list.length
+    ? list.map((product) => `<div class="drawer-item"><div><strong>${product.name}</strong><div class="meta">${formatKip(product.salePrice)}</div></div><button type="button" data-add-cart="${product.id}">＋</button></div>`).join("")
+    : `<p class="meta">ຍັງບໍ່ມີສິນຄ້າທີ່ຖືກໃຈ</p>`;
   els.wishlistCount.textContent = state.wishlist.size;
+}
+
+function cartItemsWithProducts() {
+  return state.cart
+    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
+    .filter((item) => item.product);
+}
+
+function buildOrderMessage(productId = "") {
+  const focusedProduct = allProducts.find((product) => product.id === productId);
+  const items = focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
+  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(item.product.salePrice * item.qty)}`);
+  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  return [
+    "Kinglike order inquiry",
+    ...lines,
+    total ? `Total: ${formatKip(total)}` : "",
+    "Please confirm stock, delivery, and payment options."
+  ].filter(Boolean).join("\n");
+}
+
+async function copyOrderMessage(message) {
+  try {
+    await navigator.clipboard.writeText(message);
+  } catch (error) {
+    window.prompt("Copy this order message for LINE:", message);
+  }
+}
+
+function openLineContact(productId = "") {
+  copyOrderMessage(buildOrderMessage(productId));
+  window.open(LINE_CONTACT_URL, "_blank", "noopener");
+}
+
+function checkout() {
+  if (!cartItemsWithProducts().length) {
+    openDrawer(els.cartDrawer);
+    return;
+  }
+  openLineContact();
 }
 
 function openDrawer(drawer) {
@@ -341,6 +396,16 @@ document.addEventListener("click", (event) => {
   const removeId = event.target.closest("[data-remove-cart]")?.dataset.removeCart;
   const increaseId = event.target.closest("[data-cart-increase]")?.dataset.cartIncrease;
   const decreaseId = event.target.closest("[data-cart-decrease]")?.dataset.cartDecrease;
+  const lineTarget = event.target.closest("[data-line-contact]");
+  const shouldCheckout = event.target.closest("[data-checkout]");
+  if (lineTarget) {
+    openLineContact(lineTarget.dataset.lineProduct || "");
+    return;
+  }
+  if (shouldCheckout) {
+    checkout();
+    return;
+  }
   if (addId) addToCart(addId);
   if (removeId) {
     removeFromCart(removeId);

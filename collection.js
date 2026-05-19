@@ -1,5 +1,7 @@
 const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
+const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
+const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
 
 const collections = {
   mattresses: {
@@ -147,10 +149,11 @@ const collectionKey = params.get("category") || "pillows";
 const typeKey = params.get("type") || "";
 const collection = collections[collectionKey] || collections.pillows;
 let products = getCollectionProducts(collectionKey, typeKey);
+const allProducts = [...loadAdminProducts(), ...Object.values(collections).flatMap((item) => item.products)].filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
 
 const state = {
   cart: loadCart(),
-  wishlist: new Set(),
+  wishlist: loadWishlist(),
   search: "",
   sort: "popular"
 };
@@ -192,6 +195,19 @@ function loadCart() {
 
 function saveCart() {
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+}
+
+function loadWishlist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(WISHLIST_STORAGE_KEY) || "[]");
+    return new Set(Array.isArray(saved) ? saved.filter(Boolean) : []);
+  } catch (error) {
+    return new Set();
+  }
+}
+
+function saveWishlist() {
+  localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify([...state.wishlist]));
 }
 
 function renderCollectionMeta() {
@@ -267,13 +283,14 @@ function addToCart(id) {
 function toggleWishlist(id) {
   if (state.wishlist.has(id)) state.wishlist.delete(id);
   else state.wishlist.add(id);
+  saveWishlist();
   renderProducts();
   renderWishlist();
 }
 
 function renderCart() {
   const items = state.cart
-    .map((item) => ({ ...item, product: products.find((candidate) => candidate.id === item.id) }))
+    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
     .filter((item) => item.product);
 
   els.cartItems.innerHTML = items.length
@@ -322,11 +339,50 @@ function updateCartQty(id, delta) {
 }
 
 function renderWishlist() {
-  const list = [...state.wishlist].map((id) => products.find((product) => product.id === id));
+  const list = [...state.wishlist].map((id) => allProducts.find((product) => product.id === id)).filter(Boolean);
   els.wishlistItems.innerHTML = list.length
     ? list.map((product) => `<div class="drawer-item"><div><strong>${product.name}</strong><div class="meta">${formatKip(product.salePrice)}</div></div><button type="button" data-add-cart="${product.id}">＋</button></div>`).join("")
     : `<p class="meta">ຍັງບໍ່ມີສິນຄ້າທີ່ຖືກໃຈ</p>`;
   els.wishlistCount.textContent = state.wishlist.size;
+}
+
+function cartItemsWithProducts() {
+  return state.cart
+    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
+    .filter((item) => item.product);
+}
+
+function buildOrderMessage() {
+  const items = cartItemsWithProducts();
+  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(item.product.salePrice * item.qty)}`);
+  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  return [
+    "Kinglike order inquiry",
+    ...lines,
+    total ? `Total: ${formatKip(total)}` : "",
+    "Please confirm stock, delivery, and payment options."
+  ].filter(Boolean).join("\n");
+}
+
+async function copyOrderMessage(message) {
+  try {
+    await navigator.clipboard.writeText(message);
+  } catch (error) {
+    window.prompt("Copy this order message for LINE:", message);
+  }
+}
+
+function openLineContact() {
+  copyOrderMessage(buildOrderMessage());
+  window.open(LINE_CONTACT_URL, "_blank", "noopener");
+}
+
+function checkout() {
+  if (!cartItemsWithProducts().length) {
+    openDrawer(els.cartDrawer);
+    return;
+  }
+  openLineContact();
 }
 
 function openProductDetail(id) {
@@ -361,6 +417,16 @@ document.addEventListener("click", (event) => {
   const increaseId = event.target.closest("[data-cart-increase]")?.dataset.cartIncrease;
   const decreaseId = event.target.closest("[data-cart-decrease]")?.dataset.cartDecrease;
   const detailId = event.target.closest("[data-open-detail]")?.dataset.openDetail;
+  const lineTarget = event.target.closest("[data-line-contact]");
+  const shouldCheckout = event.target.closest("[data-checkout]");
+  if (lineTarget) {
+    openLineContact();
+    return;
+  }
+  if (shouldCheckout) {
+    checkout();
+    return;
+  }
   if (addId) {
     addToCart(addId);
     return;

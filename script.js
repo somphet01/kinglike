@@ -1,6 +1,8 @@
 ﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const PROMO_STORAGE_KEY = "kinglikePromotion";
 const CART_STORAGE_KEY = "kinglikeCart";
+const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
+const LINE_CONTACT_URL = "https://line.me/R/ti/p/@kinglike";
 
 const defaultProducts = [
   {
@@ -145,7 +147,7 @@ function loadPromotion() {
 
 const state = {
   cart: loadCart(),
-  wishlist: new Set(),
+  wishlist: loadWishlist(),
   search: "",
   size: "",
   firmness: "",
@@ -189,6 +191,19 @@ function loadCart() {
 
 function saveCart() {
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+}
+
+function loadWishlist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(WISHLIST_STORAGE_KEY) || "[]");
+    return new Set(Array.isArray(saved) ? saved.filter(Boolean) : []);
+  } catch (error) {
+    return new Set();
+  }
+}
+
+function saveWishlist() {
+  localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify([...state.wishlist]));
 }
 
 function filteredProducts() {
@@ -323,6 +338,7 @@ function addToCart(id) {
 function toggleWishlist(id) {
   if (state.wishlist.has(id)) state.wishlist.delete(id);
   else state.wishlist.add(id);
+  saveWishlist();
   renderProducts();
   renderWishlist();
 }
@@ -388,7 +404,7 @@ function openProductDetail(id) {
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
           <button class="buy-now" type="button" data-add-cart="${product.id}">ຊື້ທັນທີ</button>
         </div>
-        <button class="line-contact" type="button">ປຶກສາຜ່ານ LINE</button>
+        <button class="line-contact" type="button" data-line-contact data-line-product="${product.id}">ປຶກສາຜ່ານ LINE</button>
       </aside>
     </div>
 
@@ -501,6 +517,47 @@ function renderWishlist() {
   els.wishlistCount.textContent = state.wishlist.size;
 }
 
+function cartItemsWithProducts() {
+  return state.cart
+    .map((item) => ({ ...item, product: products.find((candidate) => candidate.id === item.id) }))
+    .filter((item) => item.product);
+}
+
+function buildOrderMessage(productId = "") {
+  const focusedProduct = products.find((product) => product.id === productId);
+  const items = focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
+  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(item.product.salePrice * item.qty)}`);
+  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  return [
+    "Kinglike order inquiry",
+    ...lines,
+    total ? `Total: ${formatKip(total)}` : "",
+    "Please confirm stock, delivery, and payment options."
+  ].filter(Boolean).join("\n");
+}
+
+async function copyOrderMessage(message) {
+  try {
+    await navigator.clipboard.writeText(message);
+  } catch (error) {
+    window.prompt("Copy this order message for LINE:", message);
+  }
+}
+
+function openLineContact(productId = "") {
+  const message = buildOrderMessage(productId);
+  copyOrderMessage(message);
+  window.open(LINE_CONTACT_URL, "_blank", "noopener");
+}
+
+function checkout() {
+  if (!cartItemsWithProducts().length) {
+    openDrawer(els.cartDrawer);
+    return;
+  }
+  openLineContact();
+}
+
 function openDrawer(drawer) {
   drawer.classList.add("is-open");
 }
@@ -526,7 +583,17 @@ document.addEventListener("click", (event) => {
   const increaseId = event.target.closest("[data-cart-increase]")?.dataset.cartIncrease;
   const decreaseId = event.target.closest("[data-cart-decrease]")?.dataset.cartDecrease;
   const detailId = event.target.closest("[data-open-detail]")?.dataset.openDetail;
+  const lineTarget = event.target.closest("[data-line-contact]");
+  const shouldCheckout = event.target.closest("[data-checkout]");
 
+  if (lineTarget) {
+    openLineContact(lineTarget.dataset.lineProduct || "");
+    return;
+  }
+  if (shouldCheckout) {
+    checkout();
+    return;
+  }
   if (addId) {
     addToCart(addId);
     return;

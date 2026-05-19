@@ -217,10 +217,9 @@ select {
 .hero {
   align-items: center;
   background:
-    radial-gradient(circle at 73% 18%, rgba(255, 246, 204, 0.82), transparent 14%),
-    radial-gradient(ellipse at 22% 28%, rgba(255, 255, 255, 0.78), transparent 22%),
-    radial-gradient(ellipse at 78% 58%, rgba(255, 255, 255, 0.6), transparent 28%),
-    linear-gradient(180deg, #74c3f4 0%, #bfe8fb 42%, #edf8ff 74%, #f7fbf0 100%);
+    radial-gradient(circle at 73% 16%, rgba(255, 248, 211, 0.78) 0 7%, rgba(255, 248, 211, 0.34) 12%, transparent 24%),
+    radial-gradient(ellipse at 18% 18%, rgba(255, 255, 255, 0.7), transparent 28%),
+    linear-gradient(180deg, #5fb4e7 0%, #9fd5f4 30%, #d9effb 58%, #f3f8f2 100%);
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
   min-height: 94vh;
@@ -231,35 +230,109 @@ select {
 
 .hero::before {
   background:
-    radial-gradient(ellipse at 14% 18%, rgba(255, 255, 255, 0.7) 0 8%, transparent 23%),
-    radial-gradient(ellipse at 62% 22%, rgba(255, 255, 255, 0.48) 0 7%, transparent 21%),
-    radial-gradient(ellipse at 36% 66%, rgba(255, 255, 255, 0.58) 0 8%, transparent 24%),
-    linear-gradient(115deg, rgba(255, 255, 255, 0.42), transparent 38%, rgba(255, 255, 255, 0.24) 64%, transparent 82%);
+    radial-gradient(ellipse at 7% 74%, rgba(255, 255, 255, 0.78) 0 10%, transparent 24%),
+    radial-gradient(ellipse at 26% 69%, rgba(255, 255, 255, 0.58) 0 8%, transparent 22%),
+    radial-gradient(ellipse at 78% 70%, rgba(255, 255, 255, 0.62) 0 11%, transparent 28%),
+    radial-gradient(ellipse at 95% 58%, rgba(255, 255, 255, 0.46) 0 8%, transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 42%, rgba(255, 255, 255, 0.38) 78%, rgba(246, 249, 239, 0.72));
   content: "";
   inset: 0;
-  opacity: 0.84;
+  opacity: 0.9;
   position: absolute;
 }
 
 .hero::after {
-  background: linear-gradient(180deg, transparent 70%, rgba(5, 5, 5, 0.08));
+  background:
+    linear-gradient(180deg, transparent 68%, rgba(255, 255, 255, 0.28) 84%, rgba(5, 5, 5, 0.08)),
+    repeating-radial-gradient(circle at 20% 20%, rgba(16, 32, 51, 0.045) 0 1px, transparent 1px 5px);
   content: "";
   inset: 0;
+  opacity: 0.48;
   pointer-events: none;
   position: absolute;
 }
 
 .sky-motion {
-  animation: skyDrift 18s ease-in-out infinite alternate;
+  animation: skyDrift 28s ease-in-out infinite alternate;
   background:
-    radial-gradient(ellipse at 12% 38%, rgba(255, 255, 255, 0.5), transparent 20%),
-    radial-gradient(ellipse at 86% 24%, rgba(255, 255, 255, 0.44), transparent 18%),
-    radial-gradient(ellipse at 54% 76%, rgba(255, 255, 255, 0.38), transparent 24%);
-  filter: blur(14px);
+    radial-gradient(ellipse at 8% 34%, rgba(255, 255, 255, 0.62) 0 8%, transparent 23%),
+    radial-gradient(ellipse at 38% 42%, rgba(255, 255, 255, 0.4) 0 7%, transparent 24%),
+    radial-gradient(ellipse at 70% 31%, rgba(255, 255, 255, 0.46) 0 9%, transparent 26%),
+    radial-gradient(ellipse at 92% 38%, rgba(255, 255, 255, 0.34) 0 8%, transparent 22%),
+    linear-gradient(100deg, transparent 0 12%, rgba(255, 255, 255, 0.18) 30%, transparent 52%, rgba(255, 255, 255, 0.14) 75%, transparent);
+  filter: blur(18px);
+  inset: -6%;
+  opacity: 0.78;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+}
+
+.sky-birds {
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   position: absolute;
+  z-index: 1;
+}
+
+.bird {
+  --bird-scale: 0.75;
+  animation: birdFlight 20s linear infinite;
+  height: 12px;
+  left: -8vw;
+  position: absolute;
+  top: 22%;
+  width: 28px;
+}
+
+.bird::before,
+.bird::after {
+  animation: wingBeat 0.78s ease-in-out infinite;
+  border-top: 2px solid rgba(24, 42, 58, 0.72);
+  content: "";
+  height: 10px;
+  position: absolute;
+  top: 4px;
+  width: 16px;
+}
+
+.bird::before {
+  border-radius: 100% 0 0 0;
+  left: 0;
+  transform: rotate(18deg);
+  transform-origin: right center;
+}
+
+.bird::after {
+  border-radius: 0 100% 0 0;
+  right: 0;
+  transform: rotate(-18deg);
+  transform-origin: left center;
+}
+
+.bird-two {
+  --bird-scale: 0.55;
+  animation-delay: -5s;
+  animation-duration: 26s;
+  opacity: 0.72;
+  top: 17%;
+}
+
+.bird-three {
+  --bird-scale: 0.42;
+  animation-delay: -11s;
+  animation-duration: 23s;
+  opacity: 0.58;
+  top: 31%;
+}
+
+.bird-four {
+  --bird-scale: 0.36;
+  animation-delay: -15s;
+  animation-duration: 31s;
+  opacity: 0.48;
+  top: 13%;
 }
 
 .hero-copy {
@@ -339,32 +412,47 @@ h1 span,
 }
 
 .hero-stage {
-  min-height: 420px;
+  min-height: clamp(440px, 42vw, 620px);
   position: relative;
   z-index: 2;
 }
 
-.mattress-model {
-  animation: hoverMattress 6s ease-in-out infinite;
-  height: clamp(260px, 42vw, 560px);
+.hero-stage::before {
+  background: radial-gradient(ellipse, rgba(48, 78, 104, 0.18) 0 28%, rgba(48, 78, 104, 0.08) 42%, transparent 68%);
+  bottom: 4%;
+  content: "";
+  filter: blur(10px);
+  height: 28%;
   left: 50%;
+  position: absolute;
+  transform: translateX(-44%) rotate(-2deg);
+  width: 86%;
+  z-index: 1;
+}
+
+.mattress-model {
+  animation: hoverMattress 8s ease-in-out infinite;
+  height: clamp(330px, 40vw, 590px);
+  left: 48%;
   perspective: 1000px;
   position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(-10deg);
-  width: clamp(360px, 48vw, 900px);
+  top: 54%;
+  transform: translate(-50%, -50%);
+  width: clamp(430px, 50vw, 860px);
 }
 
 .hero-mattress-image {
-  animation: mattressTilt 8s ease-in-out infinite;
-  filter: drop-shadow(0 34px 46px rgba(16, 32, 51, 0.26));
+  animation: mattressTilt 10s ease-in-out infinite;
+  filter:
+    drop-shadow(0 30px 28px rgba(33, 58, 77, 0.22))
+    drop-shadow(0 66px 38px rgba(31, 68, 96, 0.16));
   left: 50%;
   max-height: none;
   object-fit: contain;
   position: absolute;
-  top: 46%;
-  transform: translate(-50%, -50%) rotateX(4deg) rotateZ(-3deg);
-  width: clamp(340px, 58vw, 980px);
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: clamp(430px, 51vw, 860px);
   z-index: 3;
 }
 
@@ -398,14 +486,17 @@ h1 span,
 }
 
 .mattress-shadow {
-  background: radial-gradient(ellipse, rgba(32, 76, 116, 0.26), transparent 64%);
-  bottom: 32px;
-  filter: blur(12px);
-  height: 82px;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(25, 47, 62, 0.32), rgba(25, 47, 62, 0.12) 42%, transparent 70%),
+    radial-gradient(ellipse at 44% 42%, rgba(255, 255, 255, 0.42), transparent 54%);
+  bottom: 2%;
+  filter: blur(14px);
+  height: 24%;
   left: 50%;
   position: absolute;
-  transform: translateX(-50%);
-  width: 78%;
+  transform: translateX(-45%) rotate(-2deg);
+  width: 88%;
+  z-index: 2;
 }
 
 .benefits,
@@ -1509,19 +1600,31 @@ h1 span,
 
 @keyframes hoverMattress {
   0%,
-  100% { transform: translate(-50%, -50%) rotate(-4deg) translateY(0) scale(1); }
-  50% { transform: translate(-50%, -50%) rotate(-1deg) translateY(-18px) scale(1.025); }
+  100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+  50% { transform: translate(-50%, -50%) translateY(-8px) scale(1.008); }
 }
 
 @keyframes mattressTilt {
   0%,
-  100% { transform: translate(-50%, -50%) rotateX(4deg) rotateZ(-3deg) translateY(0); }
-  50% { transform: translate(-50%, -50%) rotateX(8deg) rotateZ(2deg) translateY(-10px); }
+  100% { transform: translate(-50%, -50%) rotateZ(-0.5deg); }
+  50% { transform: translate(-50%, -50%) rotateZ(0.8deg) translateY(-4px); }
 }
 
 @keyframes skyDrift {
-  0% { transform: translate3d(-2%, -1%, 0) scale(1.02); }
-  100% { transform: translate3d(2%, 1%, 0) scale(1.08); }
+  0% { transform: translate3d(-3%, -1%, 0) scale(1.03); }
+  100% { transform: translate3d(3%, 1%, 0) scale(1.08); }
+}
+
+@keyframes birdFlight {
+  0% { transform: translate3d(-8vw, 0, 0) scale(var(--bird-scale, 0.7)); }
+  45% { transform: translate3d(48vw, -18px, 0) scale(var(--bird-scale, 0.7)); }
+  100% { transform: translate3d(112vw, 14px, 0) scale(var(--bird-scale, 0.7)); }
+}
+
+@keyframes wingBeat {
+  0%,
+  100% { top: 4px; }
+  50% { top: 0; }
 }
 
 @keyframes float {
@@ -1572,9 +1675,9 @@ h1 span,
 
   .site-header {
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     height: auto;
-    min-height: 70px;
+    min-height: 78px;
     padding: 12px 14px;
   }
 
@@ -1640,8 +1743,8 @@ h1 span,
   }
 
   .brand img {
-    height: 28px;
-    width: 112px;
+    height: 38px;
+    width: clamp(146px, 31vw, 172px);
   }
 
   .header-actions {
@@ -1666,8 +1769,9 @@ h1 span,
 
   .hero {
     order: 1;
-    min-height: auto;
-    padding: 100px 20px 28px;
+    display: block;
+    min-height: clamp(310px, 56vw, 360px);
+    padding: 86px 16px 18px;
   }
 
   .collection-cover {
@@ -1699,21 +1803,77 @@ h1 span,
   }
 
   .hero-stage {
-    min-height: clamp(260px, 58vw, 380px);
+    inset: 0;
+    min-height: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 1;
+  }
+
+  .hero-stage::before {
+    bottom: 4%;
+    height: 16%;
+    left: 64%;
+    width: 58%;
   }
 
   .mattress-model {
-    height: clamp(250px, 56vw, 360px);
-    width: min(94vw, 560px);
+    height: clamp(170px, 36vw, 240px);
+    left: 66%;
+    top: 70%;
+    width: min(58vw, 370px);
   }
 
   .hero-mattress-image {
-    width: min(96vw, 620px);
+    width: min(60vw, 390px);
+  }
+
+  .mattress-shadow {
+    bottom: 8%;
+    height: 20%;
+    width: 80%;
+  }
+
+  .hero-copy {
+    max-width: 56%;
+    min-height: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(30px, 8.4vw, 42px);
+    line-height: 0.94;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 2;
   }
 
   .hero-copy p:not(.eyebrow) {
-    font-size: 15px;
-    line-height: 1.65;
+    font-size: 12px;
+    line-height: 1.55;
+    max-width: 230px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero .eyebrow {
+    font-size: 9px;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-actions {
+    gap: 8px;
+    margin-top: 14px;
+    position: relative;
+    z-index: 3;
+  }
+
+  .hero-actions .primary-btn,
+  .hero-actions .secondary-btn {
+    font-size: 12px;
+    min-height: 38px;
+    padding: 9px 13px;
   }
 
   .benefits,
