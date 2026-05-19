@@ -199,7 +199,11 @@ async function hydrateSyncedStore() {
 }
 
 function formatKip(value) {
-  return `${money(value)} ₭`;
+  return `${money(Number(value || 0))} ₭`;
+}
+
+function productPrice(product, key) {
+  return Number(product?.[key] || 0);
 }
 
 function loadCart() {
@@ -248,10 +252,6 @@ function renderProduct() {
               <span>${item.label}</span>
             </button>
           `).join("")}
-          <span>ຮູບສິນຄ້າ</span>
-          <span>ວັດສະດຸ</span>
-          <span>ການໃຊ້ງານ</span>
-          <span>ຂະໜາດ</span>
         </div>
       </div>
       <aside class="detail-buybox">
@@ -340,13 +340,13 @@ function renderCart() {
           </div>
         </div>
         <div class="cart-line-side">
-          <strong>${formatKip(item.product.salePrice * item.qty)}</strong>
+          <strong>${formatKip(productPrice(item.product, "salePrice") * item.qty)}</strong>
           <button type="button" data-remove-cart="${item.product.id}">×</button>
         </div>
       </div>
     `).join("")
     : `<p class="meta">ລົດເຂັນຍັງວ່າງຢູ່</p>`;
-  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
   els.cartTotal.textContent = formatKip(total);
   els.cartCount.textContent = items.reduce((sum, item) => sum + item.qty, 0);
 }
@@ -374,7 +374,7 @@ function renderWishlist() {
   els.wishlistItems.innerHTML = list.length
     ? list.map((product) => `<div class="drawer-item"><div><strong>${product.name}</strong><div class="meta">${formatKip(product.salePrice)}</div></div><button type="button" data-add-cart="${product.id}">＋</button></div>`).join("")
     : `<p class="meta">ຍັງບໍ່ມີສິນຄ້າທີ່ຖືກໃຈ</p>`;
-  els.wishlistCount.textContent = state.wishlist.size;
+  els.wishlistCount.textContent = list.length;
 }
 
 function cartItemsWithProducts() {
@@ -386,8 +386,8 @@ function cartItemsWithProducts() {
 function buildOrderMessage(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
   const items = focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
-  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(item.product.salePrice * item.qty)}`);
-  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(productPrice(item.product, "salePrice") * item.qty)}`);
+  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
   return [
     "Kinglike order inquiry",
     ...lines,

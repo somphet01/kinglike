@@ -221,7 +221,19 @@ const els = {
 };
 
 function formatKip(value) {
-  return `${money(value)} ₭`;
+  return `${money(Number(value || 0))} ₭`;
+}
+
+function productPrice(product, key) {
+  return Number(product?.[key] || 0);
+}
+
+function productSizes(product) {
+  return Array.isArray(product?.sizes) && product.sizes.length ? product.sizes.filter(Boolean) : ["ມາດຕະຖານ"];
+}
+
+function productMaterials(product) {
+  return Array.isArray(product?.materials) && product.materials.length ? product.materials.filter(Boolean) : ["Premium fabric", "Comfort support"];
 }
 
 function loadCart() {
@@ -254,16 +266,16 @@ function filteredProducts() {
   const term = state.search.trim().toLowerCase();
   const list = products.filter((product) => {
     const matchesTerm = !term || `${product.name} ${product.category} ${product.firmness}`.toLowerCase().includes(term);
-    const matchesSize = !state.size || product.sizes.includes(state.size);
+    const matchesSize = !state.size || productSizes(product).includes(state.size);
     const matchesFirmness = !state.firmness || product.firmness === state.firmness;
     return matchesTerm && matchesSize && matchesFirmness;
   });
 
   return list.sort((a, b) => {
-    if (state.sort === "low") return a.salePrice - b.salePrice;
-    if (state.sort === "high") return b.salePrice - a.salePrice;
-    if (state.sort === "discount") return b.discountPercent - a.discountPercent;
-    return b.popular - a.popular;
+    if (state.sort === "low") return productPrice(a, "salePrice") - productPrice(b, "salePrice");
+    if (state.sort === "high") return productPrice(b, "salePrice") - productPrice(a, "salePrice");
+    if (state.sort === "discount") return productPrice(b, "discountPercent") - productPrice(a, "discountPercent");
+    return productPrice(b, "popular") - productPrice(a, "popular");
   });
 }
 
@@ -356,10 +368,10 @@ function productCard(product) {
       <div class="product-body">
         <h3>${product.name}</h3>
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
-        <div class="sizes">${product.sizes.map((size) => `<span>${size}</span>`).join("")}</div>
+        <div class="sizes">${productSizes(product).map((size) => `<span>${size}</span>`).join("")}</div>
         <div class="prices">
-          <strong class="sale-price">${formatKip(product.salePrice)}</strong>
-          <span class="regular-price">${formatKip(product.price)}</span>
+          <strong class="sale-price">${formatKip(productPrice(product, "salePrice"))}</strong>
+          <span class="regular-price">${formatKip(productPrice(product, "price"))}</span>
         </div>
         <div class="card-actions">
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
@@ -391,7 +403,9 @@ function openProductDetail(id) {
   const product = products.find((candidate) => candidate.id === id);
   if (!product) return;
 
-  const saving = product.price - product.salePrice;
+  const price = productPrice(product, "price");
+  const salePrice = productPrice(product, "salePrice");
+  const saving = price - salePrice;
   const gallery = galleryItems(product);
   const heroImage = gallery[0]?.image || "";
   const imageClass = heroImage ? "has-admin-image" : "";
@@ -413,10 +427,6 @@ function openProductDetail(id) {
               <span>${item.label}</span>
             </button>
           `).join("")}
-          <span>ຮູບດ້ານໜ້າ</span>
-          <span>Layer ວັດສະດຸ</span>
-          <span>ຜ້າຫຸ້ມ</span>
-          <span>ຂະໜາດຫ້ອງນອນ</span>
         </div>
       </div>
 
@@ -425,14 +435,14 @@ function openProductDetail(id) {
         <div class="detail-code">SKU: ${product.sku} • ${product.stock}</div>
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
         <div class="detail-price">
-          <strong>${formatKip(product.salePrice)}</strong>
-          <span class="regular-price">${formatKip(product.price)}</span>
+          <strong>${formatKip(salePrice)}</strong>
+          <span class="regular-price">${formatKip(price)}</span>
         </div>
         <div class="save-line">ປະຢັດ ${formatKip(saving)} (${product.discountPercent}%) • ຮອງຮັບຜ່ອນ 0%</div>
 
         <div class="option-group">
           <label>ເລືອກຂະໜາດ</label>
-          <div class="size-options">${product.sizes.map((size) => `<button type="button">${size}</button>`).join("")}</div>
+          <div class="size-options">${productSizes(product).map((size) => `<button type="button">${size}</button>`).join("")}</div>
         </div>
 
         <div class="option-group">
@@ -468,7 +478,7 @@ function openProductDetail(id) {
       <section>
         <h3>ຄຸນສົມບັດຫຼັກ</h3>
         <ul>
-          ${product.materials.map((item) => `<li>${item}</li>`).join("")}
+          ${productMaterials(product).map((item) => `<li>${item}</li>`).join("")}
           <li>ອອກແບບໃຫ້ລະບາຍອາກາດໄດ້ດີ ແລະຊ່ວຍລົດການສະສົມຄວາມຮ້ອນ.</li>
         </ul>
       </section>
@@ -478,7 +488,7 @@ function openProductDetail(id) {
           <div><span>ຄວາມໜາ</span><strong>${product.thickness}</strong></div>
           <div><span>ຄວາມນຸ່ມ</span><strong>${product.firmness}</strong></div>
           <div><span>ປະເພດ</span><strong>${product.category}</strong></div>
-          <div><span>ຂະໜາດ</span><strong>${product.sizes.join(", ")}</strong></div>
+          <div><span>ຂະໜາດ</span><strong>${productSizes(product).join(", ")}</strong></div>
           <div><span>ຮັບປະກັນ</span><strong>${product.warranty}</strong></div>
           <div><span>ສະຖານະ</span><strong>${product.stock}</strong></div>
         </div>
@@ -524,7 +534,7 @@ function renderCart() {
           <div class="drawer-item cart-line">
             <div class="cart-line-info">
               <strong>${product.name}</strong>
-              <div class="meta">${formatKip(product.salePrice)}</div>
+              <div class="meta">${formatKip(productPrice(product, "salePrice"))}</div>
               <div class="cart-qty">
                 <button type="button" data-cart-decrease="${product.id}">−</button>
                 <span>${item.qty}</span>
@@ -532,7 +542,7 @@ function renderCart() {
               </div>
             </div>
             <div class="cart-line-side">
-              <strong>${formatKip(product.salePrice * item.qty)}</strong>
+              <strong>${formatKip(productPrice(product, "salePrice") * item.qty)}</strong>
               <button type="button" data-remove-cart="${product.id}">×</button>
             </div>
           </div>
@@ -540,25 +550,25 @@ function renderCart() {
       }).join("")
     : `<p class="meta">ລົດເຂັນຍັງວ່າງຢູ່</p>`;
 
-  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
   els.cartTotal.textContent = formatKip(total);
   els.cartCount.textContent = items.reduce((sum, item) => sum + item.qty, 0);
 }
 
 function renderWishlist() {
-  const list = [...state.wishlist].map((id) => products.find((product) => product.id === id));
+  const list = [...state.wishlist].map((id) => products.find((product) => product.id === id)).filter(Boolean);
   els.wishlistItems.innerHTML = list.length
     ? list.map((product) => `
       <div class="drawer-item">
         <div>
           <strong>${product.name}</strong>
-          <div class="meta">${formatKip(product.salePrice)}</div>
+          <div class="meta">${formatKip(productPrice(product, "salePrice"))}</div>
         </div>
         <button type="button" data-add-cart="${product.id}">＋</button>
       </div>
     `).join("")
     : `<p class="meta">ຍັງບໍ່ມີສິນຄ້າທີ່ຖືກໃຈ</p>`;
-  els.wishlistCount.textContent = state.wishlist.size;
+  els.wishlistCount.textContent = list.length;
 }
 
 function cartItemsWithProducts() {
@@ -570,8 +580,8 @@ function cartItemsWithProducts() {
 function buildOrderMessage(productId = "") {
   const focusedProduct = products.find((product) => product.id === productId);
   const items = focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
-  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(item.product.salePrice * item.qty)}`);
-  const total = items.reduce((sum, item) => sum + item.product.salePrice * item.qty, 0);
+  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(productPrice(item.product, "salePrice") * item.qty)}`);
+  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
   return [
     "Kinglike order inquiry",
     ...lines,
