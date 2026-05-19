@@ -47,6 +47,7 @@
       <section class="admin-tabs" aria-label="Admin sections">
         <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
         <button type="button" data-admin-tab="promotion">Cover / Promotion</button>
+        <button type="button" data-admin-tab="backup">Backup</button>
         <button type="button" data-admin-tab="help">ຄູ່ມືຈຸດທີ່ຈະໂຊว์</button>
       </section>
 
@@ -78,6 +79,19 @@
 
             <input type="hidden" name="id" />
             <input type="hidden" name="image" data-product-image-value />
+            <input type="hidden" name="images" data-product-images-value />
+
+            <div class="admin-status-grid">
+              <article>
+                <span>Mode</span>
+                <strong data-admin-mode>New product</strong>
+              </article>
+              <article>
+                <span>Shows on</span>
+                <strong data-admin-placement>Home / Category / Detail</strong>
+              </article>
+              <a class="admin-view-product" data-view-product href="index.html#products" target="_blank" rel="noreferrer">View shop page</a>
+            </div>
 
             <div class="admin-hint">
               <strong>Preview:</strong> ຂໍ້ມູນດ້ານລຸ່ມຈະໄປສະແດງຢູ່ product card ແລະຫນ້າລາຍລະອຽດສິນຄ້າ.
@@ -86,8 +100,9 @@
             <label>
               ຮູບສິນຄ້າ
               <input name="imageUpload" type="file" accept="image/*" data-product-image-upload />
-              <small>ຮູບນີ້ຈະໄປໂຊว์ຢູ່ card ສິນຄ້າ ແລະ gallery.</small>
+              <small>ເພີ່ມຮູບທີລະຮູບໄດ້. ຮູບໃໝ່ຈະຕໍ່ທ້າຍຂອງເກົ່າ, ຮູບທຳອິດຈະໂຊว์ຢູ່ card.</small>
             </label>
+            <div class="admin-upload-preview" data-product-image-preview>Product image preview</div>
 
             <label>
               ຊື່ສິນຄ້າ
@@ -168,6 +183,12 @@
             </label>
 
             <label>
+              ຂອງແຖມ / Free gifts
+              <textarea name="freebies" rows="3" placeholder="ຫມອນນອນ 2 ໃບ, ຜ້າຫອມ, ຜ້າປູທີ່ນອນ"></textarea>
+              <small>ຂຽນແຍກດ້ວຍ comma. ຂອງແຖມຈະໂຊว์ໃນ product card ແລະ detail.</small>
+            </label>
+
+            <label>
               Materials / ຄຸນສົມບັດ
               <textarea name="materials" rows="3" placeholder="Premium fabric, Natural latex, Pocket spring"></textarea>
             </label>
@@ -231,6 +252,31 @@
             </div>
             <div class="promo-preview" data-promo-preview></div>
           </aside>
+        </div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="backup">
+        <div class="admin-card admin-backup">
+          <p class="eyebrow">DATA BACKUP</p>
+          <h2>Export / Import ຂໍ້ມູນຮ້ານ</h2>
+          <p class="admin-backup-copy">ໃຊ້ສຳລັບສຳຮອງສິນຄ້າ, ລາຄາ, ຮູບສິນຄ້າ ແລະ Cover. ເວລາຍ້າຍໄປເຄື່ອງອື່ນ ຫຼື browser ອື່ນ ໃຫ້ Import ໄຟລ໌ນີ້ກັບເຂົ້າມາ.</p>
+          <div class="backup-actions">
+            <button class="primary-btn" type="button" data-export-data>Export backup file</button>
+            <label class="secondary-btn backup-import">
+              Import backup file
+              <input type="file" accept="application/json,.json" data-import-data />
+            </label>
+          </div>
+          <div class="backup-summary">
+            <article>
+              <strong data-backup-product-count>0</strong>
+              <span>Products in backup</span>
+            </article>
+            <article>
+              <strong data-backup-promo-status>Not saved</strong>
+              <span>Promotion / Cover</span>
+            </article>
+          </div>
         </div>
       </section>
 

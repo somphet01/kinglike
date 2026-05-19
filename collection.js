@@ -80,16 +80,38 @@ function loadAdminProducts() {
 function normalizeAdminProduct(item) {
   const price = Number(item.price || 0);
   const salePrice = Number(item.salePrice || 0);
+  const images = productImages(item);
   return {
     ...item,
+    image: images[0] || item.image || "",
+    images,
     price,
     salePrice,
     discountPercent: item.discountPercent || discountPercent(price, salePrice),
     sizes: Array.isArray(item.sizes) && item.sizes.length ? item.sizes : ["ມາດຕະຖານ"],
     rating: item.rating || 4.8,
+    freebies: Array.isArray(item.freebies) ? item.freebies.filter(Boolean) : [],
     popular: item.popular || Date.now(),
     type: item.type || productTypeFromCategory(item.category)
   };
+}
+
+function productImages(product) {
+  if (Array.isArray(product?.images) && product.images.length) return product.images.filter(Boolean);
+  return product?.image ? [product.image] : [];
+}
+
+function primaryImage(product) {
+  return productImages(product)[0] || "";
+}
+
+function productFreebies(product) {
+  const saved = Array.isArray(product?.freebies) ? product.freebies.filter(Boolean) : [];
+  if (saved.length) return saved;
+  const category = (product?.category || "").toLowerCase();
+  if (category.includes("pillow")) return ["Pillow cover"];
+  if (category.includes("topper")) return ["Aroma fabric spray"];
+  return ["2 pillows", "Premium bedsheet"];
 }
 
 function discountPercent(price, salePrice) {
@@ -202,11 +224,12 @@ function filteredProducts() {
 
 function productCard(product) {
   const isWishlisted = state.wishlist.has(product.id);
-  const imageClass = product.image ? "has-admin-image" : "";
+  const image = primaryImage(product);
+  const imageClass = image ? "has-admin-image" : "";
   return `
     <article class="product-card collection-card clickable-card" data-open-detail="${product.id}">
       <div class="product-art ${collection.art}-product-art ${imageClass}">
-        ${product.image ? `<img src="${product.image}" alt="${product.name}" />` : ""}
+        ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
         <span class="badge">${product.badge}</span>
         <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="Wishlist">♡</button>
       </div>

@@ -1,4 +1,4 @@
-const PRODUCT_STORAGE_KEY = "kinglikeProducts";
+﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const PROMO_STORAGE_KEY = "kinglikePromotion";
 const CART_STORAGE_KEY = "kinglikeCart";
 
@@ -18,6 +18,7 @@ const defaultProducts = [
     popular: 99,
     sku: "KL-RC-1201",
     materials: ["Premium knitted fabric", "Natural latex comfort layer", "Pocket spring support", "Anti-dust mite finish"],
+    freebies: ["2 pillows", "Premium bedsheet"],
     warranty: "10 ປີ",
     stock: "ມີສິນຄ້າ",
     description: "ຮຸ່ນ Royal Cloud ເນັ້ນຄວາມນຸ່ມສະບາຍແບບຫ້ອງພັກຫຼູ ຊ່ວຍຮອງຮັບສະຣີລະໃຫ້ຜ່ອນຄາຍ ແລະລົດແຮງກົດທັບໃນຈຸດສຳຄັນ."
@@ -37,6 +38,7 @@ const defaultProducts = [
     popular: 88,
     sku: "KL-HL-1002",
     materials: ["Latex comfort layer", "Breathable fabric", "High density foam", "Pocket spring base"],
+    freebies: ["Latex pillow", "Aroma fabric spray"],
     warranty: "10 ປີ",
     stock: "ມີສິນຄ້າ",
     description: "ທີ່ນອນ Latex ສຳລັບຄົນທີ່ຕ້ອງການຄວາມນຸ່ມແນ່ນ ນອນສະບາຍ ແລະຮອງຮັບຫຼັງໄດ້ດີ."
@@ -56,6 +58,7 @@ const defaultProducts = [
     popular: 75,
     sku: "KL-PG-1103",
     materials: ["Pocket spring", "Support foam", "Cool-touch fabric", "Edge support"],
+    freebies: ["2 pillows"],
     warranty: "8 ປີ",
     stock: "ມີສິນຄ້າ",
     description: "Pocket Grand ເຫມາະກັບຜູ້ທີ່ມັກຄວາມແນ່ນ ໂຄງສ້າງ spring ແຍກອິດສະຫຼະຊ່ວຍລົດການສັ່ນໄຫວ."
@@ -228,13 +231,66 @@ function renderPromotion() {
   }
 }
 
+function productImages(product) {
+  if (Array.isArray(product?.images) && product.images.length) return product.images.filter(Boolean);
+  return product?.image ? [product.image] : [];
+}
+
+function primaryImage(product) {
+  return productImages(product)[0] || "";
+}
+
+function productFreebies(product) {
+  const saved = Array.isArray(product?.freebies) ? product.freebies.filter(Boolean) : [];
+  if (saved.length) return saved;
+  const category = (product?.category || "").toLowerCase();
+  if (category.includes("pillow")) return ["Pillow cover"];
+  if (category.includes("topper")) return ["Aroma fabric spray"];
+  return ["2 pillows", "Premium bedsheet"];
+}
+
+function galleryItems(product) {
+  const images = productImages(product);
+  if (images.length) {
+    return images.map((image, index) => ({
+      image,
+      label: index === 0 ? "ຮູບສິນຄ້າ" : `ຮູບ ${index + 1}`
+    }));
+  }
+  return [
+    { image: "", label: "ຮູບດ້ານໜ້າ" },
+    { image: "", label: "Layer ວັດສະດຸ" },
+    { image: "", label: "ຜ້າຫຸ້ມ" },
+    { image: "", label: "ຂະໜາດຫ້ອງນອນ" }
+  ];
+}
+
+function bindDetailGallery(container, gallery) {
+  if (!gallery.length) return;
+  let activeIndex = 0;
+  const hero = container.querySelector("[data-gallery-hero]");
+  const heroImage = container.querySelector("[data-gallery-hero-image]");
+  const thumbs = container.querySelectorAll("[data-gallery-index]");
+  const setActive = (index) => {
+    activeIndex = (index + gallery.length) % gallery.length;
+    const item = gallery[activeIndex];
+    hero.classList.toggle("has-admin-image", Boolean(item.image));
+    if (item.image && heroImage) heroImage.src = item.image;
+    thumbs.forEach((thumb) => thumb.classList.toggle("is-active", Number(thumb.dataset.galleryIndex) === activeIndex));
+  };
+  thumbs.forEach((thumb) => thumb.addEventListener("click", () => setActive(Number(thumb.dataset.galleryIndex))));
+  container.querySelector("[data-gallery-prev]")?.addEventListener("click", () => setActive(activeIndex - 1));
+  container.querySelector("[data-gallery-next]")?.addEventListener("click", () => setActive(activeIndex + 1));
+}
+
 function productCard(product) {
   const isWishlisted = state.wishlist.has(product.id);
-  const imageClass = product.image ? "has-admin-image" : "";
+  const image = primaryImage(product);
+  const imageClass = image ? "has-admin-image" : "";
   return `
     <article class="product-card clickable-card" data-open-detail="${product.id}">
       <div class="product-art ${imageClass}">
-        ${product.image ? `<img src="${product.image}" alt="${product.name}" />` : ""}
+        ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
         <span class="badge">${product.badge}</span>
         <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="Wishlist">♡</button>
       </div>
@@ -276,15 +332,27 @@ function openProductDetail(id) {
   if (!product) return;
 
   const saving = product.price - product.salePrice;
-  const imageClass = product.image ? "has-admin-image" : "";
+  const gallery = galleryItems(product);
+  const heroImage = gallery[0]?.image || "";
+  const imageClass = heroImage ? "has-admin-image" : "";
   els.productDetail.innerHTML = `
     <div class="detail-layout">
       <div class="detail-gallery">
-        <div class="detail-hero-art ${imageClass}">
-          ${product.image ? `<img src="${product.image}" alt="${product.name}" />` : ""}
+        <div class="detail-hero-art ${imageClass}" data-gallery-hero>
+          ${heroImage ? `<img src="${heroImage}" alt="${product.name}" data-gallery-hero-image />` : ""}
           <span class="badge">${product.badge}</span>
+          ${gallery.length > 1 ? `
+            <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
+            <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Next image">›</button>
+          ` : ""}
         </div>
-        <div class="detail-thumbs">
+        <div class="detail-thumbs" data-gallery-thumbs>
+          ${gallery.map((item, index) => `
+            <button class="${index === 0 ? "is-active" : ""}" type="button" data-gallery-index="${index}">
+              ${item.image ? `<img src="${item.image}" alt="${item.label}" />` : ""}
+              <span>${item.label}</span>
+            </button>
+          `).join("")}
           <span>ຮູບດ້ານໜ້າ</span>
           <span>Layer ວັດສະດຸ</span>
           <span>ຜ້າຫຸ້ມ</span>
@@ -329,6 +397,7 @@ function openProductDetail(id) {
       <div>ຮັບປະກັນ ${product.warranty}</div>
       <div>ກວດສອບສິນຄ້າກ່ອນຮັບ</div>
       <div>ມີທີມງານແນະນຳ</div>
+      ${productFreebies(product).length ? `<div class="detail-gift-benefit">ຂອງແຖມ: ${productFreebies(product).join(", ")}</div>` : ""}
     </div>
 
     <div class="detail-info">
@@ -362,6 +431,7 @@ function openProductDetail(id) {
   `;
 
   els.detailOverlay.classList.add("is-open");
+  bindDetailGallery(els.productDetail, gallery);
 }
 
 function removeFromCart(id) {

@@ -26,6 +26,7 @@ function productSeed(id, name, category, firmness, thickness, price, salePrice, 
     popular: Date.now(),
     sku: id.toUpperCase(),
     materials: ["Premium fabric", "Comfort support", "Hotel grade"],
+    freebies: ["2 pillows", "Premium bedsheet"],
     warranty: "10 ປີ",
     stock: "ມີສິນຄ້າ",
     description: `${name} ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike.`
@@ -48,10 +49,19 @@ const els = {
   preview: document.querySelector("[data-product-preview]"),
   productImageUpload: document.querySelector("[data-product-image-upload]"),
   productImageValue: document.querySelector("[data-product-image-value]"),
+  productImagesValue: document.querySelector("[data-product-images-value]"),
+  productImagePreview: document.querySelector("[data-product-image-preview]"),
+  adminMode: document.querySelector("[data-admin-mode]"),
+  adminPlacement: document.querySelector("[data-admin-placement]"),
+  viewProduct: document.querySelector("[data-view-product]"),
   promoForm: document.querySelector("[data-promo-form]"),
   coverUpload: document.querySelector("[data-cover-image-upload]"),
   coverValue: document.querySelector("[data-cover-image-value]"),
   promoPreview: document.querySelector("[data-promo-preview]"),
+  exportData: document.querySelector("[data-export-data]"),
+  importData: document.querySelector("[data-import-data]"),
+  backupProductCount: document.querySelector("[data-backup-product-count]"),
+  backupPromoStatus: document.querySelector("[data-backup-promo-status]"),
   toast: document.querySelector("[data-toast]")
 };
 
@@ -71,6 +81,7 @@ function loadProducts() {
 
 function saveProducts() {
   localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+  renderBackupSummary();
 }
 
 function money(value) {
@@ -109,9 +120,93 @@ function setTab(tabName) {
 }
 
 function productImageMarkup(product) {
-  return product?.image
-    ? `<img src="${product.image}" alt="${product.name}" />`
+  const image = primaryImage(product);
+  return image
+    ? `<img src="${image}" alt="${product.name}" />`
     : "";
+}
+
+function productImages(product) {
+  if (Array.isArray(product?.images) && product.images.length) return product.images.filter(Boolean);
+  return product?.image ? [product.image] : [];
+}
+
+function currentFormImages() {
+  return parseImages(field("images")?.value || "");
+}
+
+function setProductImages(images) {
+  const clean = images.filter(Boolean);
+  setField("images", JSON.stringify(clean));
+  setField("image", clean[0] || "");
+  updateImagePreview(clean);
+  renderPreview();
+}
+
+function primaryImage(product) {
+  return productImages(product)[0] || "";
+}
+
+function productFreebies(product) {
+  const saved = Array.isArray(product?.freebies) ? product.freebies.filter(Boolean) : [];
+  if (saved.length) return saved;
+  const category = (product?.category || "").toLowerCase();
+  if (category.includes("pillow")) return ["Pillow cover"];
+  if (category.includes("topper")) return ["Aroma fabric spray"];
+  return ["2 pillows", "Premium bedsheet"];
+}
+
+function parseImages(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function collectionKeyForProduct(product) {
+  const category = (product?.category || "").toLowerCase();
+  if (category.includes("pillow")) return "pillows";
+  if (category.includes("topper")) return "toppers";
+  if (category.includes("bedding") || category.includes("sheet") || category.includes("protector")) return "bedding";
+  return "mattresses";
+}
+
+function placementLabel(product) {
+  if (!product?.name) return "Home / Category / Detail";
+  const labels = {
+    mattresses: "Home + Mattress category + Detail",
+    pillows: "Pillow category + Detail",
+    toppers: "Topper category + Detail",
+    bedding: "Bedding category + Detail"
+  };
+  return labels[collectionKeyForProduct(product)] || labels.mattresses;
+}
+
+function productDetailUrl(product) {
+  if (!product?.id) return "index.html#products";
+  return `product.html?id=${encodeURIComponent(product.id)}&category=${encodeURIComponent(collectionKeyForProduct(product))}`;
+}
+
+function updateImagePreview(src) {
+  if (!els.productImagePreview) return;
+  const images = Array.isArray(src) ? src : src ? [src] : [];
+  els.productImagePreview.classList.toggle("has-image", Boolean(images.length));
+  els.productImagePreview.innerHTML = images.length
+    ? `<div class="admin-upload-grid">${images.map((image, index) => `<span><img src="${image}" alt="Product preview ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-image="${index}" aria-label="Remove image">×</button></span>`).join("")}</div>`
+    : "Product image preview";
+}
+
+function updateAdminStatus(product) {
+  if (els.adminMode) els.adminMode.textContent = activeProductId ? "Editing product" : "New product";
+  if (els.adminPlacement) els.adminPlacement.textContent = placementLabel(product);
+  if (els.viewProduct) {
+    const canView = Boolean(product?.name && activeProductId);
+    els.viewProduct.href = canView ? productDetailUrl(product) : "index.html#products";
+    els.viewProduct.classList.toggle("is-disabled", !canView);
+  }
 }
 
 function renderProducts() {
@@ -142,11 +237,16 @@ function formToProduct() {
   const salePrice = Number(data.get("salePrice") || 0);
   const id = data.get("id") || slugify(name);
   const previous = products.find((item) => item.id === id);
+  const images = parseImages(data.get("images")).length
+    ? parseImages(data.get("images"))
+    : productImages(previous);
+  const image = images[0] || data.get("image") || previous?.image || "";
 
   return {
     id,
     name,
-    image: data.get("image") || previous?.image || "",
+    image,
+    images: images.length ? images : image ? [image] : [],
     sku: data.get("sku").trim() || id.toUpperCase(),
     category: data.get("category"),
     firmness: data.get("firmness"),
@@ -160,14 +260,17 @@ function formToProduct() {
     popular: previous?.popular || Date.now(),
     stock: data.get("stock").trim() || "ມີສິນຄ້າ",
     warranty: data.get("warranty").trim() || "10 ປີ",
+    freebies: toList(data.get("freebies") || "2 pillows, Premium bedsheet"),
     materials: toList(data.get("materials") || "Premium fabric, Pocket spring"),
     description: data.get("description").trim() || "ລາຍລະອຽດສິນຄ້າ Kinglike."
   };
 }
 
 function fillForm(product) {
+  const images = productImages(product);
   setField("id", product.id);
-  setField("image", product.image || "");
+  setField("image", images[0] || "");
+  setField("images", JSON.stringify(images));
   setField("name", product.name || "");
   setField("sku", product.sku || "");
   setField("badge", product.badge || "");
@@ -180,10 +283,13 @@ function fillForm(product) {
   setField("rating", product.rating || "");
   setField("stock", product.stock || "");
   setField("warranty", product.warranty || "");
+  setField("freebies", product.freebies?.join(", ") || "");
   setField("materials", product.materials?.join(", ") || "");
   setField("description", product.description || "");
   els.formTitle.textContent = "ແກ້ໄຂສິນຄ້າ";
   activeProductId = product.id;
+  updateImagePreview(images);
+  updateAdminStatus(product);
   renderProducts();
   renderPreview();
 }
@@ -201,8 +307,11 @@ function clearForm() {
   els.form.reset();
   setField("id", "");
   setField("image", "");
+  setField("images", "");
   els.formTitle.textContent = "ເພີ່ມສິນຄ້າໃໝ່";
   activeProductId = "";
+  updateImagePreview("");
+  updateAdminStatus(null);
   renderProducts();
   renderPreview();
 }
@@ -210,6 +319,7 @@ function clearForm() {
 function currentPreviewProduct() {
   const data = new FormData(els.form);
   if (!data.get("name")) {
+    if (!activeProductId) return null;
     return products.find((product) => product.id === activeProductId) || products[0];
   }
   return formToProduct();
@@ -219,14 +329,17 @@ function renderPreview() {
   const product = currentPreviewProduct();
   if (!product) {
     els.preview.innerHTML = `<div class="admin-preview-empty">ເລືອກສິນຄ້າ ຫຼືເພີ່ມສິນຄ້າໃໝ່</div>`;
+    updateAdminStatus(null);
     return;
   }
 
-  const imageClass = product.image ? "has-admin-image" : "";
+  updateAdminStatus(product);
+  const previewImage = primaryImage(product);
+  const imageClass = previewImage ? "has-admin-image" : "";
   els.preview.innerHTML = `
     <article class="product-card">
       <div class="product-art ${imageClass}">
-        ${product.image ? `<img src="${product.image}" alt="${product.name}" />` : ""}
+        ${previewImage ? `<img src="${previewImage}" alt="${product.name}" />` : ""}
         <span class="badge">${product.badge}</span>
         <button class="wishlist-toggle" type="button">♡</button>
       </div>
@@ -254,6 +367,16 @@ function readFileAsDataUrl(file, callback) {
   reader.readAsDataURL(file);
 }
 
+function readFilesAsDataUrls(files, callback) {
+  const list = [...files].filter((file) => file.type.startsWith("image/"));
+  if (!list.length) return;
+  Promise.all(list.map((file) => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  }))).then(callback);
+}
+
 function loadPromoForm() {
   try {
     const promo = JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {};
@@ -278,6 +401,69 @@ function renderPromoPreview() {
     : `<div class="promo-preview-copy"><p class="eyebrow">HOT DEAL</p><h3>${title}</h3><p>${text}</p></div>`;
 }
 
+function loadPromotionData() {
+  try {
+    return JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function renderBackupSummary() {
+  if (els.backupProductCount) els.backupProductCount.textContent = products.length;
+  if (els.backupPromoStatus) {
+    const promo = loadPromotionData();
+    els.backupPromoStatus.textContent = promo.title || promo.text || promo.coverImage ? "Saved" : "Not saved";
+  }
+}
+
+function exportBackup() {
+  const backup = {
+    app: "Kinglike",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    products,
+    promotion: loadPromotionData()
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `kinglike-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(link.href);
+  showToast("Export backup file ແລ້ວ");
+}
+
+function importBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const backup = JSON.parse(reader.result);
+      if (!Array.isArray(backup.products)) throw new Error("Missing products");
+      products = backup.products;
+      activeProductId = products[0]?.id || "";
+      saveProducts();
+      if (backup.promotion && typeof backup.promotion === "object") {
+        localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(backup.promotion));
+      }
+      renderProducts();
+      if (products[0]) fillForm(products[0]);
+      else clearForm();
+      loadPromoForm();
+      renderBackupSummary();
+      showToast("Import backup file ສຳເລັດ");
+    } catch (error) {
+      showToast("Import ບໍ່ສຳເລັດ: file ບໍ່ຖືກຕ້ອງ");
+    } finally {
+      els.importData.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
 els.tabs.forEach((tab) => tab.addEventListener("click", () => setTab(tab.dataset.adminTab)));
 els.search.addEventListener("input", renderProducts);
 els.clearForm.addEventListener("click", clearForm);
@@ -295,10 +481,18 @@ els.addSample.addEventListener("click", () => {
 els.form.addEventListener("input", renderPreview);
 
 els.productImageUpload.addEventListener("change", (event) => {
-  readFileAsDataUrl(event.target.files[0], (dataUrl) => {
-    els.productImageValue.value = dataUrl;
-    renderPreview();
+  readFilesAsDataUrls(event.target.files, (dataUrls) => {
+    setProductImages([...currentFormImages(), ...dataUrls]);
+    event.target.value = "";
   });
+});
+
+els.productImagePreview.addEventListener("click", (event) => {
+  const removeIndex = event.target.closest("[data-remove-image]")?.dataset.removeImage;
+  if (removeIndex === undefined) return;
+  const images = currentFormImages();
+  images.splice(Number(removeIndex), 1);
+  setProductImages(images);
 });
 
 els.coverUpload.addEventListener("change", (event) => {
@@ -307,6 +501,9 @@ els.coverUpload.addEventListener("change", (event) => {
     renderPromoPreview();
   });
 });
+
+els.exportData.addEventListener("click", exportBackup);
+els.importData.addEventListener("change", (event) => importBackup(event.target.files[0]));
 
 els.promoForm.addEventListener("input", renderPromoPreview);
 
@@ -365,9 +562,11 @@ els.promoForm.addEventListener("submit", (event) => {
     button: data.get("button").trim(),
     coverImage: data.get("coverImage")
   }));
+  renderBackupSummary();
   showToast("ບັນທຶກ Cover / Promotion ແລ້ວ");
 });
 
 renderProducts();
 if (products[0]) fillForm(products[0]);
 loadPromoForm();
+renderBackupSummary();

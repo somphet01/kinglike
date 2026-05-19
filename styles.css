@@ -217,9 +217,10 @@ select {
 .hero {
   align-items: center;
   background:
-    radial-gradient(circle at 76% 32%, rgba(212, 175, 55, 0.2), transparent 26%),
-    radial-gradient(circle at 18% 76%, rgba(245, 215, 110, 0.08), transparent 28%),
-    linear-gradient(135deg, #050505 0%, #0b0b0b 52%, #19150d 100%);
+    radial-gradient(circle at 73% 18%, rgba(255, 246, 204, 0.82), transparent 14%),
+    radial-gradient(ellipse at 22% 28%, rgba(255, 255, 255, 0.78), transparent 22%),
+    radial-gradient(ellipse at 78% 58%, rgba(255, 255, 255, 0.6), transparent 28%),
+    linear-gradient(180deg, #74c3f4 0%, #bfe8fb 42%, #edf8ff 74%, #f7fbf0 100%);
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
   min-height: 94vh;
@@ -228,27 +229,43 @@ select {
   position: relative;
 }
 
-.gold-particles::before,
-.gold-particles::after {
-  animation: float 8s ease-in-out infinite;
-  background-image: radial-gradient(circle, rgba(245, 215, 110, 0.9) 0 2px, transparent 3px);
-  background-size: 76px 76px;
+.hero::before {
+  background:
+    radial-gradient(ellipse at 14% 18%, rgba(255, 255, 255, 0.7) 0 8%, transparent 23%),
+    radial-gradient(ellipse at 62% 22%, rgba(255, 255, 255, 0.48) 0 7%, transparent 21%),
+    radial-gradient(ellipse at 36% 66%, rgba(255, 255, 255, 0.58) 0 8%, transparent 24%),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.42), transparent 38%, rgba(255, 255, 255, 0.24) 64%, transparent 82%);
   content: "";
   inset: 0;
-  opacity: 0.22;
+  opacity: 0.84;
   position: absolute;
 }
 
-.gold-particles::after {
-  animation-delay: -3s;
-  background-size: 118px 118px;
-  opacity: 0.13;
+.hero::after {
+  background: linear-gradient(180deg, transparent 70%, rgba(5, 5, 5, 0.08));
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.sky-motion {
+  animation: skyDrift 18s ease-in-out infinite alternate;
+  background:
+    radial-gradient(ellipse at 12% 38%, rgba(255, 255, 255, 0.5), transparent 20%),
+    radial-gradient(ellipse at 86% 24%, rgba(255, 255, 255, 0.44), transparent 18%),
+    radial-gradient(ellipse at 54% 76%, rgba(255, 255, 255, 0.38), transparent 24%);
+  filter: blur(14px);
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
 }
 
 .hero-copy {
   max-width: 660px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .eyebrow {
@@ -277,8 +294,17 @@ h1 span,
   color: var(--gold);
 }
 
+.hero h1 {
+  color: #102033;
+  text-shadow: 0 12px 42px rgba(255, 255, 255, 0.5);
+}
+
+.hero h1 span {
+  color: #c99d16;
+}
+
 .hero-copy p:not(.eyebrow) {
-  color: var(--muted);
+  color: rgba(16, 32, 51, 0.76);
   font-size: 18px;
   line-height: 1.8;
   max-width: 560px;
@@ -308,25 +334,38 @@ h1 span,
 }
 
 .secondary-btn {
-  border: 1px solid var(--line);
-  color: var(--text);
+  border: 1px solid rgba(16, 32, 51, 0.2);
+  color: #102033;
 }
 
 .hero-stage {
   min-height: 420px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .mattress-model {
-  animation: hoverMattress 5s ease-in-out infinite;
-  height: 360px;
+  animation: hoverMattress 6s ease-in-out infinite;
+  height: clamp(260px, 42vw, 560px);
   left: 50%;
   perspective: 1000px;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%) rotate(-10deg);
-  width: min(620px, 82vw);
+  width: clamp(360px, 48vw, 900px);
+}
+
+.hero-mattress-image {
+  animation: mattressTilt 8s ease-in-out infinite;
+  filter: drop-shadow(0 34px 46px rgba(16, 32, 51, 0.26));
+  left: 50%;
+  max-height: none;
+  object-fit: contain;
+  position: absolute;
+  top: 46%;
+  transform: translate(-50%, -50%) rotateX(4deg) rotateZ(-3deg);
+  width: clamp(340px, 58vw, 980px);
+  z-index: 3;
 }
 
 .mattress-top {
@@ -342,6 +381,11 @@ h1 span,
   width: 100%;
 }
 
+.hero-mattress-image ~ .mattress-top,
+.hero-mattress-image ~ .mattress-side {
+  display: none;
+}
+
 .mattress-side {
   background: linear-gradient(135deg, #c9a227, #715d2f);
   border-radius: 0 0 18px 18px;
@@ -354,10 +398,10 @@ h1 span,
 }
 
 .mattress-shadow {
-  background: radial-gradient(ellipse, rgba(212, 175, 55, 0.32), transparent 64%);
-  bottom: 28px;
-  filter: blur(10px);
-  height: 90px;
+  background: radial-gradient(ellipse, rgba(32, 76, 116, 0.26), transparent 64%);
+  bottom: 32px;
+  filter: blur(12px);
+  height: 82px;
   left: 50%;
   position: absolute;
   transform: translateX(-50%);
@@ -849,6 +893,40 @@ h1 span,
   padding: 5px 9px;
 }
 
+.gift-line {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 8px;
+  color: var(--gold-soft);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+  margin-top: 10px;
+  padding: 9px 10px;
+}
+
+.gift-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.gift-list span {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 999px;
+  color: var(--gold-soft);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 8px 12px;
+}
+
+.detail-gift-benefit {
+  color: var(--gold-soft);
+  font-weight: 900;
+}
+
 .prices {
   align-items: baseline;
   display: flex;
@@ -1069,12 +1147,39 @@ h1 span,
   width: min(72%, 520px);
 }
 
+.gallery-nav {
+  align-items: center;
+  background: rgba(5, 5, 5, 0.58);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-size: 34px;
+  height: 46px;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  z-index: 3;
+}
+
+.gallery-prev {
+  left: 14px;
+}
+
+.gallery-next {
+  right: 14px;
+}
+
 .detail-thumbs {
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(4, 1fr);
 }
 
+.detail-thumbs button,
 .detail-thumbs span {
   align-items: center;
   background: #101010;
@@ -1086,7 +1191,42 @@ h1 span,
   justify-content: center;
   min-height: 78px;
   padding: 8px;
+  position: relative;
   text-align: center;
+}
+
+.detail-thumbs:has(button) > span {
+  display: none;
+}
+
+.detail-thumbs button {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.detail-thumbs button.is-active {
+  border-color: rgba(212, 175, 55, 0.82);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.12);
+}
+
+.detail-thumbs button img {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.detail-thumbs button img + span {
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.78));
+  bottom: 0;
+  color: #fff;
+  display: flex;
+  font-weight: 900;
+  inset-inline: 0;
+  min-height: auto;
+  padding: 26px 8px 8px;
+  position: absolute;
 }
 
 .detail-buybox {
@@ -1369,8 +1509,19 @@ h1 span,
 
 @keyframes hoverMattress {
   0%,
-  100% { transform: translate(-50%, -50%) rotate(-10deg) translateY(0); }
-  50% { transform: translate(-50%, -50%) rotate(-7deg) translateY(-18px); }
+  100% { transform: translate(-50%, -50%) rotate(-4deg) translateY(0) scale(1); }
+  50% { transform: translate(-50%, -50%) rotate(-1deg) translateY(-18px) scale(1.025); }
+}
+
+@keyframes mattressTilt {
+  0%,
+  100% { transform: translate(-50%, -50%) rotateX(4deg) rotateZ(-3deg) translateY(0); }
+  50% { transform: translate(-50%, -50%) rotateX(8deg) rotateZ(2deg) translateY(-10px); }
+}
+
+@keyframes skyDrift {
+  0% { transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  100% { transform: translate3d(2%, 1%, 0) scale(1.08); }
 }
 
 @keyframes float {
@@ -1548,11 +1699,16 @@ h1 span,
   }
 
   .hero-stage {
-    min-height: 230px;
+    min-height: clamp(260px, 58vw, 380px);
   }
 
   .mattress-model {
-    height: 230px;
+    height: clamp(250px, 56vw, 360px);
+    width: min(94vw, 560px);
+  }
+
+  .hero-mattress-image {
+    width: min(96vw, 620px);
   }
 
   .hero-copy p:not(.eyebrow) {

@@ -1,4 +1,4 @@
-const PRODUCT_STORAGE_KEY = "kinglikeProducts";
+﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
 
 const collectionProducts = {
@@ -44,6 +44,7 @@ function product(id, name, category, firmness, thickness, price, salePrice, disc
     warranty: "1 ປີ",
     stock: "ມີສິນຄ້າ",
     materials: ["Premium fabric", "Comfort support", "Easy care"],
+    freebies: ["2 pillows", "Premium bedsheet"],
     description: `${name} ຖືກອອກແບບໃຫ້ເຂົ້າກັບຫ້ອງນອນພຣີມຽມ ແລະຊ່ວຍໃຫ້ການນອນສະບາຍຂຶ້ນ.`
   };
 }
@@ -60,8 +61,11 @@ function loadAdminProducts() {
 function normalizeAdminProduct(item) {
   const price = Number(item.price || 0);
   const salePrice = Number(item.salePrice || 0);
+  const images = productImages(item);
   return {
     ...item,
+    image: images[0] || item.image || "",
+    images,
     price,
     salePrice,
     discountPercent: item.discountPercent || discountPercent(price, salePrice),
@@ -71,8 +75,39 @@ function normalizeAdminProduct(item) {
     warranty: item.warranty || "1 ປີ",
     stock: item.stock || "ມີສິນຄ້າ",
     materials: Array.isArray(item.materials) && item.materials.length ? item.materials : ["Premium fabric", "Comfort support"],
+    freebies: Array.isArray(item.freebies) ? item.freebies.filter(Boolean) : [],
     description: item.description || `${item.name} ສິນຄ້າພຣີມຽມຈາກ Kinglike.`
   };
+}
+
+function productImages(product) {
+  if (Array.isArray(product?.images) && product.images.length) return product.images.filter(Boolean);
+  return product?.image ? [product.image] : [];
+}
+
+function galleryItems(product) {
+  const images = productImages(product);
+  if (images.length) {
+    return images.map((image, index) => ({
+      image,
+      label: index === 0 ? "ຮູບສິນຄ້າ" : `ຮູບ ${index + 1}`
+    }));
+  }
+  return [
+    { image: "", label: "ຮູບສິນຄ້າ" },
+    { image: "", label: "Layer ວັດສະດຸ" },
+    { image: "", label: "ຜ້ານຸ່ມ" },
+    { image: "", label: "ຂະໜາດເຂົ້າມຸມ" }
+  ];
+}
+
+function productFreebies(product) {
+  const saved = Array.isArray(product?.freebies) ? product.freebies.filter(Boolean) : [];
+  if (saved.length) return saved;
+  const category = (product?.category || "").toLowerCase();
+  if (category.includes("pillow")) return ["Pillow cover"];
+  if (category.includes("topper")) return ["Aroma fabric spray"];
+  return ["2 pillows", "Premium bedsheet"];
 }
 
 function discountPercent(price, salePrice) {
@@ -136,15 +171,27 @@ function saveCart() {
 function renderProduct() {
   document.title = `Kinglike - ${currentProduct.name}`;
   const saving = currentProduct.price - currentProduct.salePrice;
-  const imageClass = currentProduct.image ? "has-admin-image" : "";
+  const gallery = galleryItems(currentProduct);
+  const heroImage = gallery[0]?.image || "";
+  const imageClass = heroImage ? "has-admin-image" : "";
   els.page.innerHTML = `
     <div class="detail-layout">
       <div class="detail-gallery">
-        <div class="detail-hero-art ${categoryKey === "pillows" ? "pillow-detail-art" : ""} ${imageClass}">
-          ${currentProduct.image ? `<img src="${currentProduct.image}" alt="${currentProduct.name}" />` : ""}
+        <div class="detail-hero-art ${categoryKey === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero>
+          ${heroImage ? `<img src="${heroImage}" alt="${currentProduct.name}" data-gallery-hero-image />` : ""}
           <span class="badge">${currentProduct.badge}</span>
+          ${gallery.length > 1 ? `
+            <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
+            <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Next image">›</button>
+          ` : ""}
         </div>
-        <div class="detail-thumbs">
+        <div class="detail-thumbs" data-gallery-thumbs>
+          ${gallery.map((item, index) => `
+            <button class="${index === 0 ? "is-active" : ""}" type="button" data-gallery-index="${index}">
+              ${item.image ? `<img src="${item.image}" alt="${item.label}" />` : ""}
+              <span>${item.label}</span>
+            </button>
+          `).join("")}
           <span>ຮູບສິນຄ້າ</span>
           <span>ວັດສະດຸ</span>
           <span>ການໃຊ້ງານ</span>
@@ -176,6 +223,7 @@ function renderProduct() {
       <div>ຮັບປະກັນ ${currentProduct.warranty}</div>
       <div>ກວດສອບສິນຄ້າກ່ອນຮັບ</div>
       <div>ມີທີມງານແນະນຳ</div>
+      ${productFreebies(currentProduct).length ? `<div class="detail-gift-benefit">ຂອງແຖມ: ${productFreebies(currentProduct).join(", ")}</div>` : ""}
     </div>
     <div class="detail-info">
       <section>
@@ -188,6 +236,25 @@ function renderProduct() {
       </section>
     </div>
   `;
+  bindGallery(gallery);
+}
+
+function bindGallery(gallery) {
+  if (!gallery.length) return;
+  let activeIndex = 0;
+  const hero = els.page.querySelector("[data-gallery-hero]");
+  const heroImage = els.page.querySelector("[data-gallery-hero-image]");
+  const thumbs = els.page.querySelectorAll("[data-gallery-index]");
+  const setActive = (index) => {
+    activeIndex = (index + gallery.length) % gallery.length;
+    const item = gallery[activeIndex];
+    hero.classList.toggle("has-admin-image", Boolean(item.image));
+    if (item.image && heroImage) heroImage.src = item.image;
+    thumbs.forEach((thumb) => thumb.classList.toggle("is-active", Number(thumb.dataset.galleryIndex) === activeIndex));
+  };
+  thumbs.forEach((thumb) => thumb.addEventListener("click", () => setActive(Number(thumb.dataset.galleryIndex))));
+  els.page.querySelector("[data-gallery-prev]")?.addEventListener("click", () => setActive(activeIndex - 1));
+  els.page.querySelector("[data-gallery-next]")?.addEventListener("click", () => setActive(activeIndex + 1));
 }
 
 function addToCart(idToAdd) {
