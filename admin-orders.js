@@ -1,5 +1,6 @@
 const money = new Intl.NumberFormat("lo-LA").format;
 const statusLabels = {
+  draft: "Draft",
   checking: "Checking",
   paid: "Paid",
   rejected: "Rejected",
@@ -60,7 +61,7 @@ function filteredOrders() {
 function renderOrders() {
   const list = filteredOrders();
   els.count.textContent = orders.length;
-  els.checkingCount.textContent = orders.filter((order) => order.status === "checking").length;
+  els.checkingCount.textContent = orders.filter((order) => order.status === "draft" || order.status === "checking").length;
   els.list.innerHTML = list.length ? list.map((order) => `
     <button class="order-row ${order.id === selectedId ? "is-active" : ""}" type="button" data-select-order="${order.id}">
       <span>
@@ -81,6 +82,9 @@ function renderDetail() {
   }
   const orderLogs = logs.filter((log) => log.orderId === order.id);
   const isPdf = order.slip?.type === "application/pdf";
+  const chatUrl = order.contactChannel === "messenger"
+    ? "https://m.me/kinglike"
+    : `https://wa.me/8562059379231?text=${encodeURIComponent(order.chatMessage || "")}`;
   els.detail.innerHTML = `
     <div class="order-detail-head">
       <div>
@@ -91,8 +95,9 @@ function renderDetail() {
     </div>
     <div class="order-customer">
       <p><strong>ລູກຄ້າ:</strong> ${order.customerName}</p>
-      <p><strong>WhatsApp:</strong> ${order.customerWhatsapp || order.customerPhone}</p>
-      <p><strong>ທີ່ຢູ່:</strong> ${order.customerAddress}</p>
+      <p><strong>Phone:</strong> ${order.customerWhatsapp || order.customerPhone}</p>
+      <p><strong>Channel:</strong> ${order.contactChannel || "whatsapp"}</p>
+      ${order.customerAddress ? `<p><strong>ທີ່ຢູ່:</strong> ${order.customerAddress}</p>` : ""}
       ${order.note ? `<p><strong>Note:</strong> ${order.note}</p>` : ""}
     </div>
     <div class="checkout-items">
@@ -104,9 +109,9 @@ function renderDetail() {
       `).join("")}
     </div>
     <div class="checkout-total-row"><span>ຍອດຊຳລະ</span><strong>${formatKip(order.totalAmount)}</strong></div>
-    <div class="slip-preview">
+    ${order.slip ? `<div class="slip-preview">
       ${isPdf ? `<a class="secondary-btn" href="${order.slip.dataUrl}" target="_blank" rel="noreferrer">Open PDF slip</a>` : `<img src="${order.slip?.dataUrl || ""}" alt="Payment slip" />`}
-    </div>
+    </div>` : `<div class="chat-draft-box"><strong>Chat message</strong><pre>${order.chatMessage || "-"}</pre><a class="primary-btn" href="${chatUrl}" target="_blank" rel="noreferrer">ติดต่อเร็ว</a></div>`}
     <label class="admin-note-field">
       Admin note / Reject reason
       <textarea data-admin-note rows="3">${order.adminNote || ""}</textarea>

@@ -97,11 +97,12 @@ function validateSlip(slip) {
 
 function createOrder(payload) {
   const items = Array.isArray(payload.items) ? payload.items : [];
-  if (!payload.customerName || !payload.customerPhone || !payload.customerAddress) {
-    throw new Error("Name, phone, and address are required");
+  const isChatDraft = payload.mode === "chat_draft" || payload.paymentMethod === "chat" || Boolean(payload.contactChannel);
+  if (!isChatDraft && (!payload.customerName || !payload.customerPhone)) {
+    throw new Error("Name and phone are required");
   }
   if (!items.length) throw new Error("Order items are required");
-  validateSlip(payload.slip);
+  if (!isChatDraft) validateSlip(payload.slip);
 
   const now = new Date().toISOString();
   const normalizedItems = items.map((item) => {
@@ -121,15 +122,18 @@ function createOrder(payload) {
   const order = {
     id: crypto.randomUUID(),
     orderCode: orderCode(),
-    customerName: String(payload.customerName).trim(),
-    customerPhone: String(payload.customerPhone).trim(),
-    customerWhatsapp: String(payload.customerWhatsapp || payload.customerPhone).trim(),
-    customerAddress: String(payload.customerAddress).trim(),
+    customerName: String(payload.customerName || (isChatDraft ? "Website chat customer" : "")).trim(),
+    customerPhone: String(payload.customerPhone || "").trim(),
+    customerWhatsapp: String(payload.customerWhatsapp || payload.customerPhone || "").trim(),
+    customerAddress: String(payload.customerAddress || "").trim(),
     note: String(payload.note || "").trim(),
+    contactChannel: String(payload.contactChannel || "whatsapp"),
+    productLink: String(payload.productLink || ""),
+    chatMessage: String(payload.chatMessage || ""),
     totalAmount,
-    status: "checking",
-    paymentMethod: "qr_transfer",
-    slip: payload.slip,
+    status: isChatDraft ? "draft" : "checking",
+    paymentMethod: isChatDraft ? "chat" : "qr_transfer",
+    slip: isChatDraft ? null : payload.slip,
     adminNote: "",
     items: normalizedItems,
     createdAt: now,
@@ -141,9 +145,9 @@ function createOrder(payload) {
     id: crypto.randomUUID(),
     orderId: order.id,
     oldStatus: "",
-    newStatus: "checking",
+    newStatus: order.status,
     changedBy: "customer",
-    note: "Order submitted with slip",
+    note: isChatDraft ? `Chat draft via ${order.contactChannel}` : "Order submitted with slip",
     createdAt: now
   });
   writeOrders(data);
@@ -151,7 +155,7 @@ function createOrder(payload) {
 }
 
 function updateOrderStatus(id, payload) {
-  const allowed = new Set(["checking", "paid", "rejected", "shipping", "completed", "cancelled"]);
+  const allowed = new Set(["draft", "checking", "paid", "rejected", "shipping", "completed", "cancelled"]);
   if (!allowed.has(payload.status)) throw new Error("Invalid status");
   const data = readOrders();
   const order = data.orders.find((item) => item.id === id || item.orderCode === id);

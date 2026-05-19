@@ -3,6 +3,7 @@ const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const WHATSAPP_PHONE = "8562059379231";
+const MESSENGER_URL = "https://m.me/kinglike";
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
@@ -271,7 +272,7 @@ function renderProduct() {
           <button class="add-cart" type="button" data-add-cart="${currentProduct.id}">ເພີ່ມລົດເຂັນ</button>
           <button class="buy-now" type="button" data-buy-now="${currentProduct.id}">ຊື້ທັນທີ</button>
         </div>
-        <button class="line-contact" type="button" data-line-contact data-line-product="${currentProduct.id}">ປຶກສາຜ່ານ WhatsApp</button>
+        ${contactChannelButtons(currentProduct.id)}
       </aside>
     </div>
     <div class="detail-benefits">
@@ -386,35 +387,126 @@ function cartItemsWithProducts() {
 function buildOrderMessage(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
   const items = focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
-  const lines = items.map((item, index) => `${index + 1}. ${item.product.name} x${item.qty} - ${formatKip(productPrice(item.product, "salePrice") * item.qty)}`);
-  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
+  const product = items[0]?.product;
   return [
-    "Kinglike order inquiry",
-    ...lines,
-    total ? `Total: ${formatKip(total)}` : "",
-    "Please confirm stock, delivery, and payment options."
+    "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35 \u0e2a\u0e19\u0e43\u0e08\u0e2a\u0e31\u0e48\u0e07\u0e0b\u0e37\u0e49\u0e2d\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+    "",
+    `\u0e0a\u0e37\u0e48\u0e2d\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${product?.name || "-"}`,
+    `\u0e23\u0e2b\u0e31\u0e2a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${product?.sku || product?.id || "-"}`,
+    `\u0e02\u0e19\u0e32\u0e14: ${(product?.sizes || ["ມາດຕະຖານ"]).join(", ")}`,
+    `\u0e23\u0e32\u0e04\u0e32: ${formatKip(productPrice(product, "salePrice"))}`,
+    `\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${new URL(`product.html?id=${encodeURIComponent(product?.id || "")}&category=${encodeURIComponent(categoryKey)}`, window.location.href).toString()}`
   ].filter(Boolean).join("\n");
 }
 
-function openLineContact(productId = "") {
-  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(buildOrderMessage(productId))}`;
-  window.open(url, "_blank", "noopener");
+function chatItems(productId = "") {
+  const focusedProduct = allProducts.find((product) => product.id === productId);
+  return focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
 }
 
-function checkout() {
-  if (!cartItemsWithProducts().length) {
+function channelIcon(channel) {
+  if (channel === "messenger") {
+    return `<span class="contact-icon messenger-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3C6.76 3 2.5 6.94 2.5 11.78c0 2.76 1.38 5.22 3.54 6.82v3.05l3.24-1.78c.86.24 1.77.37 2.72.37 5.24 0 9.5-3.94 9.5-8.78S17.24 3 12 3Zm.95 11.82-2.42-2.58-4.72 2.58 5.18-5.5 2.48 2.58 4.66-2.58-5.18 5.5Z"/></svg></span>`;
+  }
+  return `<span class="contact-icon whatsapp-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12.04 3.5a8.45 8.45 0 0 0-7.27 12.75L3.8 20.5l4.36-.94a8.45 8.45 0 1 0 3.88-16.06Zm0 1.55a6.9 6.9 0 0 1 5.86 10.54 6.9 6.9 0 0 1-8.98 2.34l-.31-.18-2.44.53.54-2.38-.2-.32a6.9 6.9 0 0 1 5.53-10.53Zm-2.55 3.62c-.15 0-.39.06-.59.28-.2.22-.77.75-.77 1.84s.79 2.13.9 2.28c.11.15 1.53 2.45 3.78 3.34 1.87.74 2.25.59 2.66.55.41-.04 1.32-.54 1.5-1.06.19-.52.19-.96.13-1.06-.06-.1-.2-.16-.43-.27-.23-.11-1.32-.65-1.53-.72-.2-.08-.35-.11-.5.11-.15.22-.57.72-.7.87-.13.15-.26.17-.48.06-.23-.11-.95-.35-1.81-1.12-.67-.6-1.12-1.33-1.25-1.55-.13-.22-.01-.34.1-.45.1-.1.23-.26.34-.39.11-.13.15-.22.23-.37.08-.15.04-.28-.02-.39-.06-.11-.5-1.2-.68-1.64-.18-.43-.36-.37-.5-.38h-.38Z"/></svg></span>`;
+}
+
+function channelButton(channel, label, extraAttributes = "") {
+  return `<button type="button" data-chat-channel="${channel}" ${extraAttributes}>${channelIcon(channel)}<span>${label}</span></button>`;
+}
+
+function contactChannelButtons(productId = "") {
+  const productAttr = productId ? ` data-line-product="${productId}"` : "";
+  return `
+    <div class="contact-channel-group">
+      <button class="line-contact whatsapp-contact" type="button" data-line-contact data-line-channel="whatsapp"${productAttr}>${channelIcon("whatsapp")}<span>ປຶກສາ WhatsApp</span></button>
+      <button class="line-contact messenger-contact" type="button" data-line-contact data-line-channel="messenger"${productAttr}>${channelIcon("messenger")}<span>ປຶກສາ Messenger</span></button>
+    </div>
+  `;
+}
+
+function ensureChatModal() {
+  let modal = document.querySelector("[data-chat-order-modal]");
+  if (modal) return modal;
+  modal = document.createElement("div");
+  modal.className = "chat-order-modal";
+  modal.dataset.chatOrderModal = "";
+  modal.innerHTML = `
+    <div class="chat-order-panel">
+      <button class="close-btn" type="button" data-close-chat-order>×</button>
+      <p class="eyebrow">CHAT ORDER</p>
+      <h2>เลือกช่องทางติดต่อ</h2>
+      <p class="meta">เลือก WhatsApp หรือ Messenger ระบบจะสร้างข้อความสินค้าให้อัตโนมัติ</p>
+      <div class="chat-order-summary" data-chat-summary></div>
+      <p class="checkout-alert" data-chat-error></p>
+      <div class="chat-channel-actions">
+        ${channelButton("whatsapp", "WhatsApp")}
+        ${channelButton("messenger", "Messenger")}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function openChatOrder(productId = "") {
+  const items = chatItems(productId);
+  if (!items.length) {
     openDrawer(els.cartDrawer);
     return;
   }
-  window.location.href = "checkout.html";
+  const modal = ensureChatModal();
+  modal.dataset.productId = productId;
+  modal.querySelector("[data-chat-summary]").innerHTML = items.map((item) => `
+    <div><strong>${item.product.name}</strong><span>${formatKip(productPrice(item.product, "salePrice"))} x ${item.qty}</span></div>
+  `).join("");
+  modal.classList.add("is-open");
+}
+
+async function sendChatDraft(channel, productId = "") {
+  const items = chatItems(productId);
+  const message = items.length ? buildOrderMessage(productId) : "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35 \u0e2a\u0e19\u0e43\u0e08\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32 Kinglike";
+  try {
+    if (items.length) await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mode: "chat_draft",
+        contactChannel: channel,
+        customerName: "Website chat customer",
+        customerPhone: "",
+        customerWhatsapp: "",
+        chatMessage: message,
+        productLink: window.location.href,
+        items: items.map((item) => ({
+          productId: item.product.id,
+          productName: item.product.name,
+          size: (item.product.sizes || [""])[0],
+          quantity: item.qty,
+          unitPrice: productPrice(item.product, "salePrice")
+        }))
+      })
+    });
+  } catch (error) {
+    // Let customer continue to chat even if the local draft API is unavailable.
+  }
+  const url = channel === "messenger" ? `${MESSENGER_URL}?text=${encodeURIComponent(message)}` : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank", "noopener");
+}
+
+async function submitChatDraft(channel) {
+  const modal = ensureChatModal();
+  const productId = modal.dataset.productId || "";
+  await sendChatDraft(channel, productId);
+  modal.classList.remove("is-open");
+}
+
+function checkout() {
+  openChatOrder();
 }
 
 function buyNow(idToBuy) {
-  const item = state.cart.find((cartItem) => cartItem.id === idToBuy);
-  if (item) item.qty = Math.max(1, item.qty);
-  else state.cart.push({ id: idToBuy, qty: 1 });
-  saveCart();
-  window.location.href = "checkout.html";
+  openChatOrder(idToBuy);
 }
 
 function openDrawer(drawer) {
@@ -444,7 +536,7 @@ document.addEventListener("click", (event) => {
   const shouldCheckout = event.target.closest("[data-checkout]");
   const buyNowId = event.target.closest("[data-buy-now]")?.dataset.buyNow;
   if (lineTarget) {
-    openLineContact(lineTarget.dataset.lineProduct || "");
+    sendChatDraft(lineTarget.dataset.lineChannel || "whatsapp", lineTarget.dataset.lineProduct || "");
     return;
   }
   if (buyNowId) {
@@ -465,6 +557,15 @@ document.addEventListener("click", (event) => {
   if (decreaseId) {
     updateCartQty(decreaseId, -1);
   }
+});
+
+document.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-chat-order]")) {
+    ensureChatModal().classList.remove("is-open");
+    return;
+  }
+  const channel = event.target.closest("[data-chat-channel]")?.dataset.chatChannel;
+  if (channel) submitChatDraft(channel);
 });
 
 document.querySelector("[data-open-cart]").addEventListener("click", () => openDrawer(els.cartDrawer));
