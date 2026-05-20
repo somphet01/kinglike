@@ -3,7 +3,8 @@ const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const WHATSAPP_PHONE = "8562051777641";
-const MESSENGER_URL = "https://www.facebook.com/share/1GbHw9wGrM/?mibextid=wwXIfr";
+const MESSENGER_ID = "kinglike";
+const MESSENGER_URL = `https://m.me/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
 

@@ -3,7 +3,8 @@ const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const WHATSAPP_PHONE = "8562051777641";
-const MESSENGER_URL = "https://www.facebook.com/share/1GbHw9wGrM/?mibextid=wwXIfr";
+const MESSENGER_ID = "kinglike";
+const MESSENGER_URL = `https://m.me/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
 
@@ -126,6 +127,60 @@ function galleryItems(product) {
     { image: "", label: "ຜ້ານຸ່ມ" },
     { image: "", label: "ຂະໜາດເຂົ້າມຸມ" }
   ];
+}
+
+function primaryImage(product) {
+  return productImages(product)[0] || "";
+}
+
+function productCollectionKey(product) {
+  if (product?.type && collectionProducts.mattresses.some((item) => item.id === product.id)) return "mattresses";
+  return collectionFromAdminProduct(product);
+}
+
+function productUrl(product) {
+  return `product.html?id=${encodeURIComponent(product.id)}&category=${encodeURIComponent(productCollectionKey(product))}`;
+}
+
+function relatedProducts(product) {
+  const key = productCollectionKey(product);
+  const sameCollection = getProductList(key).filter((item) => item.id !== product.id);
+  const sameType = sameCollection.filter((item) => item.type && product.type && item.type === product.type);
+  const sameCategory = sameCollection.filter((item) => item.category === product.category);
+  const adjacent = allProducts.filter((item) => item.id !== product.id);
+  const merged = [...sameType, ...sameCategory, ...sameCollection, ...adjacent];
+  return merged
+    .filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index)
+    .slice(0, 8);
+}
+
+function relatedTitle(product) {
+  const key = productCollectionKey(product);
+  if (key === "pillows") return "ໝອນແນະນຳ";
+  if (key === "toppers") return "ທັອບເປີແນະນຳ";
+  if (key === "bedding") return "ອຸປະກອນການນອນແນະນຳ";
+  return "ສິນຄ້າທີ່ໃກ້ຄຽງ";
+}
+
+function relatedProductCard(product) {
+  const image = primaryImage(product);
+  const imageClass = image ? "has-admin-image" : "";
+  return `
+    <a class="product-card related-product-card" href="${productUrl(product)}">
+      <div class="product-art ${imageClass}">
+        ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
+        <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
+      </div>
+      <div class="product-body">
+        <h3>${product.name}</h3>
+        <div class="meta">${product.category} • ${product.thickness} • ${product.firmness}</div>
+        <div class="prices">
+          <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
+          <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
+        </div>
+      </div>
+    </a>
+  `;
 }
 
 function productFreebies(product) {
@@ -311,6 +366,7 @@ function loadWishlist() {
 
 function renderProduct() {
   document.title = `Kinglike - ${currentProduct.name}`;
+  const related = relatedProducts(currentProduct);
   const selectedOption = productSizeOption(currentProduct);
   const saving = selectedOption.regularPrice - selectedOption.salePrice;
   const gallery = galleryItems(currentProduct);
@@ -380,6 +436,17 @@ function renderProduct() {
         <ul>${currentProduct.materials.map((item) => `<li>${item}</li>`).join("")}</ul>
       </section>
     </div>
+    ${related.length ? `
+      <section class="related-products">
+        <div class="section-heading">
+          <p class="eyebrow">RECOMMENDED</p>
+          <h2>${relatedTitle(currentProduct)}</h2>
+        </div>
+        <div class="product-grid related-product-grid">
+          ${related.map(relatedProductCard).join("")}
+        </div>
+      </section>
+    ` : ""}
   `;
   bindGallery(gallery);
 }
@@ -636,7 +703,7 @@ function checkout() {
 }
 
 function buyNow(idToBuy) {
-  openChatOrder(idToBuy);
+  sendChatDraft("messenger", idToBuy);
 }
 
 function openDrawer(drawer) {

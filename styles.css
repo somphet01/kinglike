@@ -1544,6 +1544,21 @@ h1 span,
   padding: 120px 7vw 72px;
 }
 
+.related-products {
+  display: grid;
+  gap: 22px;
+  margin-top: 48px;
+}
+
+.related-product-card {
+  color: inherit;
+  text-decoration: none;
+}
+
+.related-product-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .pillow-detail-art::before {
   border-radius: 34% 26% 32% 24%;
   height: 130px;
@@ -2368,6 +2383,10 @@ h1 span,
   }
 
   .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .related-product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

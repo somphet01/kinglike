@@ -4,7 +4,8 @@ const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const WHATSAPP_PHONE = "8562051777641";
-const MESSENGER_URL = "https://www.facebook.com/share/1GbHw9wGrM/?mibextid=wwXIfr";
+const MESSENGER_ID = "kinglike";
+const MESSENGER_URL = `https://m.me/${MESSENGER_ID}`;
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 const IDB_NAME = "kinglikeAdminStore";
@@ -610,106 +611,7 @@ function toggleWishlist(id) {
 function openProductDetail(id) {
   const product = products.find((candidate) => candidate.id === id);
   if (!product) return;
-
-  const selectedOption = productSizeOption(product);
-  const price = selectedOption.regularPrice;
-  const salePrice = selectedOption.salePrice;
-  const saving = price - salePrice;
-  const gallery = galleryItems(product);
-  const heroImage = gallery[0]?.image || "";
-  const imageClass = heroImage ? "has-admin-image" : "";
-  els.productDetail.innerHTML = `
-    <div class="detail-layout">
-      <div class="detail-gallery">
-        <div class="detail-hero-art ${imageClass}" data-gallery-hero>
-          ${heroImage ? `<img src="${heroImage}" alt="${product.name}" data-gallery-hero-image />` : ""}
-          <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
-          ${gallery.length > 1 ? `
-            <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
-            <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Next image">›</button>
-          ` : ""}
-        </div>
-        <div class="detail-thumbs" data-gallery-thumbs>
-          ${gallery.map((item, index) => `
-            <button class="${index === 0 ? "is-active" : ""}" type="button" data-gallery-index="${index}">
-              ${item.image ? `<img src="${item.image}" alt="${item.label}" />` : ""}
-              <span>${item.label}</span>
-            </button>
-          `).join("")}
-        </div>
-      </div>
-
-      <aside class="detail-buybox">
-        <h2>${product.name}</h2>
-        <div class="detail-code">SKU: ${product.sku} • ${product.stock}</div>
-        <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
-        <div class="detail-price">
-          <strong data-detail-sale-price>${formatKip(salePrice)}</strong>
-          <span class="regular-price" data-detail-regular-price>${formatKip(price)}</span>
-        </div>
-        <div class="save-line">ປະຢັດ ${formatKip(saving)} (${product.discountPercent}%) • ຮອງຮັບຜ່ອນ 0%</div>
-
-        <div class="option-group">
-          <label>ເລືອກຂະໜາດ</label>
-          <div class="size-options">${productSizeOptions(product).map((option, index) => `<button class="${index === 0 ? "is-active" : ""}" type="button" data-size-option="${option.size}" data-size-sale="${option.salePrice}" data-size-regular="${option.regularPrice}">${option.size}</button>`).join("")}</div>
-        </div>
-
-        <div class="option-group">
-          <label>ຈຳນວນ</label>
-          <div class="qty-control">
-            <button type="button" data-detail-qty-decrease>−</button>
-            <span data-detail-qty>1</span>
-            <button type="button" data-detail-qty-increase>＋</button>
-          </div>
-        </div>
-
-        <div class="detail-actions">
-          <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
-          <button class="buy-now" type="button" data-buy-now="${product.id}">ຊື້ທັນທີ</button>
-        </div>
-      </aside>
-    </div>
-
-    <div class="detail-benefits">
-      <div>ສົ່ງຟຣີທົ່ວປະເທດ</div>
-      <div>ຮັບປະກັນ ${product.warranty}</div>
-      <div>ກວດສອບສິນຄ້າກ່ອນຮັບ</div>
-      <div>ມີທີມງານແນະນຳ</div>
-      ${productFreebies(product).length ? `<div class="detail-gift-benefit">ຂອງແຖມ: ${productFreebies(product).join(", ")}</div>` : ""}
-    </div>
-
-    <div class="detail-info">
-      <section>
-        <h3>ລາຍລະອຽດສິນຄ້າ</h3>
-        <p>${product.description}</p>
-      </section>
-      <section>
-        <h3>ຄຸນສົມບັດຫຼັກ</h3>
-        <ul>
-          ${productMaterials(product).map((item) => `<li>${item}</li>`).join("")}
-          <li>ອອກແບບໃຫ້ລະບາຍອາກາດໄດ້ດີ ແລະຊ່ວຍລົດການສະສົມຄວາມຮ້ອນ.</li>
-        </ul>
-      </section>
-      <section>
-        <h3>ຂໍ້ມູນສະເປກ</h3>
-        <div class="spec-grid">
-          <div><span>ຄວາມໜາ</span><strong>${product.thickness}</strong></div>
-          <div><span>ຄວາມນຸ່ມ</span><strong>${product.firmness}</strong></div>
-          <div><span>ປະເພດ</span><strong>${product.category}</strong></div>
-          <div><span>ຂະໜາດ</span><strong>${productSizes(product).join(", ")}</strong></div>
-          <div><span>ຮັບປະກັນ</span><strong>${product.warranty}</strong></div>
-          <div><span>ສະຖານະ</span><strong>${product.stock}</strong></div>
-        </div>
-      </section>
-      <section>
-        <h3>ການຈັດສົ່ງ ແລະການຮັບປະກັນ</h3>
-        <p>ຈັດສົ່ງຟຣີສຳລັບພື້ນທີ່ທີ່ກຳນົດ ພ້ອມໃຫ້ຄຳແນະນຳການໃຊ້ງານ. ເງື່ອນໄຂຈິງສາມາດປັບໄດ້ເມື່ອມີນະໂຍບາຍຮ້ານສຸດທ້າຍ.</p>
-      </section>
-    </div>
-  `;
-
-  els.detailOverlay.classList.add("is-open");
-  bindDetailGallery(els.productDetail, gallery);
+  window.location.href = `product.html?id=${encodeURIComponent(product.id)}&category=mattresses`;
 }
 
 function removeFromCart(key) {
@@ -944,7 +846,7 @@ function checkout() {
 }
 
 function buyNow(id) {
-  openChatOrder(id);
+  sendChatDraft("messenger", id);
 }
 
 function openDrawer(drawer) {
