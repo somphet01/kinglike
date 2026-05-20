@@ -242,6 +242,51 @@ function productPrice(product, key) {
   return Number(product?.[key] || 0);
 }
 
+function productDiscountPercent(product) {
+  return Math.max(0, Math.round(Number(product?.discountPercent || 0)));
+}
+
+function productBadgeText(product) {
+  const discount = productDiscountPercent(product);
+  return discount > 0 ? `ຫຼຸດ ${discount}%` : product.badge || "New";
+}
+
+function productBadgeClass(product) {
+  return productDiscountPercent(product) > 0 ? "badge is-discount" : "badge";
+}
+
+function productSizes(product) {
+  return Array.isArray(product?.sizes) && product.sizes.length ? product.sizes.filter(Boolean) : ["ມາດຕະຖານ"];
+}
+
+function productSizeOptions(product) {
+  const sizes = productSizes(product);
+  const baseSale = productPrice(product, "salePrice");
+  const baseRegular = productPrice(product, "price");
+  return sizes.map((size, index) => {
+    const salePrice = Number(product?.sizePrices?.[size] || 0) || Math.round(baseSale + (baseSale * index * 0.12));
+    const regularPrice = Number(product?.sizeRegularPrices?.[size] || 0) || Math.round(baseRegular + (baseRegular * index * 0.12));
+    return { size, salePrice, regularPrice };
+  });
+}
+
+function productSizeOption(product, size = "") {
+  const options = productSizeOptions(product);
+  return options.find((option) => option.size === size) || options[0] || { size: "ມາດຕະຖານ", salePrice: productPrice(product, "salePrice"), regularPrice: productPrice(product, "price") };
+}
+
+function productDisplayPrice(product, key = "salePrice") {
+  const prices = productSizeOptions(product).map((option) => option[key]).filter((value) => value > 0);
+  if (!prices.length) return formatKip(productPrice(product, key));
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  return min === max ? formatKip(min) : `${formatKip(min)} - ${formatKip(max)}`;
+}
+
+function cartKey(id, size = "") {
+  return `${id}__${size || ""}`;
+}
+
 function loadCart() {
   try {
     const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
@@ -266,7 +311,8 @@ function loadWishlist() {
 
 function renderProduct() {
   document.title = `Kinglike - ${currentProduct.name}`;
-  const saving = currentProduct.price - currentProduct.salePrice;
+  const selectedOption = productSizeOption(currentProduct);
+  const saving = selectedOption.regularPrice - selectedOption.salePrice;
   const gallery = galleryItems(currentProduct);
   const heroImage = gallery[0]?.image || "";
   const imageClass = heroImage ? "has-admin-image" : "";
@@ -275,7 +321,7 @@ function renderProduct() {
       <div class="detail-gallery">
         <div class="detail-hero-art ${categoryKey === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero>
           ${heroImage ? `<img src="${heroImage}" alt="${currentProduct.name}" data-gallery-hero-image />` : ""}
-          <span class="badge">${currentProduct.badge}</span>
+          <span class="${productBadgeClass(currentProduct)}">${productBadgeText(currentProduct)}</span>
           ${gallery.length > 1 ? `
             <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
             <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Next image">›</button>
@@ -295,13 +341,21 @@ function renderProduct() {
         <div class="detail-code">SKU: ${currentProduct.sku} • ${currentProduct.stock}</div>
         <div class="meta">${currentProduct.category} • ${currentProduct.thickness} • ${currentProduct.firmness} • ★ ${currentProduct.rating}</div>
         <div class="detail-price">
-          <strong>${formatKip(currentProduct.salePrice)}</strong>
-          <span class="regular-price">${formatKip(currentProduct.price)}</span>
+          <strong data-detail-sale-price>${formatKip(selectedOption.salePrice)}</strong>
+          <span class="regular-price" data-detail-regular-price>${formatKip(selectedOption.regularPrice)}</span>
         </div>
         <div class="save-line">ປະຢັດ ${formatKip(saving)} (${currentProduct.discountPercent}%)</div>
         <div class="option-group">
           <label>ເລືອກຂະໜາດ</label>
-          <div class="size-options">${currentProduct.sizes.map((size) => `<button type="button">${size}</button>`).join("")}</div>
+          <div class="size-options">${productSizeOptions(currentProduct).map((option, index) => `<button class="${index === 0 ? "is-active" : ""}" type="button" data-size-option="${option.size}" data-size-sale="${option.salePrice}" data-size-regular="${option.regularPrice}">${option.size}</button>`).join("")}</div>
+        </div>
+        <div class="option-group">
+          <label>ຈຳນວນ</label>
+          <div class="qty-control">
+            <button type="button" data-detail-qty-decrease>−</button>
+            <span data-detail-qty>1</span>
+            <button type="button" data-detail-qty-increase>＋</button>
+          </div>
         </div>
         <div class="detail-actions">
           <button class="add-cart" type="button" data-add-cart="${currentProduct.id}">ເພີ່ມລົດເຂັນ</button>
@@ -348,10 +402,14 @@ function bindGallery(gallery) {
   els.page.querySelector("[data-gallery-next]")?.addEventListener("click", () => setActive(activeIndex + 1));
 }
 
-function addToCart(idToAdd) {
-  const item = state.cart.find((cartItem) => cartItem.id === idToAdd);
-  if (item) item.qty += 1;
-  else state.cart.push({ id: idToAdd, qty: 1 });
+function addToCart(idToAdd, size = "", qty = 1) {
+  const product = allProducts.find((candidate) => candidate.id === idToAdd);
+  if (!product) return;
+  const option = productSizeOption(product, size);
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === cartKey(idToAdd, option.size));
+  const quantity = Math.max(1, Number(qty || 1));
+  if (item) item.qty += quantity;
+  else state.cart.push({ id: idToAdd, size: option.size, unitPrice: option.salePrice, qty: quantity });
   saveCart();
   renderCart();
   openDrawer(els.cartDrawer);
@@ -367,37 +425,37 @@ function renderCart() {
       <div class="drawer-item cart-line">
         <div class="cart-line-info">
           <strong>${item.product.name}</strong>
-          <div class="meta">${formatKip(item.product.salePrice)}</div>
+          <div class="meta">${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)}</div>
           <div class="cart-qty">
-            <button type="button" data-cart-decrease="${item.product.id}">−</button>
+            <button type="button" data-cart-decrease="${cartKey(item.product.id, item.size)}">−</button>
             <span>${item.qty}</span>
-            <button type="button" data-cart-increase="${item.product.id}">＋</button>
+            <button type="button" data-cart-increase="${cartKey(item.product.id, item.size)}">＋</button>
           </div>
         </div>
         <div class="cart-line-side">
-          <strong>${formatKip(productPrice(item.product, "salePrice") * item.qty)}</strong>
-          <button type="button" data-remove-cart="${item.product.id}">×</button>
+          <strong>${formatKip((item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty)}</strong>
+          <button type="button" data-remove-cart="${cartKey(item.product.id, item.size)}">×</button>
         </div>
       </div>
     `).join("")
     : `<p class="meta">ລົດເຂັນຍັງວ່າງຢູ່</p>`;
-  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
+  const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   els.cartTotal.textContent = formatKip(total);
   els.cartCount.textContent = items.reduce((sum, item) => sum + item.qty, 0);
 }
 
-function removeFromCart(idToRemove) {
-  state.cart = state.cart.filter((item) => item.id !== idToRemove);
+function removeFromCart(key) {
+  state.cart = state.cart.filter((item) => cartKey(item.id, item.size) !== key);
   saveCart();
   renderCart();
 }
 
-function updateCartQty(idToUpdate, delta) {
-  const item = state.cart.find((cartItem) => cartItem.id === idToUpdate);
+function updateCartQty(key, delta) {
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === key);
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) {
-    removeFromCart(idToUpdate);
+    removeFromCart(key);
     return;
   }
   saveCart();
@@ -414,28 +472,66 @@ function renderWishlist() {
 
 function cartItemsWithProducts() {
   return state.cart
-    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
-    .filter((item) => item.product);
+    .map((item) => {
+      const product = allProducts.find((candidate) => candidate.id === item.id);
+      if (!product) return null;
+      const option = productSizeOption(product, item.size);
+      return { ...item, size: item.size || option.size, unitPrice: item.unitPrice || option.salePrice, product };
+    })
+    .filter(Boolean);
 }
 
 function buildOrderMessage(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
-  const items = focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
-  const product = items[0]?.product;
+  const focusedOption = focusedProduct ? selectedDetailSize(focusedProduct) : null;
+  const items = focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
+  const itemLines = items.map((item, index) => {
+    const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
+    const subtotal = unitPrice * item.qty;
+    return [
+      `${index + 1}. ${item.product.name}`,
+      `   ລະຫັດສິນຄ້າ: ${item.product.sku || item.product.id || "-"}`,
+      `   ຂະໜາດ: ${item.size || productSizeOption(item.product).size}`,
+      `   ຈຳນວນ: ${item.qty}`,
+      `   ລາຄາ/ໜ່ວຍ: ${formatKip(unitPrice)}`,
+      `   ລວມ: ${formatKip(subtotal)}`
+    ].join("\n");
+  });
+  const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
+  const productLink = focusedProduct
+    ? new URL(`product.html?id=${encodeURIComponent(focusedProduct.id)}&category=${encodeURIComponent(categoryKey)}`, window.location.href).toString()
+    : window.location.href;
   return [
-    "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35 \u0e2a\u0e19\u0e43\u0e08\u0e2a\u0e31\u0e48\u0e07\u0e0b\u0e37\u0e49\u0e2d\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+    "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
     "",
-    `\u0e0a\u0e37\u0e48\u0e2d\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${product?.name || "-"}`,
-    `\u0e23\u0e2b\u0e31\u0e2a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${product?.sku || product?.id || "-"}`,
-    `\u0e02\u0e19\u0e32\u0e14: ${(product?.sizes || ["ມາດຕະຖານ"]).join(", ")}`,
-    `\u0e23\u0e32\u0e04\u0e32: ${formatKip(productPrice(product, "salePrice"))}`,
-    `\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${new URL(`product.html?id=${encodeURIComponent(product?.id || "")}&category=${encodeURIComponent(categoryKey)}`, window.location.href).toString()}`
+    "ໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ",
+    "ຮ້ານ: Kinglike Product",
+    "",
+    "ລາຍການສິນຄ້າ:",
+    itemLines.join("\n\n"),
+    "",
+    `ຍອດລວມທີ່ຕ້ອງຊຳລະ: ${formatKip(total)}`,
+    "",
+    "ລິ້ງສິນຄ້າ:",
+    productLink,
+    "",
+    "ກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ."
   ].filter(Boolean).join("\n");
 }
 
 function chatItems(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
-  return focusedProduct ? [{ product: focusedProduct, qty: 1 }] : cartItemsWithProducts();
+  const option = focusedProduct ? selectedDetailSize(focusedProduct) : null;
+  return focusedProduct ? [{ product: focusedProduct, size: option.size, unitPrice: option.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
+}
+
+function selectedDetailSize(product) {
+  const selected = els.page?.querySelector("[data-size-option].is-active")?.dataset.sizeOption || "";
+  return productSizeOption(product, selected);
+}
+
+function selectedDetailQty(container = document) {
+  return Math.max(1, Number(container.querySelector("[data-detail-qty]")?.textContent || 1));
 }
 
 function channelIcon(channel) {
@@ -492,14 +588,14 @@ function openChatOrder(productId = "") {
   const modal = ensureChatModal();
   modal.dataset.productId = productId;
   modal.querySelector("[data-chat-summary]").innerHTML = items.map((item) => `
-    <div><strong>${item.product.name}</strong><span>${formatKip(productPrice(item.product, "salePrice"))} x ${item.qty}</span></div>
+    <div><strong>${item.product.name}</strong><span>${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)} x ${item.qty}</span></div>
   `).join("");
   modal.classList.add("is-open");
 }
 
 async function sendChatDraft(channel, productId = "") {
   const items = chatItems(productId);
-  const message = items.length ? buildOrderMessage(productId) : "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35 \u0e2a\u0e19\u0e43\u0e08\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32 Kinglike";
+  const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີ ຂ້ອຍສົນໃຈສອບຖາມສິນຄ້າ Kinglike";
   try {
     if (items.length) await fetch("/api/orders", {
       method: "POST",
@@ -515,9 +611,9 @@ async function sendChatDraft(channel, productId = "") {
         items: items.map((item) => ({
           productId: item.product.id,
           productName: item.product.name,
-          size: (item.product.sizes || [""])[0],
+          size: item.size || productSizeOption(item.product).size,
           quantity: item.qty,
-          unitPrice: productPrice(item.product, "salePrice")
+          unitPrice: item.unitPrice || productSizeOption(item.product, item.size).salePrice
         }))
       })
     });
@@ -562,7 +658,8 @@ function closeMobileMenu() {
 }
 
 document.addEventListener("click", (event) => {
-  const addId = event.target.closest("[data-add-cart]")?.dataset.addCart;
+  const addButton = event.target.closest("[data-add-cart]");
+  const addId = addButton?.dataset.addCart;
   const removeId = event.target.closest("[data-remove-cart]")?.dataset.removeCart;
   const increaseId = event.target.closest("[data-cart-increase]")?.dataset.cartIncrease;
   const decreaseId = event.target.closest("[data-cart-decrease]")?.dataset.cartDecrease;
@@ -581,7 +678,12 @@ document.addEventListener("click", (event) => {
     checkout();
     return;
   }
-  if (addId) addToCart(addId);
+  if (addId) {
+    const product = allProducts.find((candidate) => candidate.id === addId);
+    const isDetailAdd = Boolean(addButton.closest(".detail-buybox"));
+    const selected = product && isDetailAdd ? selectedDetailSize(product).size : "";
+    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.page) : 1);
+  }
   if (removeId) {
     removeFromCart(removeId);
   }
@@ -600,6 +702,23 @@ document.addEventListener("click", (event) => {
   }
   const channel = event.target.closest("[data-chat-channel]")?.dataset.chatChannel;
   if (channel) submitChatDraft(channel);
+  const qtyDecrease = event.target.closest("[data-detail-qty-decrease]");
+  const qtyIncrease = event.target.closest("[data-detail-qty-increase]");
+  if (qtyDecrease || qtyIncrease) {
+    const qtyTarget = event.target.closest(".qty-control")?.querySelector("[data-detail-qty]");
+    const current = Math.max(1, Number(qtyTarget?.textContent || 1));
+    if (qtyTarget) qtyTarget.textContent = String(Math.max(1, current + (qtyIncrease ? 1 : -1)));
+  }
+  const sizeButton = event.target.closest("[data-size-option]");
+  if (sizeButton) {
+    const group = sizeButton.closest(".size-options");
+    group?.querySelectorAll("[data-size-option]").forEach((button) => button.classList.toggle("is-active", button === sizeButton));
+    const panel = sizeButton.closest(".detail-buybox");
+    const saleTarget = panel?.querySelector("[data-detail-sale-price]");
+    const regularTarget = panel?.querySelector("[data-detail-regular-price]");
+    if (saleTarget) saleTarget.textContent = formatKip(sizeButton.dataset.sizeSale);
+    if (regularTarget) regularTarget.textContent = formatKip(sizeButton.dataset.sizeRegular);
+  }
 });
 
 document.querySelector("[data-open-cart]").addEventListener("click", () => openDrawer(els.cartDrawer));

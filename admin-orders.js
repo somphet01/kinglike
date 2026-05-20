@@ -1,13 +1,14 @@
 const money = new Intl.NumberFormat("lo-LA").format;
 const statusLabels = {
-  draft: "Draft",
-  checking: "Checking",
-  paid: "Paid",
-  rejected: "Rejected",
-  shipping: "Shipping",
-  completed: "Completed",
-  cancelled: "Cancelled"
+  draft: "ລໍຖ້າຢືນຢັນ",
+  checking: "ກຳລັງກວດສອບ",
+  paid: "ຊຳລະແລ້ວ",
+  rejected: "ບໍ່ຜ່ານ",
+  shipping: "ກຳລັງຈັດສົ່ງ",
+  completed: "ສຳເລັດ",
+  cancelled: "ຍົກເລີກ"
 };
+const BUSINESS_WHATSAPP_PHONE = "8562051777641";
 
 const els = {
   list: document.querySelector("[data-orders-list]"),
@@ -25,6 +26,56 @@ let selectedId = "";
 
 function formatKip(value) {
   return `${money(Number(value || 0))} ₭`;
+}
+
+function formatOrderDate(value) {
+  if (!value) return "-";
+  return new Date(value).toLocaleString("lo-LA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function whatsappPhone(order) {
+  const raw = String(order.customerWhatsapp || order.customerPhone || "").replace(/\D/g, "");
+  if (!raw) return BUSINESS_WHATSAPP_PHONE;
+  if (raw.startsWith("856")) return raw;
+  if (raw.startsWith("0")) return `856${raw.slice(1)}`;
+  return raw;
+}
+
+function buildCustomerBillMessage(order) {
+  const itemLines = order.items.map((item, index) => [
+    `${index + 1}. ${item.productName}`,
+    `   ຂະໜາດ: ${item.size || "ມາດຕະຖານ"}`,
+    `   ຈຳນວນ: ${item.quantity}`,
+    `   ລາຄາ/ໜ່ວຍ: ${formatKip(item.unitPrice)}`,
+    `   ລວມ: ${formatKip(item.subtotal)}`
+  ].join("\n")).join("\n\n");
+  return [
+    "ສະບາຍດີ ລູກຄ້າທີ່ນັບຖື",
+    "Kinglike Product ຂໍສົ່ງໃບບິນ / ໃບແຈ້ງຊຳລະສຳລັບອໍເດີຂອງທ່ານ.",
+    "",
+    "ໃບບິນ / ໃບແຈ້ງຊຳລະ",
+    `ເລກອໍເດີ: ${order.orderCode}`,
+    `ວັນທີ: ${formatOrderDate(order.createdAt)}`,
+    `ສະຖານະ: ${statusLabels[order.status] || order.status}`,
+    "",
+    `ຊື່ລູກຄ້າ: ${order.customerName || "-"}`,
+    `ເບີໂທ / WhatsApp: ${order.customerWhatsapp || order.customerPhone || "-"}`,
+    order.customerAddress ? `ທີ່ຢູ່ຈັດສົ່ງ: ${order.customerAddress}` : "",
+    "",
+    "ລາຍການສິນຄ້າ:",
+    itemLines,
+    "",
+    `ຍອດລວມທີ່ຕ້ອງຊຳລະ: ${formatKip(order.totalAmount)}`,
+    "",
+    "ໝາຍເຫດ: ກະລຸນາກວດສອບລາຍການ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ຖ້າຂໍ້ມູນຖືກຕ້ອງ ກະລຸນາຢືນຢັນກັບແອດມິນໄດ້ເລີຍ.",
+    "ຂອບໃຈທີ່ໄວ້ໃຈ Kinglike Product."
+  ].filter(Boolean).join("\n");
 }
 
 function showToast(message) {
@@ -82,9 +133,10 @@ function renderDetail() {
   }
   const orderLogs = logs.filter((log) => log.orderId === order.id);
   const isPdf = order.slip?.type === "application/pdf";
+  const customerBillMessage = buildCustomerBillMessage(order);
   const chatUrl = order.contactChannel === "messenger"
     ? "https://m.me/kinglike"
-    : `https://wa.me/8562059379231?text=${encodeURIComponent(order.chatMessage || "")}`;
+    : `https://wa.me/${whatsappPhone(order)}?text=${encodeURIComponent(customerBillMessage)}`;
   els.detail.innerHTML = `
     <div class="order-detail-head">
       <div>
@@ -111,7 +163,8 @@ function renderDetail() {
     <div class="checkout-total-row"><span>ຍອດຊຳລະ</span><strong>${formatKip(order.totalAmount)}</strong></div>
     ${order.slip ? `<div class="slip-preview">
       ${isPdf ? `<a class="secondary-btn" href="${order.slip.dataUrl}" target="_blank" rel="noreferrer">Open PDF slip</a>` : `<img src="${order.slip?.dataUrl || ""}" alt="Payment slip" />`}
-    </div>` : `<div class="chat-draft-box"><strong>Chat message</strong><pre>${order.chatMessage || "-"}</pre><a class="primary-btn" href="${chatUrl}" target="_blank" rel="noreferrer">ติดต่อเร็ว</a></div>`}
+    </div>` : ""}
+    <div class="chat-draft-box"><strong>ໃບບິນທີ່ຈະສົ່ງຫາລູກຄ້າ</strong><pre>${customerBillMessage}</pre><a class="primary-btn" href="${chatUrl}" target="_blank" rel="noreferrer">ສົ່ງໃບບິນຫາລູກຄ້າ</a></div>
     <label class="admin-note-field">
       Admin note / Reject reason
       <textarea data-admin-note rows="3">${order.adminNote || ""}</textarea>

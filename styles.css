@@ -1043,6 +1043,11 @@ h1 span,
   top: 14px;
 }
 
+.badge.is-discount {
+  background: #e53935;
+  color: #fff;
+}
+
 .wishlist-toggle {
   background: rgba(0, 0, 0, 0.48);
   border: 1px solid var(--line);
@@ -1742,10 +1747,17 @@ h1 span,
   padding: 8px 13px;
 }
 
-.size-options button:first-child {
+.size-options button.is-active {
   background: rgba(212, 175, 55, 0.18);
   color: var(--gold-soft);
 }
+
+.size-options button.is-active {
+  background: rgba(212, 175, 55, 0.24);
+  border-color: rgba(212, 175, 55, 0.78);
+  color: var(--gold-soft);
+}
+
 
 .qty-control {
   align-items: center;

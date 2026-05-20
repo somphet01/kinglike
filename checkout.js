@@ -60,11 +60,12 @@ function checkoutItems() {
       const product = products.find((item) => item.id === line.id);
       if (!product) return null;
       const quantity = Math.max(1, Number(line.qty || 1));
-      const unitPrice = Number(product.salePrice || 0);
+      const size = line.size || (Array.isArray(product.sizes) ? product.sizes[0] || "" : "");
+      const unitPrice = Number(line.unitPrice || product.sizePrices?.[size] || product.salePrice || 0);
       return {
         productId: product.id,
         productName: product.name,
-        size: Array.isArray(product.sizes) ? product.sizes[0] || "" : "",
+        size,
         quantity,
         unitPrice,
         subtotal: quantity * unitPrice

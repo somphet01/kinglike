@@ -266,6 +266,51 @@ function productPrice(product, key) {
   return Number(product?.[key] || 0);
 }
 
+function productDiscountPercent(product) {
+  return Math.max(0, Math.round(Number(product?.discountPercent || 0)));
+}
+
+function productBadgeText(product) {
+  const discount = productDiscountPercent(product);
+  return discount > 0 ? `ຫຼຸດ ${discount}%` : product.badge || "New";
+}
+
+function productBadgeClass(product) {
+  return productDiscountPercent(product) > 0 ? "badge is-discount" : "badge";
+}
+
+function productSizes(product) {
+  return Array.isArray(product?.sizes) && product.sizes.length ? product.sizes.filter(Boolean) : ["ມາດຕະຖານ"];
+}
+
+function productSizeOptions(product) {
+  const sizes = productSizes(product);
+  const baseSale = productPrice(product, "salePrice");
+  const baseRegular = productPrice(product, "price");
+  return sizes.map((size, index) => {
+    const salePrice = Number(product?.sizePrices?.[size] || 0) || Math.round(baseSale + (baseSale * index * 0.12));
+    const regularPrice = Number(product?.sizeRegularPrices?.[size] || 0) || Math.round(baseRegular + (baseRegular * index * 0.12));
+    return { size, salePrice, regularPrice };
+  });
+}
+
+function productSizeOption(product, size = "") {
+  const options = productSizeOptions(product);
+  return options.find((option) => option.size === size) || options[0] || { size: "ມາດຕະຖານ", salePrice: productPrice(product, "salePrice"), regularPrice: productPrice(product, "price") };
+}
+
+function productDisplayPrice(product, key = "salePrice") {
+  const prices = productSizeOptions(product).map((option) => option[key]).filter((value) => value > 0);
+  if (!prices.length) return formatKip(productPrice(product, key));
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  return min === max ? formatKip(min) : `${formatKip(min)} - ${formatKip(max)}`;
+}
+
+function cartKey(id, size = "") {
+  return `${id}__${size || ""}`;
+}
+
 function loadCart() {
   try {
     const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
@@ -328,16 +373,16 @@ function productCard(product) {
     <article class="product-card collection-card clickable-card" data-open-detail="${product.id}">
       <div class="product-art ${collection.art}-product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
-        <span class="badge">${product.badge}</span>
+        <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
         <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="ສິນຄ້າທີ່ຖືກໃຈ">♡</button>
       </div>
       <div class="product-body">
         <h3>${product.name}</h3>
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
-        <div class="sizes">${product.sizes.map((size) => `<span>${size}</span>`).join("")}</div>
+        <div class="sizes">${productSizes(product).map((size) => `<span>${size}</span>`).join("")}</div>
         <div class="prices">
-          <strong class="sale-price">${formatKip(product.salePrice)}</strong>
-          <span class="regular-price">${formatKip(product.price)}</span>
+          <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
+          <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
         </div>
         <div class="card-actions">
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
@@ -353,10 +398,13 @@ function renderProducts() {
   els.products.innerHTML = list.length ? list.map(productCard).join("") : `<p class="meta">ບໍ່ພົບສິນຄ້າ</p>`;
 }
 
-function addToCart(id) {
-  const item = state.cart.find((cartItem) => cartItem.id === id);
+function addToCart(id, size = "") {
+  const product = allProducts.find((candidate) => candidate.id === id);
+  if (!product) return;
+  const option = productSizeOption(product, size);
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === cartKey(id, option.size));
   if (item) item.qty += 1;
-  else state.cart.push({ id, qty: 1 });
+  else state.cart.push({ id, size: option.size, unitPrice: option.salePrice, qty: 1 });
   saveCart();
   renderCart();
   openDrawer(els.cartDrawer);
@@ -372,8 +420,13 @@ function toggleWishlist(id) {
 
 function renderCart() {
   const items = state.cart
-    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
-    .filter((item) => item.product);
+    .map((item) => {
+      const product = allProducts.find((candidate) => candidate.id === item.id);
+      if (!product) return null;
+      const option = productSizeOption(product, item.size);
+      return { ...item, size: item.size || option.size, unitPrice: item.unitPrice || option.salePrice, product };
+    })
+    .filter(Boolean);
 
   els.cartItems.innerHTML = items.length
     ? items.map((item) => {
@@ -382,38 +435,38 @@ function renderCart() {
         <div class="drawer-item cart-line">
           <div class="cart-line-info">
             <strong>${product.name}</strong>
-            <div class="meta">${formatKip(product.salePrice)}</div>
+            <div class="meta">${item.size || productSizeOption(product).size} • ${formatKip(item.unitPrice || productSizeOption(product, item.size).salePrice)}</div>
             <div class="cart-qty">
-              <button type="button" data-cart-decrease="${product.id}">−</button>
+              <button type="button" data-cart-decrease="${cartKey(product.id, item.size)}">−</button>
               <span>${item.qty}</span>
-              <button type="button" data-cart-increase="${product.id}">＋</button>
+              <button type="button" data-cart-increase="${cartKey(product.id, item.size)}">＋</button>
             </div>
           </div>
           <div class="cart-line-side">
-            <strong>${formatKip(productPrice(product, "salePrice") * item.qty)}</strong>
-            <button type="button" data-remove-cart="${product.id}">×</button>
+            <strong>${formatKip((item.unitPrice || productSizeOption(product, item.size).salePrice) * item.qty)}</strong>
+            <button type="button" data-remove-cart="${cartKey(product.id, item.size)}">×</button>
           </div>
         </div>
       `;
     }).join("")
     : `<p class="meta">ລົດເຂັນຍັງວ່າງຢູ່</p>`;
-  const total = items.reduce((sum, item) => sum + productPrice(item.product, "salePrice") * item.qty, 0);
+  const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   els.cartTotal.textContent = formatKip(total);
   els.cartCount.textContent = items.reduce((sum, item) => sum + item.qty, 0);
 }
 
-function removeFromCart(id) {
-  state.cart = state.cart.filter((item) => item.id !== id);
+function removeFromCart(key) {
+  state.cart = state.cart.filter((item) => cartKey(item.id, item.size) !== key);
   saveCart();
   renderCart();
 }
 
-function updateCartQty(id, delta) {
-  const item = state.cart.find((cartItem) => cartItem.id === id);
+function updateCartQty(key, delta) {
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === key);
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) {
-    removeFromCart(id);
+    removeFromCart(key);
     return;
   }
   saveCart();
@@ -430,21 +483,45 @@ function renderWishlist() {
 
 function cartItemsWithProducts() {
   return state.cart
-    .map((item) => ({ ...item, product: allProducts.find((candidate) => candidate.id === item.id) }))
-    .filter((item) => item.product);
+    .map((item) => {
+      const product = allProducts.find((candidate) => candidate.id === item.id);
+      if (!product) return null;
+      const option = productSizeOption(product, item.size);
+      return { ...item, size: item.size || option.size, unitPrice: item.unitPrice || option.salePrice, product };
+    })
+    .filter(Boolean);
 }
 
 function buildOrderMessage() {
   const items = cartItemsWithProducts();
-  const product = items[0]?.product;
+  const itemLines = items.map((item, index) => {
+    const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
+    const subtotal = unitPrice * item.qty;
+    return [
+      `${index + 1}. ${item.product.name}`,
+      `   ລະຫັດສິນຄ້າ: ${item.product.sku || item.product.id || "-"}`,
+      `   ຂະໜາດ: ${item.size || productSizeOption(item.product).size}`,
+      `   ຈຳນວນ: ${item.qty}`,
+      `   ລາຄາ/ໜ່ວຍ: ${formatKip(unitPrice)}`,
+      `   ລວມ: ${formatKip(subtotal)}`
+    ].join("\n");
+  });
+  const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   return [
-    "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35 \u0e2a\u0e19\u0e43\u0e08\u0e2a\u0e31\u0e48\u0e07\u0e0b\u0e37\u0e49\u0e2d\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+    "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
     "",
-    `\u0e0a\u0e37\u0e48\u0e2d\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${product?.name || "-"}`,
-    `\u0e23\u0e2b\u0e31\u0e2a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${product?.sku || product?.id || "-"}`,
-    `\u0e02\u0e19\u0e32\u0e14: ${(product?.sizes || ["ມາດຕະຖານ"]).join(", ")}`,
-    `\u0e23\u0e32\u0e04\u0e32: ${formatKip(productPrice(product, "salePrice"))}`,
-    `\u0e25\u0e34\u0e07\u0e01\u0e4c\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: ${new URL(`product.html?id=${encodeURIComponent(product?.id || "")}&category=${encodeURIComponent(collectionKey)}`, window.location.href).toString()}`
+    "ໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ",
+    "ຮ້ານ: Kinglike Product",
+    "",
+    "ລາຍການສິນຄ້າ:",
+    itemLines.join("\n\n"),
+    "",
+    `ຍອດລວມທີ່ຕ້ອງຊຳລະ: ${formatKip(total)}`,
+    "",
+    "ລິ້ງໜ້າສິນຄ້າ:",
+    window.location.href,
+    "",
+    "ກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ."
   ].filter(Boolean).join("\n");
 }
 
@@ -491,14 +568,14 @@ function openChatOrder() {
   }
   const modal = ensureChatModal();
   modal.querySelector("[data-chat-summary]").innerHTML = items.map((item) => `
-    <div><strong>${item.product.name}</strong><span>${formatKip(productPrice(item.product, "salePrice"))} x ${item.qty}</span></div>
+    <div><strong>${item.product.name}</strong><span>${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)} x ${item.qty}</span></div>
   `).join("");
   modal.classList.add("is-open");
 }
 
 async function sendChatDraft(channel) {
   const items = cartItemsWithProducts();
-  const message = items.length ? buildOrderMessage() : "\u0e2a\u0e27\u0e31\u0e2a\u0e14\u0e35 \u0e2a\u0e19\u0e43\u0e08\u0e2a\u0e2d\u0e1a\u0e16\u0e32\u0e21\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32 Kinglike";
+  const message = items.length ? buildOrderMessage() : "ສະບາຍດີ ຂ້ອຍສົນໃຈສອບຖາມສິນຄ້າ Kinglike";
   try {
     if (items.length) await fetch("/api/orders", {
       method: "POST",
@@ -514,9 +591,9 @@ async function sendChatDraft(channel) {
         items: items.map((item) => ({
           productId: item.product.id,
           productName: item.product.name,
-          size: (item.product.sizes || [""])[0],
+          size: item.size || productSizeOption(item.product).size,
           quantity: item.qty,
-          unitPrice: productPrice(item.product, "salePrice")
+          unitPrice: item.unitPrice || productSizeOption(item.product, item.size).salePrice
         }))
       })
     });

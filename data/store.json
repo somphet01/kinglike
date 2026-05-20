@@ -15,13 +15,14 @@
       "salePrice": 5290000,
       "discountPercent": 32,
       "badge": "Best Seller",
-      "rating": 4.8,
-      "popular": 1779196619725,
-      "sku": "ROYAL-CLOUD",
+      "rating": 4.9,
+      "popular": 99,
+      "sku": "KL-RC-1201",
       "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
+        "Premium knitted fabric",
+        "Natural latex comfort layer",
+        "Pocket spring support",
+        "Anti-dust mite finish"
       ],
       "freebies": [
         "2 pillows",
@@ -29,7 +30,7 @@
       ],
       "warranty": "10 ປີ",
       "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Royal Cloud ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+      "description": "ຮຸ່ນ Royal Cloud ເນັ້ນຄວາມນຸ່ມສະບາຍແບບຫ້ອງພັກຫຼູ ຊ່ວຍຮອງຮັບສະຣີລະໃຫ້ຜ່ອນຄາຍ ແລະລົດແຮງກົດທັບໃນຈຸດສຳຄັນ."
     },
     {
       "id": "hotel-latex",
@@ -45,22 +46,23 @@
       "price": 6900000,
       "salePrice": 4690000,
       "discountPercent": 32,
-      "badge": "Promotion",
+      "badge": "ຫຼຸດ 32%",
       "rating": 4.8,
-      "popular": 1779196619725,
-      "sku": "HOTEL-LATEX",
+      "popular": 88,
+      "sku": "KL-HL-1002",
       "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
+        "Latex comfort layer",
+        "Breathable fabric",
+        "High density foam",
+        "Pocket spring base"
       ],
       "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
+        "Latex pillow",
+        "Aroma fabric spray"
       ],
       "warranty": "10 ປີ",
       "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Hotel Latex ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+      "description": "ທີ່ນອນ Latex ສຳລັບຄົນທີ່ຕ້ອງການຄວາມນຸ່ມແນ່ນ ນອນສະບາຍ ແລະຮອງຮັບຫຼັງໄດ້ດີ."
     },
     {
       "id": "pocket-grand",
@@ -69,7 +71,6 @@
       "firmness": "ແນ່ນ",
       "thickness": "11 ນິ້ວ",
       "sizes": [
-        "3.5 ຟຸດ",
         "5 ຟຸດ",
         "6 ຟຸດ"
       ],
@@ -77,21 +78,21 @@
       "salePrice": 3990000,
       "discountPercent": 32,
       "badge": "Promotion",
-      "rating": 4.8,
-      "popular": 1779196619725,
-      "sku": "POCKET-GRAND",
+      "rating": 4.7,
+      "popular": 75,
+      "sku": "KL-PG-1103",
       "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
+        "Pocket spring",
+        "Support foam",
+        "Cool-touch fabric",
+        "Edge support"
       ],
       "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
+        "2 pillows"
       ],
-      "warranty": "10 ປີ",
+      "warranty": "8 ປີ",
       "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Pocket Grand ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+      "description": "Pocket Grand ເຫມາະກັບຜູ້ທີ່ມັກຄວາມແນ່ນ ໂຄງສ້າງ spring ແຍກອິດສະຫຼະຊ່ວຍລົດການສັ່ນໄຫວ."
     },
     {
       "id": "memory-luxe",
@@ -101,28 +102,24 @@
       "thickness": "8 ນິ້ວ",
       "sizes": [
         "3.5 ຟຸດ",
-        "5 ຟຸດ",
-        "6 ຟຸດ"
+        "5 ຟຸດ"
       ],
       "price": 4500000,
       "salePrice": 3290000,
       "discountPercent": 27,
       "badge": "New",
-      "rating": 4.8,
-      "popular": 1779196619725,
-      "sku": "MEMORY-LUXE",
+      "rating": 4.6,
+      "popular": 64,
+      "sku": "KL-ML-0804",
       "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
+        "Memory foam",
+        "Soft knit cover",
+        "Pressure relief layer",
+        "Anti-bacterial finish"
       ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
+      "warranty": "7 ປີ",
       "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Memory Luxe ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+      "description": "Memory Luxe ໂອບຮັບຮ່າງກາຍແບບນຸ່ມ ເໝາະກັບຫ້ອງນອນທີ່ຕ້ອງການຄວາມສະບາຍແລະຄຸ້ມຄ່າ."
     },
     {
       "id": "gold-support",
@@ -139,21 +136,18 @@
       "salePrice": 6190000,
       "discountPercent": 28,
       "badge": "Hotel Grade",
-      "rating": 4.8,
-      "popular": 1779196619725,
-      "sku": "GOLD-SUPPORT",
+      "rating": 4.9,
+      "popular": 92,
+      "sku": "KL-GS-1205",
       "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
+        "Hybrid support",
+        "Natural latex",
+        "Pocket spring",
+        "Luxury quilted fabric"
       ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
+      "warranty": "12 ປີ",
       "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Gold Support ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+      "description": "Gold Support ເປັນຮຸ່ນພຣີມຽມທີ່ຮອງຮັບແນ່ນ ແຕ່ຍັງນຸ່ມສະບາຍ ໃຫ້ຄວາມຮູ້ສຶກແບບໂຮງແຮມ."
     },
     {
       "id": "classic-rest",
@@ -170,23 +164,20 @@
       "salePrice": 2790000,
       "discountPercent": 28,
       "badge": "Value",
-      "rating": 4.8,
-      "popular": 1779196619725,
-      "sku": "CLASSIC-REST",
+      "rating": 4.5,
+      "popular": 58,
+      "sku": "KL-CR-0906",
       "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
+        "Pocket spring",
+        "Comfort foam",
+        "Knitted fabric",
+        "Edge support"
       ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
+      "warranty": "6 ປີ",
       "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Classic Rest ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
+      "description": "Classic Rest ເປັນຮຸ່ນເລີ່ມຕົ້ນທີ່ໃຊ້ງານງ່າຍ ລາຄາດີ ແລະຮອງຮັບການນອນປະຈຳວັນ."
     }
   ],
   "promotion": {},
-  "updatedAt": "2026-05-19T13:16:59.790Z"
+  "updatedAt": "2026-05-20T04:16:24.267Z"
 }

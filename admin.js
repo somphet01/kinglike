@@ -8,22 +8,135 @@ const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
 
 const defaultProducts = [
-  productSeed("royal-cloud", "Kinglike Royal Cloud", "Hybrid", "ນຸ່ມ", "12 ນິ້ວ", 7800000, 5290000, "Best Seller"),
-  productSeed("hotel-latex", "Kinglike Hotel Latex", "Latex", "ນຸ່ມແນ່ນ", "10 ນິ້ວ", 6900000, 4690000, "Promotion"),
-  productSeed("pocket-grand", "Kinglike Pocket Grand", "Pocket Spring", "ແນ່ນ", "11 ນິ້ວ", 5900000, 3990000, "Promotion"),
-  productSeed("memory-luxe", "Kinglike Memory Luxe", "Memory Foam", "ນຸ່ມ", "8 ນິ້ວ", 4500000, 3290000, "New"),
-  productSeed("gold-support", "Kinglike Gold Support", "Hybrid", "ນຸ່ມແນ່ນ", "12 ນິ້ວ", 8600000, 6190000, "Hotel Grade"),
-  productSeed("classic-rest", "Kinglike Classic Rest", "Pocket Spring", "ແນ່ນ", "9 ນິ້ວ", 3900000, 2790000, "Value")
+  {
+    id: "royal-cloud",
+    name: "Kinglike Royal Cloud",
+    category: "Hybrid",
+    firmness: "ນຸ່ມ",
+    thickness: "12 ນິ້ວ",
+    sizes: ["3.5 ຟຸດ", "5 ຟຸດ", "6 ຟຸດ"],
+    price: 7800000,
+    salePrice: 5290000,
+    discountPercent: 32,
+    badge: "Best Seller",
+    rating: 4.9,
+    popular: 99,
+    sku: "KL-RC-1201",
+    materials: ["Premium knitted fabric", "Natural latex comfort layer", "Pocket spring support", "Anti-dust mite finish"],
+    freebies: ["2 pillows", "Premium bedsheet"],
+    warranty: "10 ປີ",
+    stock: "ມີສິນຄ້າ",
+    description: "ຮຸ່ນ Royal Cloud ເນັ້ນຄວາມນຸ່ມສະບາຍແບບຫ້ອງພັກຫຼູ ຊ່ວຍຮອງຮັບສະຣີລະໃຫ້ຜ່ອນຄາຍ ແລະລົດແຮງກົດທັບໃນຈຸດສຳຄັນ."
+  },
+  {
+    id: "hotel-latex",
+    name: "Kinglike Hotel Latex",
+    category: "Latex",
+    firmness: "ນຸ່ມແນ່ນ",
+    thickness: "10 ນິ້ວ",
+    sizes: ["3.5 ຟຸດ", "5 ຟຸດ", "6 ຟຸດ"],
+    price: 6900000,
+    salePrice: 4690000,
+    discountPercent: 32,
+    badge: "ຫຼຸດ 32%",
+    rating: 4.8,
+    popular: 88,
+    sku: "KL-HL-1002",
+    materials: ["Latex comfort layer", "Breathable fabric", "High density foam", "Pocket spring base"],
+    freebies: ["Latex pillow", "Aroma fabric spray"],
+    warranty: "10 ປີ",
+    stock: "ມີສິນຄ້າ",
+    description: "ທີ່ນອນ Latex ສຳລັບຄົນທີ່ຕ້ອງການຄວາມນຸ່ມແນ່ນ ນອນສະບາຍ ແລະຮອງຮັບຫຼັງໄດ້ດີ."
+  },
+  {
+    id: "pocket-grand",
+    name: "Kinglike Pocket Grand",
+    category: "Pocket Spring",
+    firmness: "ແນ່ນ",
+    thickness: "11 ນິ້ວ",
+    sizes: ["5 ຟຸດ", "6 ຟຸດ"],
+    price: 5900000,
+    salePrice: 3990000,
+    discountPercent: 32,
+    badge: "Promotion",
+    rating: 4.7,
+    popular: 75,
+    sku: "KL-PG-1103",
+    materials: ["Pocket spring", "Support foam", "Cool-touch fabric", "Edge support"],
+    freebies: ["2 pillows"],
+    warranty: "8 ປີ",
+    stock: "ມີສິນຄ້າ",
+    description: "Pocket Grand ເຫມາະກັບຜູ້ທີ່ມັກຄວາມແນ່ນ ໂຄງສ້າງ spring ແຍກອິດສະຫຼະຊ່ວຍລົດການສັ່ນໄຫວ."
+  },
+  {
+    id: "memory-luxe",
+    name: "Kinglike Memory Luxe",
+    category: "Memory Foam",
+    firmness: "ນຸ່ມ",
+    thickness: "8 ນິ້ວ",
+    sizes: ["3.5 ຟຸດ", "5 ຟຸດ"],
+    price: 4500000,
+    salePrice: 3290000,
+    discountPercent: 27,
+    badge: "New",
+    rating: 4.6,
+    popular: 64,
+    sku: "KL-ML-0804",
+    materials: ["Memory foam", "Soft knit cover", "Pressure relief layer", "Anti-bacterial finish"],
+    warranty: "7 ປີ",
+    stock: "ມີສິນຄ້າ",
+    description: "Memory Luxe ໂອບຮັບຮ່າງກາຍແບບນຸ່ມ ເໝາະກັບຫ້ອງນອນທີ່ຕ້ອງການຄວາມສະບາຍແລະຄຸ້ມຄ່າ."
+  },
+  {
+    id: "gold-support",
+    name: "Kinglike Gold Support",
+    category: "Hybrid",
+    firmness: "ນຸ່ມແນ່ນ",
+    thickness: "12 ນິ້ວ",
+    sizes: ["3.5 ຟຸດ", "5 ຟຸດ", "6 ຟຸດ"],
+    price: 8600000,
+    salePrice: 6190000,
+    discountPercent: 28,
+    badge: "Hotel Grade",
+    rating: 4.9,
+    popular: 92,
+    sku: "KL-GS-1205",
+    materials: ["Hybrid support", "Natural latex", "Pocket spring", "Luxury quilted fabric"],
+    warranty: "12 ປີ",
+    stock: "ມີສິນຄ້າ",
+    description: "Gold Support ເປັນຮຸ່ນພຣີມຽມທີ່ຮອງຮັບແນ່ນ ແຕ່ຍັງນຸ່ມສະບາຍ ໃຫ້ຄວາມຮູ້ສຶກແບບໂຮງແຮມ."
+  },
+  {
+    id: "classic-rest",
+    name: "Kinglike Classic Rest",
+    category: "Pocket Spring",
+    firmness: "ແນ່ນ",
+    thickness: "9 ນິ້ວ",
+    sizes: ["3.5 ຟຸດ", "5 ຟຸດ", "6 ຟຸດ"],
+    price: 3900000,
+    salePrice: 2790000,
+    discountPercent: 28,
+    badge: "Value",
+    rating: 4.5,
+    popular: 58,
+    sku: "KL-CR-0906",
+    materials: ["Pocket spring", "Comfort foam", "Knitted fabric", "Edge support"],
+    warranty: "6 ປີ",
+    stock: "ມີສິນຄ້າ",
+    description: "Classic Rest ເປັນຮຸ່ນເລີ່ມຕົ້ນທີ່ໃຊ້ງານງ່າຍ ລາຄາດີ ແລະຮອງຮັບການນອນປະຈຳວັນ."
+  }
 ];
 
 function productSeed(id, name, category, firmness, thickness, price, salePrice, badge) {
+  const sizes = ["3.5 ຟຸດ", "5 ຟຸດ", "6 ຟຸດ"];
   return {
     id,
     name,
     category,
     firmness,
     thickness,
-    sizes: ["3.5 ຟຸດ", "5 ຟຸດ", "6 ຟຸດ"],
+    sizes,
+    sizePrices: Object.fromEntries(sizes.map((size, index) => [size, Math.round(salePrice + (salePrice * index * 0.12))])),
     price,
     salePrice,
     discountPercent: discountPercent(price, salePrice),
@@ -77,11 +190,11 @@ const els = {
   toast: document.querySelector("[data-toast]")
 };
 
+let promotionCache = null;
+let productsCache = null;
 let products = loadProducts();
 let activeProductId = products[0]?.id || "";
 let activePromoEventId = "";
-let promotionCache = null;
-let productsCache = null;
 
 function openLocalDb() {
   return new Promise((resolve, reject) => {
@@ -208,6 +321,38 @@ function toList(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
+function parseSizePrices(value) {
+  return toList(value || "").reduce((prices, item) => {
+    const [size, price] = item.split("=").map((part) => part.trim());
+    if (size && Number(price || 0) > 0) prices[size] = Number(price);
+    return prices;
+  }, {});
+}
+
+function formatSizePrices(product) {
+  const prices = product?.sizePrices || {};
+  const entries = Object.entries(prices);
+  if (entries.length) return entries.map(([size, price]) => `${size}=${price}`).join(", ");
+  return productSizeOptions(product).map((option) => `${option.size}=${option.salePrice}`).join(", ");
+}
+
+function productSizeOptions(product) {
+  const sizes = Array.isArray(product?.sizes) && product.sizes.length ? product.sizes.filter(Boolean) : ["ມາດຕະຖານ"];
+  const baseSale = Number(product?.salePrice || 0);
+  return sizes.map((size, index) => ({
+    size,
+    salePrice: Number(product?.sizePrices?.[size] || 0) || Math.round(baseSale + (baseSale * index * 0.12))
+  }));
+}
+
+function productPriceLabel(product) {
+  const prices = productSizeOptions(product).map((option) => option.salePrice).filter((value) => value > 0);
+  if (!prices.length) return money(product?.salePrice || 0);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  return min === max ? money(min) : `${money(min)} - ${money(max)}`;
+}
+
 const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
 const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
 
@@ -241,6 +386,19 @@ function discountPercent(price, salePrice) {
   const sale = Number(salePrice || 0);
   if (!regular || sale >= regular) return 0;
   return Math.round(((regular - sale) / regular) * 100);
+}
+
+function productDiscountPercent(product) {
+  return Math.max(0, Math.round(Number(product?.discountPercent || 0)));
+}
+
+function productBadgeText(product) {
+  const discount = productDiscountPercent(product);
+  return discount > 0 ? `ຫຼຸດ ${discount}%` : product.badge || "New";
+}
+
+function productBadgeClass(product) {
+  return productDiscountPercent(product) > 0 ? "badge is-discount" : "badge";
 }
 
 function showToast(message) {
@@ -354,7 +512,7 @@ function renderProducts() {
       <div class="admin-thumb">${productImageMarkup(product)}</div>
       <div>
         <h3>${product.name}</h3>
-        <p>${product.category} • ${product.thickness || "-"} • ${product.firmness || "-"} • ${money(product.salePrice)}</p>
+        <p>${product.category} • ${product.thickness || "-"} • ${product.firmness || "-"} • ${productPriceLabel(product)}</p>
         <p>${product.badge || "No badge"} • ${product.sizes?.join(", ") || "-"}</p>
       </div>
       <div class="admin-actions">
@@ -370,6 +528,9 @@ function formToProduct() {
   const name = data.get("name").trim();
   const price = Number(data.get("price") || 0);
   const salePrice = Number(data.get("salePrice") || 0);
+  const manualDiscount = Number(data.get("discountPercent") || 0);
+  const finalDiscount = manualDiscount > 0 ? Math.min(100, Math.round(manualDiscount)) : discountPercent(price, salePrice);
+  const sizePrices = parseSizePrices(data.get("sizePrices") || "");
   const id = data.get("id") || slugify(name);
   const previous = products.find((item) => item.id === id);
   const images = parseImages(data.get("images")).length
@@ -387,10 +548,11 @@ function formToProduct() {
     firmness: data.get("firmness"),
     thickness: data.get("thickness").trim(),
     sizes: toList(data.get("sizes") || "3.5 ຟຸດ, 5 ຟຸດ, 6 ຟຸດ"),
+    sizePrices,
     price,
     salePrice,
-    discountPercent: discountPercent(price, salePrice),
-    badge: data.get("badge").trim() || "New",
+    discountPercent: finalDiscount,
+    badge: data.get("badge").trim() || (finalDiscount > 0 ? `ຫຼຸດ ${finalDiscount}%` : "New"),
     rating: Number(data.get("rating") || 4.8),
     popular: previous?.popular || Date.now(),
     stock: data.get("stock").trim() || "ມີສິນຄ້າ",
@@ -413,8 +575,10 @@ function fillForm(product) {
   setField("firmness", product.firmness || "ນຸ່ມ");
   setField("thickness", product.thickness || "");
   setField("sizes", product.sizes?.join(", ") || "");
+  setField("sizePrices", formatSizePrices(product));
   setField("price", product.price || "");
   setField("salePrice", product.salePrice || "");
+  setField("discountPercent", product.discountPercent || "");
   setField("rating", product.rating || "");
   setField("stock", product.stock || "");
   setField("warranty", product.warranty || "");
@@ -475,7 +639,7 @@ function renderPreview() {
     <article class="product-card">
       <div class="product-art ${imageClass}">
         ${previewImage ? `<img src="${previewImage}" alt="${product.name}" />` : ""}
-        <span class="badge">${product.badge}</span>
+        <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
         <button class="wishlist-toggle" type="button">♡</button>
       </div>
       <div class="product-body">
@@ -483,7 +647,7 @@ function renderPreview() {
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating || 4.8}</div>
         <div class="sizes">${(product.sizes || []).map((size) => `<span>${size}</span>`).join("")}</div>
         <div class="prices">
-          <strong class="sale-price">${money(product.salePrice)}</strong>
+          <strong class="sale-price">${productPriceLabel(product)}</strong>
           <span class="regular-price">${money(product.price)}</span>
         </div>
         <div class="card-actions">
