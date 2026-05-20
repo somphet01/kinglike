@@ -3,10 +3,12 @@ const PROMO_STORAGE_KEY = "kinglikePromotion";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
-const WHATSAPP_PHONE = "8562059379231";
-const MESSENGER_URL = "https://m.me/kinglike";
+const WHATSAPP_PHONE = "8562051777641";
+const MESSENGER_URL = "https://www.facebook.com/share/1GbHw9wGrM/?mibextid=wwXIfr";
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
+const IDB_NAME = "kinglikeAdminStore";
+const IDB_STORE = "records";
 
 const defaultProducts = [
   {
@@ -39,7 +41,7 @@ const defaultProducts = [
     price: 6900000,
     salePrice: 4690000,
     discountPercent: 32,
-    badge: "ลด 32%",
+    badge: "ຫຼຸດ 32%",
     rating: 4.8,
     popular: 88,
     sku: "KL-HL-1002",
@@ -130,6 +132,35 @@ const defaultProducts = [
 
 let products = loadProducts();
 
+function openLocalDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IDB_NAME, 1);
+    request.onupgradeneeded = () => request.result.createObjectStore(IDB_STORE);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openLocalDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(IDB_STORE, "readonly");
+    const request = transaction.objectStore(IDB_STORE).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function loadProductsAsync() {
+  try {
+    const saved = await idbGet(PRODUCT_STORAGE_KEY);
+    if (Array.isArray(saved) && saved.length) return repairStoredData(saved);
+  } catch (error) {
+    // Keep local fallback.
+  }
+  return loadProducts();
+}
+
 async function loadSyncedStore() {
   for (const url of [SYNC_STORE_URL, STATIC_STORE_URL]) {
     try {
@@ -155,9 +186,20 @@ function shouldUseSyncedStore(store) {
 
 async function hydrateSyncedStore() {
   const store = await loadSyncedStore();
+  const idbProducts = await loadProductsAsync();
+  if (idbProducts.length) {
+    products = idbProducts;
+    renderProducts();
+    renderCart();
+    renderWishlist();
+  }
+  const idbPromotion = await loadPromotionAsync();
+  if (idbPromotion.title || idbPromotion.text || idbPromotion.coverImage || idbPromotion.events.length) {
+    renderPromotionData(idbPromotion);
+  }
   if (!shouldUseSyncedStore(store)) return;
   if (Array.isArray(store.products) && store.products.length) {
-    products = store.products;
+    products = repairStoredData(store.products);
     localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
     if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
     renderProducts();
@@ -165,7 +207,11 @@ async function hydrateSyncedStore() {
     renderWishlist();
   }
   if (store.promotion && typeof store.promotion === "object") {
-    localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(store.promotion));
+    try {
+      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(repairStoredData(store.promotion)));
+    } catch (error) {
+      // Promotion may be stored in IndexedDB by the admin when localStorage is full.
+    }
     if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
     renderPromotion();
   }
@@ -176,7 +222,7 @@ function loadProducts() {
     const saved = localStorage.getItem(PRODUCT_STORAGE_KEY);
     if (!saved) return [...defaultProducts];
     const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) && parsed.length ? parsed : [...defaultProducts];
+    return Array.isArray(parsed) && parsed.length ? repairStoredData(parsed) : [...defaultProducts];
   } catch (error) {
     return [...defaultProducts];
   }
@@ -184,10 +230,28 @@ function loadProducts() {
 
 function loadPromotion() {
   try {
-    return JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {};
+    const promotion = repairStoredData(JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {});
+    promotion.events = Array.isArray(promotion.events) ? promotion.events : [];
+    return promotion;
   } catch (error) {
-    return {};
+    return { events: [] };
   }
+}
+
+async function loadPromotionAsync() {
+  const local = loadPromotion();
+  if (local.title || local.text || local.coverImage || local.events.length) return local;
+  try {
+    const saved = await idbGet(PROMO_STORAGE_KEY);
+    if (saved && typeof saved === "object") {
+      const repaired = repairStoredData(saved);
+      repaired.events = Array.isArray(repaired.events) ? repaired.events : [];
+      return repaired;
+    }
+  } catch (error) {
+    // Keep local fallback.
+  }
+  return local;
 }
 
 const state = {
@@ -200,6 +264,35 @@ const state = {
 };
 
 const money = new Intl.NumberFormat("lo-LA").format;
+let promoPopupDismissed = false;
+
+const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
+const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
+
+function repairText(value) {
+  if (typeof value !== "string" || !/[àâÃðÂ\u0080-\u009F\u0192]/.test(value)) return value;
+  return value.replace(MOJIBAKE_RUN, (part) => {
+    if (!/[àâÃðÂ\u0080-\u009F\u0192]/.test(part)) return part;
+    const bytes = [];
+    for (const char of part) {
+      const code = char.charCodeAt(0);
+      if (CP1252_BYTES[char] !== undefined) bytes.push(CP1252_BYTES[char]);
+      else if (code <= 255) bytes.push(code);
+      else return part;
+    }
+    try {
+      return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+    } catch (error) {
+      return part;
+    }
+  });
+}
+
+function repairStoredData(value) {
+  if (Array.isArray(value)) return value.map(repairStoredData);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, repairStoredData(item)]));
+  return repairText(value);
+}
 
 const els = {
   header: document.querySelector("[data-header]"),
@@ -289,10 +382,16 @@ function renderProducts() {
 
 function renderPromotion() {
   const promotion = loadPromotion();
+  renderPromotionData(promotion);
+}
+
+function renderPromotionData(promotion) {
   const promoSection = document.querySelector(".promo");
   const title = document.querySelector("[data-promo-title]");
   const text = document.querySelector("[data-promo-text]");
   const button = document.querySelector("[data-promo-button]");
+  const eventSection = document.querySelector("[data-promo-events-section]");
+  const eventGrid = document.querySelector("[data-promo-events]");
 
   if (promotion.title && title) title.textContent = promotion.title;
   if (promotion.text && text) text.textContent = promotion.text;
@@ -301,6 +400,69 @@ function renderPromotion() {
     promoSection.classList.add("has-cover");
     promoSection.style.backgroundImage = `linear-gradient(90deg, rgba(5, 5, 5, 0.9), rgba(5, 5, 5, 0.42)), url("${promotion.coverImage}")`;
   }
+
+  const activeEvents = (promotion.events || []).filter((item) => item.active !== false && item.title);
+  if (eventSection && eventGrid) {
+    eventSection.hidden = !activeEvents.length;
+    eventGrid.innerHTML = activeEvents.map((item) => `
+      <article class="promo-event-card ${item.image ? "has-image" : ""}">
+        ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : ""}
+        <div class="promo-event-copy">
+          <span>${item.badge || "PROMOTION"}</span>
+          <h3>${item.title}</h3>
+          ${item.text ? `<p>${item.text}</p>` : ""}
+          <div class="promo-event-foot">
+            ${item.date ? `<small>${item.date}</small>` : "<small>Kinglike</small>"}
+            <a href="${item.link || "#products"}">${item.button || "ເບິ່ງສິນຄ້າ"}</a>
+          </div>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  renderPromoPopup(promotion, activeEvents);
+}
+
+function renderPromoPopup(promotion, activeEvents) {
+  const popup = document.querySelector("[data-promo-popup]");
+  const content = document.querySelector("[data-promo-popup-content]");
+  if (promoPopupDismissed) return;
+  if (!popup || !content) return;
+  const popupItem = activeEvents[0] || (promotion.title ? {
+    badge: "HOT DEAL",
+    title: promotion.title,
+    text: promotion.text || "",
+    button: promotion.button || "ເບິ່ງສິນຄ້າ",
+    link: "#products",
+    image: promotion.coverImage || "",
+    date: ""
+  } : null);
+  if (!popupItem) return;
+
+  content.innerHTML = `
+    <div class="promo-popup-art ${popupItem.image ? "has-image" : ""}">
+      ${popupItem.image ? `<img src="${popupItem.image}" alt="${popupItem.title}" />` : ""}
+    </div>
+    <div class="promo-popup-copy">
+      <span>${popupItem.badge || "PROMOTION"}</span>
+      <h2>${popupItem.title}</h2>
+      ${popupItem.text ? `<p>${popupItem.text}</p>` : ""}
+      ${popupItem.date ? `<small>${popupItem.date}</small>` : ""}
+      <a class="primary-btn" href="${popupItem.link || "#products"}" data-close-promo-popup>${popupItem.button || "ເບິ່ງສິນຄ້າ"}</a>
+    </div>
+  `;
+  requestAnimationFrame(() => {
+    popup.classList.add("is-open");
+    popup.setAttribute("aria-hidden", "false");
+  });
+}
+
+function closePromoPopup() {
+  const popup = document.querySelector("[data-promo-popup]");
+  promoPopupDismissed = true;
+  if (!popup) return;
+  popup.classList.remove("is-open");
+  popup.setAttribute("aria-hidden", "true");
 }
 
 function productImages(product) {
@@ -364,7 +526,7 @@ function productCard(product) {
       <div class="product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
         <span class="badge">${product.badge}</span>
-        <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="Wishlist">♡</button>
+        <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="ສິນຄ້າທີ່ຖືກໃຈ">♡</button>
       </div>
       <div class="product-body">
         <h3>${product.name}</h3>
@@ -459,7 +621,6 @@ function openProductDetail(id) {
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
           <button class="buy-now" type="button" data-buy-now="${product.id}">ຊື້ທັນທີ</button>
         </div>
-        ${contactChannelButtons(product.id)}
       </aside>
     </div>
 
@@ -628,9 +789,9 @@ function ensureChatModal() {
   modal.innerHTML = `
     <div class="chat-order-panel">
       <button class="close-btn" type="button" data-close-chat-order>×</button>
-      <p class="eyebrow">CHAT ORDER</p>
-      <h2>เลือกช่องทางติดต่อ</h2>
-      <p class="meta">เลือก WhatsApp หรือ Messenger ระบบจะสร้างข้อความสินค้าให้อัตโนมัติ</p>
+      <p class="eyebrow">ສັ່ງຜ່ານແຊັດ</p>
+      <h2>ເລືອກຊ່ອງທາງຕິດຕໍ່</h2>
+      <p class="meta">ເລືອກ WhatsApp ຫຼື Messenger ລະບົບຈະສ້າງຂໍ້ຄວາມສິນຄ້າໃຫ້ອັດຕະໂນມັດ</p>
       <div class="chat-order-summary" data-chat-summary></div>
       <p class="checkout-alert" data-chat-error></p>
       <div class="chat-channel-actions">
@@ -682,7 +843,7 @@ async function sendChatDraft(channel, productId = "") {
     // Still let the customer continue to chat if local API is unavailable.
   }
   const url = channel === "messenger"
-    ? `${MESSENGER_URL}?text=${encodeURIComponent(message)}`
+    ? MESSENGER_URL
     : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank", "noopener");
 }
@@ -730,6 +891,11 @@ document.addEventListener("click", (event) => {
   const lineTarget = event.target.closest("[data-line-contact]");
   const shouldCheckout = event.target.closest("[data-checkout]");
   const buyNowId = event.target.closest("[data-buy-now]")?.dataset.buyNow;
+  const shouldClosePromoPopup = event.target.closest("[data-close-promo-popup]");
+
+  if (shouldClosePromoPopup) {
+    closePromoPopup();
+  }
 
   if (lineTarget) {
     sendChatDraft(lineTarget.dataset.lineChannel || "whatsapp", lineTarget.dataset.lineProduct || "");

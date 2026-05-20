@@ -38,7 +38,7 @@ function renderOrder(data) {
           </div>
         `).join("")}
       </div>
-      ${order.adminNote ? `<p class="admin-note">Admin note: ${order.adminNote}</p>` : ""}
+      ${order.adminNote ? `<p class="admin-note">ໝາຍເຫດ Admin: ${order.adminNote}</p>` : ""}
     </article>
   `;
 }

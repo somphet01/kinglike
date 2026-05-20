@@ -49,7 +49,7 @@
         <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
         <button type="button" data-admin-tab="promotion">Cover / Promotion</button>
         <button type="button" data-admin-tab="backup">Backup</button>
-        <button type="button" data-admin-tab="help">ຄູ່ມືຈຸດທີ່ຈະໂຊว์</button>
+        <button type="button" data-admin-tab="help">ຄູ່ມືຈຸດທີ່ຈະສະແດງ</button>
       </section>
 
       <section class="admin-panel is-active" data-admin-panel="products">
@@ -101,14 +101,14 @@
             <label>
               ຮູບສິນຄ້າ
               <input name="imageUpload" type="file" accept="image/*" data-product-image-upload />
-              <small>ເພີ່ມຮູບທີລະຮູບໄດ້. ຮູບໃໝ່ຈະຕໍ່ທ້າຍຂອງເກົ່າ, ຮູບທຳອິດຈະໂຊว์ຢູ່ card.</small>
+              <small>ເພີ່ມຮູບທີລະຮູບໄດ້. ຮູບໃໝ່ຈະຕໍ່ທ້າຍຂອງເກົ່າ, ຮູບທຳອິດຈະສະແດງຢູ່ card.</small>
             </label>
             <div class="admin-upload-preview" data-product-image-preview>Product image preview</div>
 
             <label>
               ຊື່ສິນຄ້າ
               <input name="name" required placeholder="Kinglike Royal Cloud" />
-              <small>ໂຊว์ເປັນຫົວຂໍ້ໃນ card.</small>
+              <small>ສະແດງເປັນຫົວຂໍ້ໃນ card.</small>
             </label>
 
             <div class="form-row">
@@ -186,7 +186,7 @@
             <label>
               ຂອງແຖມ / Free gifts
               <textarea name="freebies" rows="3" placeholder="ຫມອນນອນ 2 ໃບ, ຜ້າຫອມ, ຜ້າປູທີ່ນອນ"></textarea>
-              <small>ຂຽນແຍກດ້ວຍ comma. ຂອງແຖມຈະໂຊว์ໃນ product card ແລະ detail.</small>
+              <small>ຂຽນແຍກດ້ວຍ comma. ຂອງແຖມຈະສະແດງໃນ product card ແລະ detail.</small>
             </label>
 
             <label>
@@ -227,7 +227,7 @@
             <label>
               ຮູບ Cover
               <input name="coverUpload" type="file" accept="image/*" data-cover-image-upload />
-              <small>ຮູບນີ້ຈະໄປໂຊว์ໃນແຖບ promotion / cover.</small>
+              <small>ຮູບນີ້ຈະໄປສະແດງໃນແຖບ promotion / cover.</small>
             </label>
             <label>
               ຫົວຂໍ້
@@ -244,6 +244,56 @@
             <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
           </form>
 
+          <form class="admin-card promo-admin" data-promo-event-form>
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">EVENT CARD</p>
+                <h2>ເພີ່ມ / ແກ້ໄຂໂປຣໂມຊັນ</h2>
+              </div>
+              <button class="secondary-btn" type="button" data-new-promo-event>+ ໃໝ່</button>
+            </div>
+            <input type="hidden" name="id" />
+            <input type="hidden" name="image" data-promo-event-image-value />
+            <label>
+              ຮູບ Promotion / Event
+              <input name="eventImageUpload" type="file" accept="image/*" data-promo-event-image-upload />
+              <small>ຮູບນີ້ຈະສະແດງເປັນ card ໃນໜ້າຫຼັກ.</small>
+            </label>
+            <div class="form-row">
+              <label>
+                Badge
+                <input name="badge" placeholder="MID MONTH / EVENT / SALE" />
+              </label>
+              <label>
+                ວັນທີ ຫຼື ໄລຍະເວລາ
+                <input name="date" placeholder="20 - 31 May" />
+              </label>
+            </div>
+            <label>
+              ຫົວຂໍ້
+              <input name="title" required placeholder="Mid Month Super Surprise" />
+            </label>
+            <label>
+              ຂໍ້ຄວາມ
+              <textarea name="text" rows="3" placeholder="ລາຍລະອຽດໂປຣໂມຊັນ ຫຼື Event"></textarea>
+            </label>
+            <div class="form-row">
+              <label>
+                ຂໍ້ຄວາມປຸ່ມ
+                <input name="button" placeholder="ເບິ່ງສິນຄ້າ" />
+              </label>
+              <label>
+                Link
+                <input name="link" placeholder="#products" />
+              </label>
+            </div>
+            <label class="admin-check">
+              <input name="active" type="checkbox" checked />
+              <span>ສະແດງໃນໜ້າຫຼັກ</span>
+            </label>
+            <button class="primary-btn admin-submit" type="submit">ບັນທຶກ Event</button>
+          </form>
+
           <aside class="admin-card">
             <div class="admin-card-head">
               <div>
@@ -252,6 +302,7 @@
               </div>
             </div>
             <div class="promo-preview" data-promo-preview></div>
+            <div class="promo-event-admin-list" data-promo-event-list></div>
           </aside>
         </div>
       </section>
@@ -288,11 +339,11 @@
           <h2>ແຜນທີ່ການແກ້ໄຂ</h2>
           <div class="map-grid">
             <article><strong>ຮູບສິນຄ້າ</strong><span>Product card + gallery detail</span></article>
-            <article><strong>Badge</strong><span>ป้ายสีทองบน card</span></article>
-            <article><strong>ລາຄາ</strong><span>ราคาทอง + ราคาเต็มขีดฆ่า</span></article>
-            <article><strong>Cover</strong><span>แถบ promotion หน้าแรก</span></article>
-            <article><strong>Materials</strong><span>หัวข้อคุณสมบัติใน detail</span></article>
-            <article><strong>Stock/Warranty</strong><span>กล่องซื้อและข้อมูลรับประกัน</span></article>
+            <article><strong>Badge</strong><span>ປ້າຍສີທອງເທິງ card</span></article>
+            <article><strong>ລາຄາ</strong><span>ລາຄາສີທອງ + ລາຄາເຕັມຂີດຂ້າ</span></article>
+            <article><strong>Cover</strong><span>ແຖບ promotion ໜ້າຫຼັກ</span></article>
+            <article><strong>Materials</strong><span>ຫົວຂໍ້ຄຸນສົມບັດໃນ detail</span></article>
+            <article><strong>Stock/Warranty</strong><span>ກ່ອງຊື້ ແລະຂໍ້ມູນຮັບປະກັນ</span></article>
           </div>
         </div>
       </section>

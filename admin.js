@@ -1,8 +1,11 @@
-const PRODUCT_STORAGE_KEY = "kinglikeProducts";
+﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const PROMO_STORAGE_KEY = "kinglikePromotion";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
+const STACKED_ADMIN_QUERY = "(max-width: 1180px)";
+const IDB_NAME = "kinglikeAdminStore";
+const IDB_STORE = "records";
 
 const defaultProducts = [
   productSeed("royal-cloud", "Kinglike Royal Cloud", "Hybrid", "ນຸ່ມ", "12 ນິ້ວ", 7800000, 5290000, "Best Seller"),
@@ -58,6 +61,11 @@ const els = {
   adminPlacement: document.querySelector("[data-admin-placement]"),
   viewProduct: document.querySelector("[data-view-product]"),
   promoForm: document.querySelector("[data-promo-form]"),
+  promoEventForm: document.querySelector("[data-promo-event-form]"),
+  promoEventList: document.querySelector("[data-promo-event-list]"),
+  newPromoEvent: document.querySelector("[data-new-promo-event]"),
+  promoEventImageUpload: document.querySelector("[data-promo-event-image-upload]"),
+  promoEventImageValue: document.querySelector("[data-promo-event-image-value]"),
   coverUpload: document.querySelector("[data-cover-image-upload]"),
   coverValue: document.querySelector("[data-cover-image-value]"),
   promoPreview: document.querySelector("[data-promo-preview]"),
@@ -71,6 +79,38 @@ const els = {
 
 let products = loadProducts();
 let activeProductId = products[0]?.id || "";
+let activePromoEventId = "";
+let promotionCache = null;
+let productsCache = null;
+
+function openLocalDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IDB_NAME, 1);
+    request.onupgradeneeded = () => request.result.createObjectStore(IDB_STORE);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function idbSet(key, value) {
+  const db = await openLocalDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(IDB_STORE, "readwrite");
+    transaction.objectStore(IDB_STORE).put(value, key);
+    transaction.oncomplete = () => resolve(true);
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openLocalDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(IDB_STORE, "readonly");
+    const request = transaction.objectStore(IDB_STORE).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
 
 async function loadSyncedStore() {
   for (const url of [SYNC_STORE_URL, STATIC_STORE_URL]) {
@@ -101,17 +141,34 @@ async function publishSyncedStore() {
 }
 
 function loadProducts() {
+  if (productsCache) return productsCache;
   try {
     const saved = localStorage.getItem(PRODUCT_STORAGE_KEY);
     if (!saved) return [...defaultProducts];
     const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) && parsed.length ? parsed : [...defaultProducts];
+    productsCache = Array.isArray(parsed) && parsed.length ? repairStoredData(parsed) : [...defaultProducts];
+    return productsCache;
   } catch (error) {
     return [...defaultProducts];
   }
 }
 
+async function loadProductsAsync() {
+  if (productsCache) return productsCache;
+  try {
+    const saved = await idbGet(PRODUCT_STORAGE_KEY);
+    if (Array.isArray(saved) && saved.length) {
+      productsCache = repairStoredData(saved);
+      return productsCache;
+    }
+  } catch (error) {
+    // Keep local fallback.
+  }
+  return loadProducts();
+}
+
 function saveProducts() {
+  productsCache = products;
   try {
     localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
     localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
@@ -119,8 +176,18 @@ function saveProducts() {
     publishSyncedStore();
     return true;
   } catch (error) {
-    showToast("ຮູບໃຫຍ່ເກີນໄປ ກະລຸນາລຶບບາງຮູບ ຫຼືໃຊ້ຮູບນ້ອຍລົງ");
-    return false;
+    idbSet(PRODUCT_STORAGE_KEY, products)
+      .then(() => {
+        try {
+          localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
+        } catch (timestampError) {
+          // IndexedDB already saved the products; localStorage may be full.
+        }
+        renderBackupSummary();
+        showToast("ບັນທຶກສິນຄ້າແລ້ວ ຮູບຖືກເກັບໃນ IndexedDB");
+      })
+      .catch(() => showToast("ບັນທຶກສິນຄ້າບໍ່ໄດ້: browser storage ເຕັມ"));
+    return true;
   }
 }
 
@@ -139,6 +206,34 @@ function slugify(value) {
 
 function toList(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
+}
+
+const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
+const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
+
+function repairText(value) {
+  if (typeof value !== "string" || !/[àâÃðÂ\u0080-\u009F\u0192]/.test(value)) return value;
+  return value.replace(MOJIBAKE_RUN, (part) => {
+    if (!/[àâÃðÂ\u0080-\u009F\u0192]/.test(part)) return part;
+    const bytes = [];
+    for (const char of part) {
+      const code = char.charCodeAt(0);
+      if (CP1252_BYTES[char] !== undefined) bytes.push(CP1252_BYTES[char]);
+      else if (code <= 255) bytes.push(code);
+      else return part;
+    }
+    try {
+      return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+    } catch (error) {
+      return part;
+    }
+  });
+}
+
+function repairStoredData(value) {
+  if (Array.isArray(value)) return value.map(repairStoredData);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, repairStoredData(item)]));
+  return repairText(value);
 }
 
 function discountPercent(price, salePrice) {
@@ -400,16 +495,18 @@ function renderPreview() {
   `;
 }
 
-function readImageAsCompressedDataUrl(file, maxSize = 1200, quality = 0.82) {
-  if (!file || !file.type.startsWith("image/")) return Promise.resolve("");
+function compressImageSource(source, maxSize = 900, quality = 0.72, maxBytes = 220000) {
+  if (!source) return Promise.resolve("");
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-      const image = new Image();
-      image.onerror = reject;
-      image.onload = () => {
-        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+    const image = new Image();
+    image.onerror = reject;
+    image.onload = () => {
+      let targetSize = maxSize;
+      let targetQuality = quality;
+      let bestDataUrl = "";
+
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const scale = Math.min(1, targetSize / Math.max(image.width, image.height));
         const width = Math.max(1, Math.round(image.width * scale));
         const height = Math.max(1, Math.round(image.height * scale));
         const canvas = document.createElement("canvas");
@@ -419,17 +516,58 @@ function readImageAsCompressedDataUrl(file, maxSize = 1200, quality = 0.82) {
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, width, height);
         context.drawImage(image, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      image.src = reader.result;
+        bestDataUrl = canvas.toDataURL("image/jpeg", targetQuality);
+
+        if (bestDataUrl.length * 0.75 <= maxBytes || targetSize <= 320) break;
+        targetSize = Math.max(320, Math.round(targetSize * 0.72));
+        targetQuality = Math.max(0.36, targetQuality - 0.08);
+      }
+
+      resolve(bestDataUrl);
     };
+    image.src = source;
+  });
+}
+
+function readImageAsCompressedDataUrl(file, maxSize = 900, quality = 0.72, maxBytes = 220000) {
+  if (!file || !file.type.startsWith("image/")) return Promise.resolve("");
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => compressImageSource(reader.result, maxSize, quality, maxBytes).then(resolve).catch(reject);
     reader.readAsDataURL(file);
   });
 }
 
+function compactExistingImage(dataUrl, maxSize = 620, quality = 0.58, maxBytes = 90000) {
+  if (!dataUrl || !dataUrl.startsWith("data:image/")) return Promise.resolve(dataUrl || "");
+  if (dataUrl.length * 0.75 <= maxBytes) return Promise.resolve(dataUrl);
+  return compressImageSource(dataUrl, maxSize, quality, maxBytes);
+}
+
+async function compactPromotionForStorage(promotion) {
+  const compacted = { ...promotion, events: Array.isArray(promotion.events) ? [...promotion.events] : [] };
+  compacted.coverImage = await compactExistingImage(compacted.coverImage, 760, 0.58, 130000);
+  compacted.events = await Promise.all(compacted.events.map(async (item) => ({
+    ...item,
+    image: await compactExistingImage(item.image, 560, 0.54, 80000)
+  })));
+  return compacted;
+}
+
+async function compactProductForStorage(product) {
+  const images = productImages(product);
+  const compactedImages = await Promise.all(images.map((image) => compactExistingImage(image, 560, 0.54, 80000)));
+  return {
+    ...product,
+    image: compactedImages[0] || "",
+    images: compactedImages.filter(Boolean)
+  };
+}
+
 function readFileAsDataUrl(file, callback, options = {}) {
   if (!file) return;
-  readImageAsCompressedDataUrl(file, options.maxSize || 1600, options.quality || 0.84)
+  readImageAsCompressedDataUrl(file, options.maxSize || 900, options.quality || 0.72, options.maxBytes || 220000)
     .then((dataUrl) => {
       if (dataUrl) callback(dataUrl);
       showToast("ບີບອັດຮູບແລ້ວ ພ້ອມບັນທຶກ");
@@ -440,7 +578,7 @@ function readFileAsDataUrl(file, callback, options = {}) {
 function readFilesAsDataUrls(files, callback) {
   const list = [...files].filter((file) => file.type.startsWith("image/"));
   if (!list.length) return;
-  Promise.all(list.map((file) => readImageAsCompressedDataUrl(file, 1200, 0.82)))
+  Promise.all(list.map((file) => readImageAsCompressedDataUrl(file, 820, 0.7, 180000)))
     .then((dataUrls) => {
       callback(dataUrls.filter(Boolean));
       showToast("ບີບອັດຮູບແລ້ວ ພ້ອມບັນທຶກ");
@@ -450,7 +588,7 @@ function readFilesAsDataUrls(files, callback) {
 
 function loadPromoForm() {
   try {
-    const promo = JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {};
+    const promo = loadPromotionData();
     els.promoForm.elements.title.value = promo.title || "";
     els.promoForm.elements.text.value = promo.text || "";
     els.promoForm.elements.button.value = promo.button || "";
@@ -459,6 +597,7 @@ function loadPromoForm() {
     els.promoForm.reset();
   }
   renderPromoPreview();
+  renderPromoEventList();
 }
 
 function renderPromoPreview() {
@@ -473,14 +612,101 @@ function renderPromoPreview() {
 }
 
 function loadPromotionData() {
+  if (promotionCache) return promotionCache;
   try {
-    return JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {};
+    const promo = repairStoredData(JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY)) || {});
+    promo.events = Array.isArray(promo.events) ? promo.events : [];
+    promotionCache = promo;
+    return promo;
   } catch (error) {
-    return {};
+    promotionCache = { events: [] };
+    return promotionCache;
   }
 }
 
+async function loadPromotionDataAsync() {
+  const local = loadPromotionData();
+  if (local.title || local.text || local.coverImage || local.events.length) return local;
+  try {
+    const saved = await idbGet(PROMO_STORAGE_KEY);
+    if (saved && typeof saved === "object") {
+      const repaired = repairStoredData(saved);
+      repaired.events = Array.isArray(repaired.events) ? repaired.events : [];
+      promotionCache = repaired;
+      return repaired;
+    }
+  } catch (error) {
+    // Use local fallback.
+  }
+  return local;
+}
+
+function savePromotionDraft(patch) {
+  const current = loadPromotionData();
+  return savePromotionData({ ...current, ...patch });
+}
+
+function clearPromoEventForm() {
+  if (!els.promoEventForm) return;
+  activePromoEventId = "";
+  els.promoEventForm.reset();
+  els.promoEventForm.elements.id.value = "";
+  els.promoEventImageValue.value = "";
+  els.promoEventForm.elements.active.checked = true;
+}
+
+function promoEventFromForm() {
+  const data = new FormData(els.promoEventForm);
+  const id = data.get("id") || `promo-${Date.now()}`;
+  return {
+    id,
+    badge: (data.get("badge") || "PROMOTION").trim(),
+    date: (data.get("date") || "").trim(),
+    title: (data.get("title") || "").trim(),
+    text: (data.get("text") || "").trim(),
+    button: (data.get("button") || "ເບິ່ງສິນຄ້າ").trim(),
+    link: (data.get("link") || "#products").trim(),
+    image: data.get("image") || "",
+    active: Boolean(data.get("active"))
+  };
+}
+
+function fillPromoEventForm(eventItem) {
+  activePromoEventId = eventItem.id;
+  els.promoEventForm.elements.id.value = eventItem.id;
+  els.promoEventForm.elements.badge.value = eventItem.badge || "";
+  els.promoEventForm.elements.date.value = eventItem.date || "";
+  els.promoEventForm.elements.title.value = eventItem.title || "";
+  els.promoEventForm.elements.text.value = eventItem.text || "";
+  els.promoEventForm.elements.button.value = eventItem.button || "";
+  els.promoEventForm.elements.link.value = eventItem.link || "";
+  els.promoEventImageValue.value = eventItem.image || "";
+  els.promoEventForm.elements.active.checked = eventItem.active !== false;
+  els.promoEventForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderPromoEventList() {
+  if (!els.promoEventList) return;
+  const events = loadPromotionData().events;
+  els.promoEventList.innerHTML = events.length ? events.map((item) => `
+    <article class="promo-event-admin-item ${item.active === false ? "is-paused" : ""}">
+      <div class="promo-event-admin-thumb">${item.image ? `<img src="${item.image}" alt="${item.title}" />` : ""}</div>
+      <div>
+        <strong>${item.title || "Untitled promotion"}</strong>
+        <span>${item.badge || "PROMOTION"}${item.date ? ` • ${item.date}` : ""}${item.active === false ? " • ປິດຢູ່" : ""}</span>
+        <div class="admin-mini-actions">
+          <button type="button" data-edit-promo-event="${item.id}">ແກ້ໄຂ</button>
+          <button type="button" data-toggle-promo-event="${item.id}">${item.active === false ? "ເປີດ" : "ປິດ"}</button>
+          <button type="button" data-delete-promo-event="${item.id}">ລຶບ</button>
+        </div>
+      </div>
+    </article>
+  `).join("") : `<p class="meta">ຍັງບໍ່ມີ Promotion / Event</p>`;
+}
+
 function savePromotionData(promotion) {
+  promotion.events = Array.isArray(promotion.events) ? promotion.events : [];
+  promotionCache = promotion;
   try {
     localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promotion));
     localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
@@ -488,8 +714,18 @@ function savePromotionData(promotion) {
     publishSyncedStore();
     return true;
   } catch (error) {
-    showToast("ຮູບ Cover ໃຫຍ່ເກີນໄປ ກະລຸນາໃຊ້ຮູບນ້ອຍລົງ");
-    return false;
+    idbSet(PROMO_STORAGE_KEY, promotion)
+      .then(() => {
+        try {
+          localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
+        } catch (timestampError) {
+          // IndexedDB already saved the promotion; localStorage may be full.
+        }
+        renderBackupSummary();
+        showToast("ບັນທຶກແລ້ວ ຮູບຖືກເກັບໃນ IndexedDB");
+      })
+      .catch(() => showToast("ບັນທຶກບໍ່ໄດ້: browser storage ເຕັມ"));
+    return true;
   }
 }
 
@@ -505,7 +741,7 @@ function renderBackupSummary() {
   if (els.backupProductCount) els.backupProductCount.textContent = products.length;
   if (els.backupPromoStatus) {
     const promo = loadPromotionData();
-    els.backupPromoStatus.textContent = promo.title || promo.text || promo.coverImage ? "Saved" : "Not saved";
+    els.backupPromoStatus.textContent = promo.title || promo.text || promo.coverImage || promo.events.length ? "Saved" : "Not saved";
   }
 }
 
@@ -573,6 +809,13 @@ function importBackup(file) {
   reader.readAsText(file);
 }
 
+function scrollToProductForm() {
+  if (!window.matchMedia(STACKED_ADMIN_QUERY).matches) return;
+  requestAnimationFrame(() => {
+    els.form.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
 els.tabs.forEach((tab) => tab.addEventListener("click", () => setTab(tab.dataset.adminTab)));
 els.search.addEventListener("input", renderProducts);
 els.clearForm.addEventListener("click", clearForm);
@@ -608,7 +851,13 @@ els.coverUpload.addEventListener("change", (event) => {
   readFileAsDataUrl(event.target.files[0], (dataUrl) => {
     els.coverValue.value = dataUrl;
     renderPromoPreview();
-  }, { maxSize: 1600, quality: 0.84 });
+  }, { maxSize: 1100, quality: 0.72, maxBytes: 260000 });
+});
+
+els.promoEventImageUpload?.addEventListener("change", (event) => {
+  readFileAsDataUrl(event.target.files[0], (dataUrl) => {
+    els.promoEventImageValue.value = dataUrl;
+  }, { maxSize: 820, quality: 0.7, maxBytes: 180000 });
 });
 
 els.exportData.addEventListener("click", exportBackup);
@@ -616,10 +865,11 @@ els.exportPublish?.addEventListener("click", exportPublishStore);
 els.importData.addEventListener("change", (event) => importBackup(event.target.files[0]));
 
 els.promoForm.addEventListener("input", renderPromoPreview);
+els.newPromoEvent?.addEventListener("click", clearPromoEventForm);
 
-els.form.addEventListener("submit", (event) => {
+els.form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const product = formToProduct();
+  const product = await compactProductForStorage(formToProduct());
   const index = products.findIndex((item) => item.id === product.id);
   const previousProducts = [...products];
   if (index >= 0) products[index] = product;
@@ -654,7 +904,10 @@ els.list.addEventListener("click", (event) => {
   const targetId = editId || selectId;
   if (targetId) {
     const product = products.find((item) => item.id === targetId);
-    if (product) fillForm(product);
+    if (product) {
+      fillForm(product);
+      if (editId) scrollToProductForm();
+    }
   }
 });
 
@@ -667,34 +920,100 @@ els.resetDemo.addEventListener("click", () => {
   showToast("Reset demo ແລ້ວ");
 });
 
-els.promoForm.addEventListener("submit", (event) => {
+els.promoForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(els.promoForm);
-  savePromotionData({
+  const draft = await compactPromotionForStorage({
+    ...loadPromotionData(),
     title: data.get("title").trim(),
     text: data.get("text").trim(),
     button: data.get("button").trim(),
     coverImage: data.get("coverImage")
   });
+  savePromotionData(draft);
   showToast("ບັນທຶກ Cover / Promotion ແລ້ວ");
+});
+
+els.promoEventForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const promo = loadPromotionData();
+  const formItem = promoEventFromForm();
+  const item = {
+    ...formItem,
+    image: await compactExistingImage(formItem.image, 560, 0.54, 80000)
+  };
+  if (!item.title) {
+    showToast("ກະລຸນາໃສ່ຫົວຂໍ້ Promotion / Event");
+    return;
+  }
+  const index = promo.events.findIndex((eventItem) => eventItem.id === item.id);
+  if (index >= 0) promo.events[index] = item;
+  else promo.events.unshift(item);
+  activePromoEventId = item.id;
+  const compactedPromo = await compactPromotionForStorage(promo);
+  if (savePromotionData(compactedPromo)) {
+    renderPromoEventList();
+    fillPromoEventForm(item);
+    showToast("ບັນທຶກ Promotion / Event ແລ້ວ");
+  }
+});
+
+els.promoEventList?.addEventListener("click", (event) => {
+  const editId = event.target.closest("[data-edit-promo-event]")?.dataset.editPromoEvent;
+  const toggleId = event.target.closest("[data-toggle-promo-event]")?.dataset.togglePromoEvent;
+  const deleteId = event.target.closest("[data-delete-promo-event]")?.dataset.deletePromoEvent;
+  const promo = loadPromotionData();
+
+  if (editId) {
+    const item = promo.events.find((eventItem) => eventItem.id === editId);
+    if (item) fillPromoEventForm(item);
+    return;
+  }
+
+  if (toggleId) {
+    promo.events = promo.events.map((item) => item.id === toggleId ? { ...item, active: item.active === false } : item);
+    savePromotionData(promo);
+    renderPromoEventList();
+    return;
+  }
+
+  if (deleteId) {
+    promo.events = promo.events.filter((item) => item.id !== deleteId);
+    savePromotionData(promo);
+    renderPromoEventList();
+    if (activePromoEventId === deleteId) clearPromoEventForm();
+  }
 });
 
 async function initAdmin() {
   const store = await loadSyncedStore();
   if (store) {
     if (shouldUseSyncedStore(store) && Array.isArray(store.products) && store.products.length) {
-      products = store.products;
+      products = repairStoredData(store.products);
+      productsCache = products;
       activeProductId = products[0]?.id || "";
-      localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+      try {
+        localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+      } catch (error) {
+        idbSet(PRODUCT_STORAGE_KEY, products);
+      }
       if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
     } else if (products.length) {
       publishSyncedStore();
     }
     if (shouldUseSyncedStore(store) && store.promotion && typeof store.promotion === "object") {
-      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(store.promotion));
+      promotionCache = repairStoredData(store.promotion);
+      try {
+        localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(store.promotion));
+      } catch (error) {
+        idbSet(PROMO_STORAGE_KEY, store.promotion);
+      }
       if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
     }
   }
+  products = await loadProductsAsync();
+  activeProductId = products[0]?.id || activeProductId;
+  await loadPromotionDataAsync();
   renderProducts();
   if (products[0]) fillForm(products[0]);
   loadPromoForm();

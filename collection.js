@@ -2,8 +2,29 @@ const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
-const WHATSAPP_PHONE = "8562059379231";
-const MESSENGER_URL = "https://m.me/kinglike";
+const WHATSAPP_PHONE = "8562051777641";
+const MESSENGER_URL = "https://www.facebook.com/share/1GbHw9wGrM/?mibextid=wwXIfr";
+const IDB_NAME = "kinglikeAdminStore";
+const IDB_STORE = "records";
+
+function openLocalDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IDB_NAME, 1);
+    request.onupgradeneeded = () => request.result.createObjectStore(IDB_STORE);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openLocalDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(IDB_STORE, "readonly");
+    const request = transaction.objectStore(IDB_STORE).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 
@@ -185,6 +206,19 @@ function shouldUseSyncedStore(store) {
 
 async function hydrateSyncedStore() {
   const store = await loadSyncedStore();
+  try {
+    const idbProducts = await idbGet(PRODUCT_STORAGE_KEY);
+    if (Array.isArray(idbProducts) && idbProducts.length) {
+      localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(idbProducts));
+      products = getCollectionProducts(collectionKey, typeKey);
+      allProducts = mergedAllProducts();
+      renderProducts();
+      renderCart();
+      renderWishlist();
+    }
+  } catch (error) {
+    // Keep local/static fallback.
+  }
   if (!shouldUseSyncedStore(store) || !Array.isArray(store.products) || !store.products.length) return;
   localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(store.products));
   if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
@@ -295,7 +329,7 @@ function productCard(product) {
       <div class="product-art ${collection.art}-product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
         <span class="badge">${product.badge}</span>
-        <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="Wishlist">♡</button>
+        <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="ສິນຄ້າທີ່ຖືກໃຈ">♡</button>
       </div>
       <div class="product-body">
         <h3>${product.name}</h3>
@@ -434,9 +468,9 @@ function ensureChatModal() {
   modal.innerHTML = `
     <div class="chat-order-panel">
       <button class="close-btn" type="button" data-close-chat-order>×</button>
-      <p class="eyebrow">CHAT ORDER</p>
-      <h2>เลือกช่องทางติดต่อ</h2>
-      <p class="meta">เลือก WhatsApp หรือ Messenger ระบบจะสร้างข้อความสินค้าให้อัตโนมัติ</p>
+      <p class="eyebrow">ສັ່ງຜ່ານແຊັດ</p>
+      <h2>ເລືອກຊ່ອງທາງຕິດຕໍ່</h2>
+      <p class="meta">ເລືອກ WhatsApp ຫຼື Messenger ລະບົບຈະສ້າງຂໍ້ຄວາມສິນຄ້າໃຫ້ອັດຕະໂນມັດ</p>
       <div class="chat-order-summary" data-chat-summary></div>
       <p class="checkout-alert" data-chat-error></p>
       <div class="chat-channel-actions">
@@ -489,7 +523,7 @@ async function sendChatDraft(channel) {
   } catch (error) {
     // Let customer continue to chat even if local API is unavailable.
   }
-  const url = channel === "messenger" ? `${MESSENGER_URL}?text=${encodeURIComponent(message)}` : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+  const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank", "noopener");
 }
 

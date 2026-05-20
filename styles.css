@@ -1190,6 +1190,211 @@ h1 span,
   background-size: cover;
 }
 
+.promo-events {
+  background: #080808;
+  padding-top: 0;
+}
+
+.promo-events[hidden] {
+  display: none;
+}
+
+.promo-event-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.promo-event-card {
+  background:
+    linear-gradient(145deg, rgba(36, 36, 36, 0.94), rgba(10, 10, 10, 0.98)),
+    radial-gradient(circle at 78% 8%, rgba(212, 175, 55, 0.22), transparent 32%);
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  border-radius: 8px;
+  min-height: 320px;
+  overflow: hidden;
+  position: relative;
+}
+
+.promo-event-card img {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.promo-event-card.has-image::after {
+  background: linear-gradient(180deg, rgba(5, 5, 5, 0.18), rgba(5, 5, 5, 0.88));
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.promo-event-copy {
+  display: flex;
+  flex-direction: column;
+  inset: 0;
+  justify-content: end;
+  padding: 22px;
+  position: absolute;
+  z-index: 1;
+}
+
+.promo-event-copy span {
+  align-self: start;
+  background: var(--gold);
+  border-radius: 999px;
+  color: #090909;
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 12px;
+  padding: 7px 12px;
+}
+
+.promo-event-copy h3 {
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.12;
+  margin-bottom: 10px;
+}
+
+.promo-event-copy p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.promo-event-foot {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.promo-event-foot small {
+  color: var(--gold-soft);
+  font-weight: 900;
+}
+
+.promo-event-foot a {
+  border: 1px solid rgba(212, 175, 55, 0.34);
+  border-radius: 999px;
+  color: var(--text);
+  font-weight: 900;
+  padding: 9px 13px;
+}
+
+.promo-popup {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.76);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  opacity: 0;
+  padding: 20px;
+  pointer-events: none;
+  position: fixed;
+  transition: opacity 0.24s ease;
+  z-index: 95;
+}
+
+.promo-popup.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.promo-popup-panel {
+  background: linear-gradient(145deg, rgba(34, 34, 34, 0.98), rgba(5, 5, 5, 0.98));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5);
+  max-width: 880px;
+  overflow: hidden;
+  position: relative;
+  transform: translateY(18px) scale(0.98);
+  transition: transform 0.24s ease;
+  width: min(92vw, 880px);
+}
+
+.promo-popup.is-open .promo-popup-panel {
+  transform: translateY(0) scale(1);
+}
+
+.promo-popup-close {
+  align-items: center;
+  background: rgba(5, 5, 5, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 28px;
+  font-weight: 400;
+  height: 42px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 42px;
+  z-index: 2;
+}
+
+.promo-popup-panel [data-promo-popup-content] {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  min-height: 460px;
+}
+
+.promo-popup-art {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(245, 215, 110, 0.3), transparent 34%),
+    linear-gradient(145deg, #1d1d1d, #080808);
+  min-height: 320px;
+  position: relative;
+}
+
+.promo-popup-art img {
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+}
+
+.promo-popup-copy {
+  align-content: center;
+  display: grid;
+  gap: 14px;
+  padding: 44px;
+}
+
+.promo-popup-copy span {
+  background: var(--gold);
+  border-radius: 999px;
+  color: #090909;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  justify-self: start;
+  padding: 8px 13px;
+}
+
+.promo-popup-copy h2 {
+  font-size: clamp(30px, 5vw, 58px);
+  line-height: 1.02;
+}
+
+.promo-popup-copy p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.promo-popup-copy small {
+  color: var(--gold-soft);
+  font-weight: 900;
+}
+
 .about-contact {
   display: grid;
   gap: 28px;
@@ -2639,6 +2844,8 @@ h1 span,
   .detail-actions,
   .detail-benefits,
   .spec-grid,
+  .promo-event-grid,
+  .promo-popup-panel [data-promo-popup-content],
   .checkout-layout,
   .checkout-payment,
   .tracking-form {
