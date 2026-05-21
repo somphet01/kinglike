@@ -261,7 +261,9 @@ const state = {
   search: "",
   size: "",
   firmness: "",
-  sort: "popular"
+  sort: "popular",
+  page: 1,
+  perPage: 8
 };
 
 const money = new Intl.NumberFormat("lo-LA").format;
@@ -298,6 +300,7 @@ function repairStoredData(value) {
 const els = {
   header: document.querySelector("[data-header]"),
   products: document.querySelector("[data-products]"),
+  pagination: document.querySelector("[data-products-pagination]"),
   cartDrawer: document.querySelector("[data-cart-drawer]"),
   wishlistDrawer: document.querySelector("[data-wishlist-drawer]"),
   cartItems: document.querySelector("[data-cart-items]"),
@@ -417,9 +420,29 @@ function filteredProducts() {
 
 function renderProducts() {
   const list = filteredProducts();
+  const pageCount = Math.max(1, Math.ceil(list.length / state.perPage));
+  state.page = Math.min(Math.max(1, state.page), pageCount);
+  const start = (state.page - 1) * state.perPage;
+  const pageItems = list.slice(start, start + state.perPage);
   els.products.innerHTML = list.length
-    ? list.map(productCard).join("")
+    ? pageItems.map(productCard).join("")
     : `<p class="meta">ບໍ່ພົບສິນຄ້າຕາມການຄົ້ນຫາ</p>`;
+  renderPagination(pageCount, list.length);
+}
+
+function renderPagination(pageCount, totalItems) {
+  if (!els.pagination) return;
+  if (pageCount <= 1) {
+    els.pagination.innerHTML = "";
+    return;
+  }
+  const pages = Array.from({ length: pageCount }, (_, index) => index + 1);
+  els.pagination.innerHTML = `
+    <button type="button" data-product-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>ກ່ອນ</button>
+    ${pages.map((page) => `<button class="${page === state.page ? "is-active" : ""}" type="button" data-product-page="${page}" aria-label="ໜ້າ ${page}">${page}</button>`).join("")}
+    <button type="button" data-product-page="${state.page + 1}" ${state.page === pageCount ? "disabled" : ""}>ຕໍ່ໄປ</button>
+    <span>${totalItems} ລາຍການ</span>
+  `;
 }
 
 function renderPromotion() {
@@ -879,6 +902,7 @@ document.addEventListener("click", (event) => {
   const shouldCheckout = event.target.closest("[data-checkout]");
   const buyNowId = event.target.closest("[data-buy-now]")?.dataset.buyNow;
   const shouldClosePromoPopup = event.target.closest("[data-close-promo-popup]");
+  const pageTarget = event.target.closest("[data-product-page]")?.dataset.productPage;
 
   if (shouldClosePromoPopup) {
     closePromoPopup();
@@ -894,6 +918,12 @@ document.addEventListener("click", (event) => {
   }
   if (shouldCheckout) {
     checkout();
+    return;
+  }
+  if (pageTarget) {
+    state.page = Number(pageTarget);
+    renderProducts();
+    document.querySelector("#products")?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
   if (addId) {
@@ -962,18 +992,22 @@ els.mobileMenu.querySelectorAll("a").forEach((link) => {
 
 els.searchInput.addEventListener("input", (event) => {
   state.search = event.target.value;
+  state.page = 1;
   renderProducts();
 });
 els.sizeFilter.addEventListener("change", (event) => {
   state.size = event.target.value;
+  state.page = 1;
   renderProducts();
 });
 els.firmnessFilter.addEventListener("change", (event) => {
   state.firmness = event.target.value;
+  state.page = 1;
   renderProducts();
 });
 els.sort.addEventListener("change", (event) => {
   state.sort = event.target.value;
+  state.page = 1;
   renderProducts();
 });
 window.addEventListener("scroll", () => {

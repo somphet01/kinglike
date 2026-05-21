@@ -234,7 +234,9 @@ const state = {
   cart: loadCart(),
   wishlist: loadWishlist(),
   search: "",
-  sort: "popular"
+  sort: "popular",
+  page: 1,
+  perPage: 8
 };
 
 const money = new Intl.NumberFormat("lo-LA").format;
@@ -246,6 +248,7 @@ const els = {
   art: document.querySelector("[data-collection-art]"),
   listTitle: document.querySelector("[data-list-title]"),
   products: document.querySelector("[data-products]"),
+  pagination: document.querySelector("[data-products-pagination]"),
   searchInput: document.querySelector("[data-search-input]"),
   sort: document.querySelector("[data-sort]"),
   cartDrawer: document.querySelector("[data-cart-drawer]"),
@@ -387,7 +390,7 @@ function productCard(product) {
         </div>
         <div class="card-actions">
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
-          <button class="view-btn" type="button">ລາຍລະອຽດ</button>
+          <button class="view-btn" type="button" data-open-detail="${product.id}">ລາຍລະອຽດ</button>
         </div>
       </div>
     </article>
@@ -396,7 +399,27 @@ function productCard(product) {
 
 function renderProducts() {
   const list = filteredProducts();
-  els.products.innerHTML = list.length ? list.map(productCard).join("") : `<p class="meta">ບໍ່ພົບສິນຄ້າ</p>`;
+  const pageCount = Math.max(1, Math.ceil(list.length / state.perPage));
+  state.page = Math.min(Math.max(1, state.page), pageCount);
+  const start = (state.page - 1) * state.perPage;
+  const pageItems = list.slice(start, start + state.perPage);
+  els.products.innerHTML = list.length ? pageItems.map(productCard).join("") : `<p class="meta">ບໍ່ພົບສິນຄ້າ</p>`;
+  renderPagination(pageCount, list.length);
+}
+
+function renderPagination(pageCount, totalItems) {
+  if (!els.pagination) return;
+  if (pageCount <= 1) {
+    els.pagination.innerHTML = "";
+    return;
+  }
+  const pages = Array.from({ length: pageCount }, (_, index) => index + 1);
+  els.pagination.innerHTML = `
+    <button type="button" data-product-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>ກ່ອນ</button>
+    ${pages.map((page) => `<button class="${page === state.page ? "is-active" : ""}" type="button" data-product-page="${page}" aria-label="ໜ້າ ${page}">${page}</button>`).join("")}
+    <button type="button" data-product-page="${state.page + 1}" ${state.page === pageCount ? "disabled" : ""}>ຕໍ່ໄປ</button>
+    <span>${totalItems} ລາຍການ</span>
+  `;
 }
 
 function addToCart(id, size = "") {
@@ -649,12 +672,19 @@ document.addEventListener("click", (event) => {
   const detailId = event.target.closest("[data-open-detail]")?.dataset.openDetail;
   const lineTarget = event.target.closest("[data-line-contact]");
   const shouldCheckout = event.target.closest("[data-checkout]");
+  const pageTarget = event.target.closest("[data-product-page]")?.dataset.productPage;
   if (lineTarget) {
     sendChatDraft(lineTarget.dataset.lineChannel || "whatsapp");
     return;
   }
   if (shouldCheckout) {
     checkout();
+    return;
+  }
+  if (pageTarget) {
+    state.page = Number(pageTarget);
+    renderProducts();
+    document.querySelector(".collection-products")?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
   if (addId) {
@@ -700,11 +730,13 @@ els.mobileMenu.querySelectorAll("a").forEach((link) => link.addEventListener("cl
 
 els.searchInput.addEventListener("input", (event) => {
   state.search = event.target.value;
+  state.page = 1;
   renderProducts();
 });
 
 els.sort.addEventListener("change", (event) => {
   state.sort = event.target.value;
+  state.page = 1;
   renderProducts();
 });
 

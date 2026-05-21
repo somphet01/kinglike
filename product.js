@@ -142,6 +142,16 @@ function productUrl(product) {
   return `product.html?id=${encodeURIComponent(product.id)}&category=${encodeURIComponent(productCollectionKey(product))}`;
 }
 
+function openProductPage(product, pushHistory = true) {
+  if (!product) return;
+  const nextCategory = productCollectionKey(product);
+  products = getProductList(nextCategory);
+  currentProduct = products.find((item) => item.id === product.id) || product;
+  if (pushHistory) window.history.pushState({ productId: currentProduct.id }, "", productUrl(currentProduct));
+  renderProduct();
+  window.scrollTo(0, 0);
+}
+
 function relatedProducts(product) {
   const key = productCollectionKey(product);
   const sameCollection = getProductList(key).filter((item) => item.id !== product.id);
@@ -150,8 +160,7 @@ function relatedProducts(product) {
   const adjacent = allProducts.filter((item) => item.id !== product.id);
   const merged = [...sameType, ...sameCategory, ...sameCollection, ...adjacent];
   return merged
-    .filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index)
-    .slice(0, 8);
+    .filter((item, index, list) => list.findIndex((candidate) => candidate.id === item.id) === index);
 }
 
 function relatedTitle(product) {
@@ -166,7 +175,7 @@ function relatedProductCard(product) {
   const image = primaryImage(product);
   const imageClass = image ? "has-admin-image" : "";
   return `
-    <a class="product-card related-product-card" href="${productUrl(product)}">
+    <article class="product-card related-product-card clickable-card" data-related-detail="${product.id}">
       <div class="product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
         <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
@@ -178,8 +187,12 @@ function relatedProductCard(product) {
           <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
           <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
         </div>
+        <div class="card-actions">
+          <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
+          <button class="view-btn" type="button" data-related-detail="${product.id}">ລາຍລະອຽດ</button>
+        </div>
       </div>
-    </a>
+    </article>
   `;
 }
 
@@ -214,6 +227,7 @@ function getProductList(category) {
 const params = new URLSearchParams(window.location.search);
 const categoryKey = params.get("category") || "pillows";
 const id = params.get("id");
+if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
 let products = getProductList(categoryKey);
 let allProducts = mergedAllProducts();
 let currentProduct = products.find((item) => item.id === id) || products[0];
@@ -375,7 +389,7 @@ function renderProduct() {
   els.page.innerHTML = `
     <div class="detail-layout">
       <div class="detail-gallery">
-        <div class="detail-hero-art ${categoryKey === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero>
+        <div class="detail-hero-art ${productCollectionKey(currentProduct) === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero>
           ${heroImage ? `<img src="${heroImage}" alt="${currentProduct.name}" data-gallery-hero-image />` : ""}
           <span class="${productBadgeClass(currentProduct)}">${productBadgeText(currentProduct)}</span>
           ${gallery.length > 1 ? `
@@ -442,13 +456,28 @@ function renderProduct() {
           <p class="eyebrow">RECOMMENDED</p>
           <h2>${relatedTitle(currentProduct)}</h2>
         </div>
-        <div class="product-grid related-product-grid">
-          ${related.map(relatedProductCard).join("")}
-        </div>
+        <div class="product-grid related-product-grid" data-related-products></div>
       </section>
     ` : ""}
   `;
   bindGallery(gallery);
+  renderRelatedProducts();
+}
+
+function renderRelatedProducts() {
+  const grid = els.page.querySelector("[data-related-products]");
+  if (!grid) return;
+  const related = relatedProducts(currentProduct);
+  grid.innerHTML = related.slice(0, 8).map(relatedProductCard).join("");
+  grid.onclick = (event) => {
+    if (event.target.closest("[data-add-cart]")) return;
+    const target = event.target.closest("[data-related-detail]");
+    if (!target || !grid.contains(target)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const product = allProducts.find((candidate) => candidate.id === target.dataset.relatedDetail);
+    openProductPage(product);
+  };
 }
 
 function bindGallery(gallery) {
@@ -566,7 +595,7 @@ function buildOrderMessage(productId = "") {
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   const productLink = focusedProduct
-    ? new URL(`product.html?id=${encodeURIComponent(focusedProduct.id)}&category=${encodeURIComponent(categoryKey)}`, window.location.href).toString()
+    ? new URL(productUrl(focusedProduct), window.location.href).toString()
     : window.location.href;
   return [
     "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
@@ -733,6 +762,7 @@ document.addEventListener("click", (event) => {
   const lineTarget = event.target.closest("[data-line-contact]");
   const shouldCheckout = event.target.closest("[data-checkout]");
   const buyNowId = event.target.closest("[data-buy-now]")?.dataset.buyNow;
+  const relatedDetailId = event.target.closest("[data-related-detail]")?.dataset.relatedDetail;
   if (lineTarget) {
     sendChatDraft(lineTarget.dataset.lineChannel || "whatsapp", lineTarget.dataset.lineProduct || "");
     return;
@@ -750,6 +780,12 @@ document.addEventListener("click", (event) => {
     const isDetailAdd = Boolean(addButton.closest(".detail-buybox"));
     const selected = product && isDetailAdd ? selectedDetailSize(product).size : "";
     addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.page) : 1);
+    return;
+  }
+  if (relatedDetailId) {
+    const product = allProducts.find((candidate) => candidate.id === relatedDetailId);
+    openProductPage(product);
+    return;
   }
   if (removeId) {
     removeFromCart(removeId);
@@ -798,6 +834,13 @@ els.menuBackdrop.addEventListener("click", closeMobileMenu);
 
 window.addEventListener("scroll", () => {
   els.header.classList.toggle("is-scrolled", window.scrollY > 24);
+});
+
+window.addEventListener("popstate", () => {
+  const nextParams = new URLSearchParams(window.location.search);
+  const nextId = nextParams.get("id");
+  const nextProduct = allProducts.find((item) => item.id === nextId);
+  if (nextProduct) openProductPage(nextProduct, false);
 });
 
 renderProduct();
