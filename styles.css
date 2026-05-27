@@ -6521,9 +6521,11 @@ body {
 }
 
 .drawer-list {
+  align-content: start !important;
   display: grid !important;
   flex: 1 1 auto !important;
   gap: 8px !important;
+  grid-auto-rows: max-content !important;
   margin: 8px 0 12px !important;
   min-height: 0 !important;
   overflow: auto !important;
@@ -6547,6 +6549,18 @@ body {
 .drawer-item > div:first-child,
 .cart-line-info {
   min-width: 0 !important;
+}
+
+.product-card .wishlist-toggle,
+.product-detail-page .wishlist-toggle {
+  align-items: center !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+  position: absolute !important;
+  right: 12px !important;
+  top: 12px !important;
+  z-index: 8 !important;
 }
 
 .drawer-item strong,

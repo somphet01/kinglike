@@ -47,15 +47,6 @@
 
   window.kinglikeSound = { click, success, error };
 
-  document.addEventListener("pointerup", (event) => {
-    if (event.target.closest("button, a, [role='button'], .clickable-card, select")) click();
-  }, { passive: true });
-
-  document.addEventListener("keyup", (event) => {
-    if (!["Enter", " "].includes(event.key)) return;
-    if (event.target.closest("button, a, [role='button'], .clickable-card, select")) click();
-  });
-
   window.addEventListener("kinglike:success", success);
   window.addEventListener("kinglike:error", error);
 
