@@ -4044,3 +4044,232 @@ main > #about {
 main > .trust-policies {
   order: 8;
 }
+
+/* Mobile comfort pass: restore the calmer old flow and make taps feel tactile. */
+.primary-btn,
+.secondary-btn,
+.add-cart,
+.view-btn,
+.buy-now,
+.line-contact,
+.floating-line,
+.icon-btn,
+.wishlist-toggle,
+.card-actions button,
+.detail-actions button,
+.size-options button,
+.qty-control button,
+.pagination button,
+.chat-channel-actions button,
+.checkout-submit {
+  position: relative;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease;
+  will-change: transform;
+}
+
+.primary-btn:active,
+.secondary-btn:active,
+.add-cart:active,
+.view-btn:active,
+.buy-now:active,
+.line-contact:active,
+.floating-line:active,
+.icon-btn:active,
+.wishlist-toggle:active,
+.card-actions button:active,
+.detail-actions button:active,
+.size-options button:active,
+.qty-control button:active,
+.pagination button:active,
+.chat-channel-actions button:active,
+.checkout-submit:active {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  opacity: 0.94;
+  transform: translateY(2px) scale(0.98);
+}
+
+@media (hover: hover) {
+  .primary-btn:hover,
+  .secondary-btn:hover,
+  .add-cart:hover,
+  .view-btn:hover,
+  .buy-now:hover,
+  .line-contact:hover,
+  .floating-line:hover,
+  .icon-btn:hover,
+  .wishlist-toggle:hover,
+  .card-actions button:hover,
+  .detail-actions button:hover,
+  .size-options button:hover,
+  .qty-control button:hover,
+  .pagination button:hover:not(:disabled),
+  .chat-channel-actions button:hover,
+  .checkout-submit:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    padding-bottom: 126px;
+  }
+
+  .site-header {
+    align-items: center;
+    border-radius: 30px;
+    height: 74px;
+    padding: 0 14px;
+    top: 10px;
+    width: calc(100vw - 24px);
+  }
+
+  .menu-btn {
+    height: 48px;
+    width: 48px;
+  }
+
+  .brand img {
+    height: 34px;
+    width: 136px;
+  }
+
+  .icon-btn {
+    height: 48px;
+    width: 48px;
+  }
+
+  .hero {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    padding: 116px 22px 72px;
+    text-align: center;
+  }
+
+  .hero-copy {
+    display: contents;
+  }
+
+  .hero .eyebrow {
+    font-size: 11px;
+    margin-bottom: 14px;
+    order: 1;
+  }
+
+  h1,
+  .hero h1 {
+    font-size: clamp(44px, 13vw, 58px);
+    letter-spacing: 0;
+    line-height: 0.95;
+    margin: 0 auto;
+    max-width: 360px;
+    order: 2;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-stage {
+    height: auto;
+    margin: -6px auto 12px;
+    min-height: 0;
+    order: 3;
+    position: relative;
+    width: min(100%, 390px);
+    z-index: 1;
+  }
+
+  .mattress-model {
+    animation: none;
+    height: auto;
+    left: auto;
+    position: relative;
+    top: auto;
+    transform: none;
+    width: 100%;
+  }
+
+  .hero-mattress-image {
+    display: block;
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.18));
+    margin: 0 auto;
+    max-height: 270px;
+    object-fit: contain;
+    width: min(100%, 360px);
+  }
+
+  .hero-copy p:not(.eyebrow) {
+    color: #707178;
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0 auto 24px;
+    max-width: 335px;
+    order: 4;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-actions {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    max-width: 100%;
+    order: 5;
+    width: 100%;
+  }
+
+  .hero-actions .primary-btn,
+  .hero-actions .secondary-btn {
+    border-radius: 999px;
+    min-height: 58px;
+    width: 100%;
+  }
+
+  .benefits {
+    gap: 14px;
+    padding: 42px 22px;
+  }
+
+  .benefits article {
+    border-radius: 20px;
+    min-height: 190px;
+    padding: 28px;
+  }
+
+  .floating-contact-group {
+    bottom: max(14px, env(safe-area-inset-bottom));
+    display: grid;
+    gap: 8px;
+    left: auto;
+    right: 14px;
+    width: min(210px, calc(100vw - 28px));
+    z-index: 80;
+  }
+
+  .floating-line {
+    border-radius: 999px;
+    font-size: 14px;
+    justify-content: center;
+    min-height: 48px;
+    padding: 10px 14px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  h1,
+  .hero h1 {
+    font-size: clamp(40px, 12.5vw, 50px);
+  }
+
+  .hero-mattress-image {
+    max-height: 238px;
+    width: min(100%, 330px);
+  }
+}
