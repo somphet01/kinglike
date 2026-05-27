@@ -864,6 +864,10 @@ els.searchInput.addEventListener("input", (event) => {
   renderProducts();
 });
 
+els.searchInput.closest(".header-search")?.addEventListener("click", () => {
+  els.searchInput.focus();
+});
+
 els.sort.addEventListener("change", (event) => {
   state.sort = event.target.value;
   state.page = 1;
