@@ -474,6 +474,7 @@ function productCard(product) {
     <article class="product-card collection-card clickable-card" data-open-detail="${product.id}">
       <div class="product-art ${collection.art}-product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
+        ${image ? "" : `<span class="image-placeholder">ຍັງບໍ່ມີຮູບສິນຄ້າ</span>`}
         <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
         <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="ສິນຄ້າທີ່ຖືກໃຈ">♡</button>
       </div>
@@ -519,7 +520,29 @@ function renderPagination(pageCount, totalItems) {
   `;
 }
 
-function addToCart(id, size = "") {
+function flyToHeaderIcon(source, target) {
+  if (!source || !target) return;
+  const start = source.getBoundingClientRect();
+  const end = target.getBoundingClientRect();
+  const dot = document.createElement("span");
+  dot.className = "fly-to-header";
+  dot.style.setProperty("--fly-x", `${end.left + end.width / 2 - start.left - start.width / 2}px`);
+  dot.style.setProperty("--fly-y", `${end.top + end.height / 2 - start.top - start.height / 2}px`);
+  dot.style.left = `${start.left + start.width / 2}px`;
+  dot.style.top = `${start.top + start.height / 2}px`;
+  document.body.appendChild(dot);
+  dot.addEventListener("animationend", () => dot.remove(), { once: true });
+}
+
+function pulseHeaderAction(type, source) {
+  const target = document.querySelector(type === "wishlist" ? "[data-open-wishlist]" : "[data-open-cart]");
+  target?.classList.remove("is-count-bump");
+  void target?.offsetWidth;
+  target?.classList.add("is-count-bump");
+  flyToHeaderIcon(source, target);
+}
+
+function addToCart(id, size = "", source) {
   const product = allProducts.find((candidate) => candidate.id === id);
   if (!product) return;
   const option = productSizeOption(product, size);
@@ -528,15 +551,16 @@ function addToCart(id, size = "") {
   else state.cart.push({ id, size: option.size, unitPrice: option.salePrice, qty: 1 });
   saveCart();
   renderCart();
-  openDrawer(els.cartDrawer);
+  pulseHeaderAction("cart", source);
 }
 
-function toggleWishlist(id) {
+function toggleWishlist(id, source) {
   if (state.wishlist.has(id)) state.wishlist.delete(id);
   else state.wishlist.add(id);
   saveWishlist();
   renderProducts();
   renderWishlist();
+  pulseHeaderAction("wishlist", source);
 }
 
 function renderCart() {
@@ -794,8 +818,10 @@ function closeMobileMenu() {
 }
 
 document.addEventListener("click", (event) => {
-  const addId = event.target.closest("[data-add-cart]")?.dataset.addCart;
-  const wishlistId = event.target.closest("[data-toggle-wishlist]")?.dataset.toggleWishlist;
+  const addButton = event.target.closest("[data-add-cart]");
+  const wishlistButton = event.target.closest("[data-toggle-wishlist]");
+  const addId = addButton?.dataset.addCart;
+  const wishlistId = wishlistButton?.dataset.toggleWishlist;
   const removeId = event.target.closest("[data-remove-cart]")?.dataset.removeCart;
   const increaseId = event.target.closest("[data-cart-increase]")?.dataset.cartIncrease;
   const decreaseId = event.target.closest("[data-cart-decrease]")?.dataset.cartDecrease;
@@ -818,11 +844,11 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (addId) {
-    addToCart(addId);
+    addToCart(addId, "", addButton);
     return;
   }
   if (wishlistId) {
-    toggleWishlist(wishlistId);
+    toggleWishlist(wishlistId, wishlistButton);
     return;
   }
   if (removeId) {

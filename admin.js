@@ -441,6 +441,7 @@ function productBadgeClass(product) {
 function showToast(message) {
   els.toast.textContent = message;
   els.toast.classList.add("is-visible");
+  window.dispatchEvent(new Event("kinglike:success"));
   setTimeout(() => els.toast.classList.remove("is-visible"), 1800);
 }
 
@@ -467,6 +468,7 @@ function showResult({ type = "success", title, message }) {
   els.resultModal?.classList.toggle("is-error", isError);
   els.resultModal?.classList.add("is-open");
   els.resultModal?.setAttribute("aria-hidden", "false");
+  window.dispatchEvent(new Event(isError ? "kinglike:error" : "kinglike:success"));
 }
 
 function closeResult() {

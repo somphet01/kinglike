@@ -3,6 +3,7 @@ const PROMO_STORAGE_KEY = "kinglikePromotion";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
+const BEST_SELLER_ORDER_KEY = "kinglikeBestSellerOrder";
 const WHATSAPP_PHONE = "8562051777641";
 const MESSENGER_ID = "Kinglikesikai";
 const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
@@ -273,6 +274,7 @@ const state = {
 
 const money = new Intl.NumberFormat("lo-LA").format;
 let promoPopupDismissed = false;
+let bestSellerOrderIds = [];
 
 const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
 const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
@@ -450,6 +452,49 @@ function saveWishlist() {
   localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify([...state.wishlist]));
 }
 
+function shuffleIds(ids) {
+  const shuffled = [...ids];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function sameOrder(a, b) {
+  return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
+function readLastBestSellerOrder(ids) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(BEST_SELLER_ORDER_KEY) || "[]");
+    return Array.isArray(saved) ? saved.filter((id) => ids.includes(id)) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function bestSellerOrder(productsToOrder) {
+  const ids = productsToOrder.map((product) => product.id).filter(Boolean);
+  if (sameOrder([...bestSellerOrderIds].sort(), [...ids].sort())) {
+    return new Map(bestSellerOrderIds.map((id, index) => [id, index]));
+  }
+
+  const lastOrder = readLastBestSellerOrder(ids);
+  let nextOrder = shuffleIds(ids);
+  if (ids.length > 1 && sameOrder(nextOrder, lastOrder)) {
+    nextOrder = [...nextOrder.slice(1), nextOrder[0]];
+  }
+
+  bestSellerOrderIds = nextOrder;
+  try {
+    localStorage.setItem(BEST_SELLER_ORDER_KEY, JSON.stringify(nextOrder));
+  } catch (error) {
+    // The shuffled order can still be used for this visit.
+  }
+  return new Map(nextOrder.map((id, index) => [id, index]));
+}
+
 function filteredProducts() {
   const term = state.search.trim().toLowerCase();
   const list = products.filter((product) => {
@@ -463,7 +508,8 @@ function filteredProducts() {
     if (state.sort === "low") return productPrice(a, "salePrice") - productPrice(b, "salePrice");
     if (state.sort === "high") return productPrice(b, "salePrice") - productPrice(a, "salePrice");
     if (state.sort === "discount") return productPrice(b, "discountPercent") - productPrice(a, "discountPercent");
-    return productPrice(b, "popular") - productPrice(a, "popular");
+    const order = bestSellerOrder(products);
+    return (order.get(a.id) ?? 9999) - (order.get(b.id) ?? 9999);
   });
 }
 
@@ -639,6 +685,7 @@ function productCard(product) {
     <article class="product-card clickable-card" data-open-detail="${product.id}">
       <div class="product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
+        ${image ? "" : `<span class="image-placeholder">ຍັງບໍ່ມີຮູບສິນຄ້າ</span>`}
         <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
         <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="ສິນຄ້າທີ່ຖືກໃຈ">♡</button>
       </div>
@@ -659,7 +706,29 @@ function productCard(product) {
   `;
 }
 
-function addToCart(id, size = "", qty = 1) {
+function flyToHeaderIcon(source, target) {
+  if (!source || !target) return;
+  const start = source.getBoundingClientRect();
+  const end = target.getBoundingClientRect();
+  const dot = document.createElement("span");
+  dot.className = "fly-to-header";
+  dot.style.setProperty("--fly-x", `${end.left + end.width / 2 - start.left - start.width / 2}px`);
+  dot.style.setProperty("--fly-y", `${end.top + end.height / 2 - start.top - start.height / 2}px`);
+  dot.style.left = `${start.left + start.width / 2}px`;
+  dot.style.top = `${start.top + start.height / 2}px`;
+  document.body.appendChild(dot);
+  dot.addEventListener("animationend", () => dot.remove(), { once: true });
+}
+
+function pulseHeaderAction(type, source) {
+  const target = document.querySelector(type === "wishlist" ? "[data-open-wishlist]" : "[data-open-cart]");
+  target?.classList.remove("is-count-bump");
+  void target?.offsetWidth;
+  target?.classList.add("is-count-bump");
+  flyToHeaderIcon(source, target);
+}
+
+function addToCart(id, size = "", qty = 1, source) {
   const product = products.find((candidate) => candidate.id === id);
   if (!product) return;
   const option = productSizeOption(product, size);
@@ -669,15 +738,16 @@ function addToCart(id, size = "", qty = 1) {
   else state.cart.push({ id, size: option.size, unitPrice: option.salePrice, qty: quantity });
   saveCart();
   renderCart();
-  openDrawer(els.cartDrawer);
+  pulseHeaderAction("cart", source);
 }
 
-function toggleWishlist(id) {
+function toggleWishlist(id, source) {
   if (state.wishlist.has(id)) state.wishlist.delete(id);
   else state.wishlist.add(id);
   saveWishlist();
   renderProducts();
   renderWishlist();
+  pulseHeaderAction("wishlist", source);
 }
 
 function productCollectionKey(product) {
@@ -1022,11 +1092,11 @@ document.addEventListener("click", (event) => {
     const product = products.find((candidate) => candidate.id === addId);
     const isDetailAdd = Boolean(addButton.closest(".detail-buybox"));
     const selected = product && isDetailAdd ? selectedDetailSize(product).size : "";
-    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.productDetail) : 1);
+    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.productDetail) : 1, addButton);
     return;
   }
   if (wishlistId) {
-    toggleWishlist(wishlistId);
+    toggleWishlist(wishlistId, event.target.closest("[data-toggle-wishlist]"));
     return;
   }
   if (removeId) {

@@ -96,6 +96,7 @@ function renderSummary() {
 function showMessage(text, isError = true) {
   els.message.textContent = text;
   els.message.classList.toggle("is-error", isError);
+  if (isError) window.dispatchEvent(new Event("kinglike:error"));
 }
 
 function readSlip(file) {
@@ -152,7 +153,10 @@ async function submitOrder(event) {
     if (!response.ok) throw new Error(await response.text());
     const order = await response.json();
     localStorage.removeItem(CART_STORAGE_KEY);
-    window.location.href = `order.html?code=${encodeURIComponent(order.orderCode)}`;
+    window.dispatchEvent(new Event("kinglike:success"));
+    setTimeout(() => {
+      window.location.href = `order.html?code=${encodeURIComponent(order.orderCode)}`;
+    }, 320);
   } catch (error) {
     showMessage(error.message || "ສົ່ງອອເດີບໍ່ສຳເລັດ. ກະລຸນາເປີດຜ່ານ http://127.0.0.1:4173/");
   }

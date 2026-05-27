@@ -1,6 +1,66 @@
 {
   "orders": [
     {
+      "id": "42fddcc2-02c9-4bd6-b613-16238927fcf5",
+      "orderCode": "KL2605276K6I",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "customerAddress": "",
+      "note": "",
+      "contactChannel": "whatsapp",
+      "productLink": "http://127.0.0.1:4173/product.html?id=gold-support&category=mattresses",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Mattress\n   ລະຫັດສິນຄ້າ: SAMPLE-MATTRESSES-1779874253852\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 5\n   ລາຄາ/ໜ່ວຍ: 4,990,000 ₭\n   ລວມ: 24,950,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 24,950,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://127.0.0.1:4173/product.html?id=gold-support&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "totalAmount": 24950000,
+      "status": "draft",
+      "paymentMethod": "chat",
+      "slip": null,
+      "adminNote": "",
+      "items": [
+        {
+          "id": "8496b76b-6222-4846-98a1-4df11ee8df55",
+          "productId": "sample-mattresses-1779874253852",
+          "productName": "Kinglike Royal Mattress",
+          "size": "3.5 ຟຸດ",
+          "quantity": 5,
+          "unitPrice": 4990000,
+          "subtotal": 24950000
+        }
+      ],
+      "createdAt": "2026-05-27T15:49:01.724Z",
+      "updatedAt": "2026-05-27T15:49:01.724Z"
+    },
+    {
+      "id": "77b0ee95-a552-4ac4-9c47-2605f1be4543",
+      "orderCode": "KL260527CAKC",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "customerAddress": "",
+      "note": "",
+      "contactChannel": "whatsapp",
+      "productLink": "http://127.0.0.1:4173/product.html?id=gold-support&category=mattresses",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Gold Support\n   ລະຫັດສິນຄ້າ: KL-GS-1205\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 1\n   ລາຄາ/ໜ່ວຍ: 6,190,000 ₭\n   ລວມ: 6,190,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 6,190,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://127.0.0.1:4173/product.html?id=gold-support&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "totalAmount": 6190000,
+      "status": "draft",
+      "paymentMethod": "chat",
+      "slip": null,
+      "adminNote": "",
+      "items": [
+        {
+          "id": "d5c9b31c-3aae-419b-9743-d147288ed729",
+          "productId": "gold-support",
+          "productName": "Kinglike Gold Support",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 6190000,
+          "subtotal": 6190000
+        }
+      ],
+      "createdAt": "2026-05-27T15:48:50.059Z",
+      "updatedAt": "2026-05-27T15:48:50.059Z"
+    },
+    {
       "mode": "chat_draft",
       "contactChannel": "messenger",
       "customerName": "Website chat customer",
@@ -802,6 +862,24 @@
     }
   ],
   "logs": [
+    {
+      "id": "393026bd-0a08-487b-8abe-fcc65c491808",
+      "orderId": "42fddcc2-02c9-4bd6-b613-16238927fcf5",
+      "oldStatus": "",
+      "newStatus": "draft",
+      "changedBy": "customer",
+      "note": "Chat draft via whatsapp",
+      "createdAt": "2026-05-27T15:49:01.724Z"
+    },
+    {
+      "id": "deaef605-d618-4c6a-b853-830bee13bb35",
+      "orderId": "77b0ee95-a552-4ac4-9c47-2605f1be4543",
+      "oldStatus": "",
+      "newStatus": "draft",
+      "changedBy": "customer",
+      "note": "Chat draft via whatsapp",
+      "createdAt": "2026-05-27T15:48:50.059Z"
+    },
     {
       "id": "8834f85b-6c65-4ff4-80fd-128e2db2d44f",
       "createdAt": "2026-05-27T03:57:25.397Z",

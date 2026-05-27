@@ -41,6 +41,7 @@ function renderOrder(data) {
       ${order.adminNote ? `<p class="admin-note">ໝາຍເຫດ Admin: ${order.adminNote}</p>` : ""}
     </article>
   `;
+  window.dispatchEvent(new Event("kinglike:success"));
 }
 
 async function loadOrder(code) {
@@ -53,6 +54,7 @@ async function loadOrder(code) {
     renderOrder(await response.json());
   } catch (error) {
     els.result.innerHTML = `<p class="checkout-alert is-error">ບໍ່ພົບອອເດີນີ້ ຫຼືຕ້ອງເປີດຜ່ານ local server.</p>`;
+    window.dispatchEvent(new Event("kinglike:error"));
   }
 }
 

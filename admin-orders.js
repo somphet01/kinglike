@@ -81,6 +81,7 @@ function buildCustomerBillMessage(order) {
 function showToast(message) {
   els.toast.textContent = message;
   els.toast.classList.add("is-visible");
+  window.dispatchEvent(new Event("kinglike:success"));
   setTimeout(() => els.toast.classList.remove("is-visible"), 1800);
 }
 
@@ -96,6 +97,7 @@ async function loadOrders() {
     renderDetail();
   } catch (error) {
     els.list.innerHTML = `<p class="checkout-alert is-error">ໂຫຼດອອເດີບໍ່ໄດ້. ກະລຸນາເປີດຜ່ານ http://127.0.0.1:4173/</p>`;
+    window.dispatchEvent(new Event("kinglike:error"));
   }
 }
 

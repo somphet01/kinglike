@@ -131,10 +131,7 @@ function galleryItems(product) {
     }));
   }
   return [
-    { image: "", label: "ຮູບສິນຄ້າ" },
-    { image: "", label: "Layer ວັດສະດຸ" },
-    { image: "", label: "ຜ້ານຸ່ມ" },
-    { image: "", label: "ຂະໜາດເຂົ້າມຸມ" }
+    { image: "", label: "ຍັງບໍ່ມີຮູບສິນຄ້າ" }
   ];
 }
 
@@ -159,6 +156,11 @@ function openProductPage(product, pushHistory = true) {
   if (pushHistory) window.history.pushState({ productId: currentProduct.id }, "", productUrl(currentProduct));
   renderProduct();
   window.scrollTo(0, 0);
+}
+
+function navigateToProductPage(product) {
+  if (!product) return;
+  window.location.href = productUrl(product);
 }
 
 function relatedProducts(product) {
@@ -189,6 +191,7 @@ function relatedProductCard(product) {
     <article class="product-card related-product-card clickable-card" data-related-detail="${product.id}">
       <div class="product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
+        ${image ? "" : `<span class="image-placeholder">ຍັງບໍ່ມີຮູບສິນຄ້າ</span>`}
         <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
       </div>
       <div class="product-body">
@@ -414,6 +417,7 @@ function renderProduct() {
       <div class="detail-gallery">
         <div class="detail-hero-art ${productCollectionKey(currentProduct) === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero>
           ${heroImage ? `<img src="${heroImage}" alt="${currentProduct.name}" data-gallery-hero-image />` : ""}
+          ${heroImage ? "" : `<span class="image-placeholder detail-image-placeholder">ຍັງບໍ່ມີຮູບສິນຄ້າ</span>`}
           <span class="${productBadgeClass(currentProduct)}">${productBadgeText(currentProduct)}</span>
           ${gallery.length > 1 ? `
             <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Previous image">‹</button>
@@ -422,7 +426,7 @@ function renderProduct() {
         </div>
         <div class="detail-thumbs" data-gallery-thumbs>
           ${gallery.map((item, index) => `
-            <button class="${index === 0 ? "is-active" : ""}" type="button" data-gallery-index="${index}">
+            <button class="${index === 0 ? "is-active" : ""} ${item.image ? "" : "is-empty"}" type="button" data-gallery-index="${index}">
               ${item.image ? `<img src="${item.image}" alt="${item.label}" />` : ""}
               <span>${item.label}</span>
             </button>
@@ -499,7 +503,7 @@ function renderRelatedProducts() {
     event.preventDefault();
     event.stopPropagation();
     const product = allProducts.find((candidate) => candidate.id === target.dataset.relatedDetail);
-    openProductPage(product);
+    navigateToProductPage(product);
   };
 }
 
@@ -521,7 +525,29 @@ function bindGallery(gallery) {
   els.page.querySelector("[data-gallery-next]")?.addEventListener("click", () => setActive(activeIndex + 1));
 }
 
-function addToCart(idToAdd, size = "", qty = 1) {
+function flyToHeaderIcon(source, target) {
+  if (!source || !target) return;
+  const start = source.getBoundingClientRect();
+  const end = target.getBoundingClientRect();
+  const dot = document.createElement("span");
+  dot.className = "fly-to-header";
+  dot.style.setProperty("--fly-x", `${end.left + end.width / 2 - start.left - start.width / 2}px`);
+  dot.style.setProperty("--fly-y", `${end.top + end.height / 2 - start.top - start.height / 2}px`);
+  dot.style.left = `${start.left + start.width / 2}px`;
+  dot.style.top = `${start.top + start.height / 2}px`;
+  document.body.appendChild(dot);
+  dot.addEventListener("animationend", () => dot.remove(), { once: true });
+}
+
+function pulseHeaderAction(type, source) {
+  const target = document.querySelector(type === "wishlist" ? "[data-open-wishlist]" : "[data-open-cart]");
+  target?.classList.remove("is-count-bump");
+  void target?.offsetWidth;
+  target?.classList.add("is-count-bump");
+  flyToHeaderIcon(source, target);
+}
+
+function addToCart(idToAdd, size = "", qty = 1, source) {
   const product = allProducts.find((candidate) => candidate.id === idToAdd);
   if (!product) return;
   const option = productSizeOption(product, size);
@@ -531,7 +557,7 @@ function addToCart(idToAdd, size = "", qty = 1) {
   else state.cart.push({ id: idToAdd, size: option.size, unitPrice: option.salePrice, qty: quantity });
   saveCart();
   renderCart();
-  openDrawer(els.cartDrawer);
+  pulseHeaderAction("cart", source);
 }
 
 function renderCart() {
@@ -835,12 +861,12 @@ document.addEventListener("click", (event) => {
     const product = allProducts.find((candidate) => candidate.id === addId);
     const isDetailAdd = Boolean(addButton.closest(".detail-buybox"));
     const selected = product && isDetailAdd ? selectedDetailSize(product).size : "";
-    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.page) : 1);
+    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.page) : 1, addButton);
     return;
   }
   if (relatedDetailId) {
     const product = allProducts.find((candidate) => candidate.id === relatedDetailId);
-    openProductPage(product);
+    navigateToProductPage(product);
     return;
   }
   if (removeId) {
