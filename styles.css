@@ -4577,6 +4577,145 @@ main > .trust-policies {
   }
 }
 
+/* Mobile hero composition: text left, bed right, actions below with no overlap. */
+@media (max-width: 720px) {
+  .hero {
+    align-items: center;
+    column-gap: 8px;
+    display: grid;
+    grid-template-areas:
+      "eyebrow image"
+      "title image"
+      "copy image"
+      "actions actions";
+    grid-template-columns: minmax(0, 0.52fr) minmax(154px, 0.48fr);
+    min-height: auto;
+    padding: 104px 18px 50px;
+    row-gap: 10px;
+    text-align: left;
+  }
+
+  .hero-copy {
+    display: contents;
+  }
+
+  .hero .eyebrow {
+    font-size: 10px;
+    grid-area: eyebrow;
+    line-height: 1.35;
+    margin: 0;
+    text-align: left;
+  }
+
+  h1,
+  .hero h1 {
+    font-size: clamp(35px, 10.6vw, 48px);
+    grid-area: title;
+    line-height: 0.98;
+    margin: 0;
+    max-width: none;
+    text-align: left;
+    z-index: 2;
+  }
+
+  .hero-copy p:not(.eyebrow) {
+    color: #686970;
+    font-size: 13px;
+    grid-area: copy;
+    line-height: 1.55;
+    margin: 0;
+    max-width: none;
+    text-align: left;
+    z-index: 2;
+  }
+
+  .hero-stage {
+    align-self: center;
+    grid-area: image;
+    height: auto;
+    margin: 0;
+    min-height: 0;
+    overflow: visible;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .mattress-model {
+    animation: none;
+    height: auto;
+    left: auto;
+    position: relative;
+    top: auto;
+    transform: none;
+    width: 100%;
+  }
+
+  .hero-mattress-image {
+    animation: none !important;
+    display: block;
+    filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.18));
+    left: auto;
+    margin: 0;
+    max-height: 252px;
+    object-fit: contain;
+    position: relative;
+    top: auto;
+    transform: none !important;
+    width: 100%;
+  }
+
+  .hero-actions {
+    display: grid;
+    gap: 8px;
+    grid-area: actions;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: start;
+    margin: 8px 0 0;
+    max-width: 320px;
+    width: 100%;
+    z-index: 3;
+  }
+
+  .hero-actions .primary-btn,
+  .hero-actions .secondary-btn {
+    font-size: 12px;
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.54fr) minmax(132px, 0.46fr);
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  h1,
+  .hero h1 {
+    font-size: clamp(32px, 10vw, 42px);
+  }
+
+  .hero-copy p:not(.eyebrow) {
+    font-size: 12px;
+  }
+
+  .hero-mattress-image {
+    max-height: 228px;
+  }
+
+  .hero-actions {
+    max-width: 300px;
+  }
+
+  .hero-actions .primary-btn,
+  .hero-actions .secondary-btn {
+    font-size: 11px;
+    min-height: 38px;
+    padding: 8px;
+  }
+}
+
 @media (min-width: 721px) and (max-width: 980px) {
   .product-grid,
   .related-product-grid {
@@ -4702,15 +4841,15 @@ main > .trust-policies {
 
   .benefits {
     display: grid;
-    grid-auto-columns: minmax(214px, 64vw);
-    grid-auto-flow: column;
-    grid-template-columns: none !important;
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 12px;
-    overflow-x: auto;
+    overflow-x: visible;
     overscroll-behavior-x: contain;
     padding: 34px 14px;
     scroll-padding-left: 14px;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: none;
     scrollbar-width: none;
   }
 
@@ -4720,10 +4859,10 @@ main > .trust-policies {
 
   .benefits article {
     border-radius: 16px;
-    gap: 14px;
-    min-height: 168px;
-    padding: 22px;
-    scroll-snap-align: start;
+    gap: 12px;
+    min-height: 154px;
+    padding: 18px;
+    scroll-snap-align: none;
   }
 
   .benefits .benefit-icon {
@@ -4737,12 +4876,12 @@ main > .trust-policies {
   }
 
   .benefits h2 {
-    font-size: 22px;
+    font-size: clamp(18px, 5.2vw, 22px);
     line-height: 1.18;
   }
 
   .benefits p {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.55;
   }
 }
@@ -4764,5 +4903,19 @@ main > .trust-policies {
     flex-basis: 38px;
     height: 38px;
     width: 38px;
+  }
+}
+
+/* Wide screens should use the full browser width, not a capped stage. */
+@media (min-width: 981px) {
+  main,
+  .product-page main,
+  .collection-page main,
+  .site-footer {
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: none;
+    width: 100%;
   }
 }
