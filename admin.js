@@ -6,6 +6,13 @@ const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toStri
 const STACKED_ADMIN_QUERY = "(max-width: 1180px)";
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
+const ADMIN_COLLECTIONS = [
+  { key: "pillows", label: "ໝອນ", category: "Pillow", sample: "Kinglike Cloud Pillow" },
+  { key: "mattresses", label: "ທີ່ນອນ", category: "Mattress", sample: "Kinglike Royal Mattress" },
+  { key: "blankets", label: "ຜ້າຫົ່ມ", category: "Blanket", sample: "Kinglike Soft Blanket" },
+  { key: "beds", label: "ຕຽງນອນ", category: "Bed", sample: "Kinglike Luxury Bed" },
+  { key: "toppers", label: "ທັອບເປີ", category: "Topper", sample: "Kinglike Comfort Topper" }
+];
 
 const defaultProducts = [
   {
@@ -155,6 +162,14 @@ function productSeed(id, name, category, firmness, thickness, price, salePrice, 
 const els = {
   tabs: document.querySelectorAll("[data-admin-tab]"),
   panels: document.querySelectorAll("[data-admin-panel]"),
+  categoryTabs: document.querySelector("[data-admin-categories]"),
+  categoryCoverForm: document.querySelector("[data-category-cover-form]"),
+  categoryCoverKey: document.querySelector("[data-category-cover-key]"),
+  categoryCoverValue: document.querySelector("[data-category-cover-value]"),
+  categoryCoverUpload: document.querySelector("[data-category-cover-upload]"),
+  categoryCoverTitle: document.querySelector("[data-category-cover-title]"),
+  categoryCoverHelp: document.querySelector("[data-category-cover-help]"),
+  categoryCoverPreview: document.querySelector("[data-category-cover-preview]"),
   form: document.querySelector("[data-product-form]"),
   formTitle: document.querySelector("[data-form-title]"),
   list: document.querySelector("[data-admin-products]"),
@@ -187,14 +202,27 @@ const els = {
   importData: document.querySelector("[data-import-data]"),
   backupProductCount: document.querySelector("[data-backup-product-count]"),
   backupPromoStatus: document.querySelector("[data-backup-promo-status]"),
+  confirmModal: document.querySelector("[data-confirm-modal]"),
+  confirmTitle: document.querySelector("[data-confirm-title]"),
+  confirmMessage: document.querySelector("[data-confirm-message]"),
+  confirmOk: document.querySelector("[data-confirm-ok]"),
+  confirmCancel: document.querySelector("[data-confirm-cancel]"),
+  resultModal: document.querySelector("[data-result-modal]"),
+  resultIcon: document.querySelector("[data-result-icon]"),
+  resultKicker: document.querySelector("[data-result-kicker]"),
+  resultTitle: document.querySelector("[data-result-title]"),
+  resultMessage: document.querySelector("[data-result-message]"),
+  resultOk: document.querySelector("[data-result-ok]"),
   toast: document.querySelector("[data-toast]")
 };
 
 let promotionCache = null;
 let productsCache = null;
 let products = loadProducts();
-let activeProductId = products[0]?.id || "";
+let activeCollectionKey = "mattresses";
+let activeProductId = products.find((product) => collectionKeyForProduct(product) === activeCollectionKey)?.id || products[0]?.id || "";
 let activePromoEventId = "";
+let confirmAction = null;
 
 function openLocalDb() {
   return new Promise((resolve, reject) => {
@@ -240,12 +268,13 @@ async function loadSyncedStore() {
   return null;
 }
 
-async function publishSyncedStore() {
+async function publishSyncedStore(promotionOverride = null) {
   try {
+    const promotion = promotionOverride || loadPromotionData();
     const response = await fetch(SYNC_STORE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ products, promotion: loadPromotionData(), updatedAt: localStorage.getItem(STORE_UPDATED_KEY) })
+      body: JSON.stringify({ products, promotion, updatedAt: localStorage.getItem(STORE_UPDATED_KEY) })
     });
     if (!response.ok) throw new Error("Sync server unavailable");
   } catch (error) {
@@ -297,9 +326,17 @@ function saveProducts() {
           // IndexedDB already saved the products; localStorage may be full.
         }
         renderBackupSummary();
-        showToast("ບັນທຶກສິນຄ້າແລ້ວ ຮູບຖືກເກັບໃນ IndexedDB");
+        publishSyncedStore();
+        showResult({
+          title: "ບັນທຶກສຳເລັດ",
+          message: "ບັນທຶກສິນຄ້າແລ້ວ ຮູບຖືກເກັບໃນ IndexedDB."
+        });
       })
-      .catch(() => showToast("ບັນທຶກສິນຄ້າບໍ່ໄດ້: browser storage ເຕັມ"));
+      .catch(() => showResult({
+        type: "error",
+        title: "ບັນທຶກບໍ່ສຳເລັດ",
+        message: "ບັນທຶກສິນຄ້າບໍ່ໄດ້: browser storage ເຕັມ."
+      }));
     return true;
   }
 }
@@ -407,6 +444,36 @@ function showToast(message) {
   setTimeout(() => els.toast.classList.remove("is-visible"), 1800);
 }
 
+function openConfirm({ title, message, onConfirm }) {
+  confirmAction = onConfirm;
+  if (els.confirmTitle) els.confirmTitle.textContent = title || "ຢືນຢັນການລຶບ";
+  if (els.confirmMessage) els.confirmMessage.textContent = message || "ທ່ານຕ້ອງການລຶບຂໍ້ມູນນີ້ບໍ?";
+  els.confirmModal?.classList.add("is-open");
+  els.confirmModal?.setAttribute("aria-hidden", "false");
+}
+
+function closeConfirm() {
+  confirmAction = null;
+  els.confirmModal?.classList.remove("is-open");
+  els.confirmModal?.setAttribute("aria-hidden", "true");
+}
+
+function showResult({ type = "success", title, message }) {
+  const isError = type === "error";
+  if (els.resultIcon) els.resultIcon.textContent = isError ? "!" : "✓";
+  if (els.resultKicker) els.resultKicker.textContent = isError ? "NOT SAVED" : "SUCCESS";
+  if (els.resultTitle) els.resultTitle.textContent = title || (isError ? "ບັນທຶກບໍ່ສຳເລັດ" : "ບັນທຶກສຳເລັດ");
+  if (els.resultMessage) els.resultMessage.textContent = message || (isError ? "ກະລຸນາລອງໃໝ່." : "ຂໍ້ມູນຖືກບັນທຶກແລ້ວ.");
+  els.resultModal?.classList.toggle("is-error", isError);
+  els.resultModal?.classList.add("is-open");
+  els.resultModal?.setAttribute("aria-hidden", "false");
+}
+
+function closeResult() {
+  els.resultModal?.classList.remove("is-open");
+  els.resultModal?.setAttribute("aria-hidden", "true");
+}
+
 function setTab(tabName) {
   els.tabs.forEach((tab) => tab.classList.toggle("is-active", tab.dataset.adminTab === tabName));
   els.panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.adminPanel === tabName));
@@ -461,10 +528,33 @@ function parseImages(value) {
 
 function collectionKeyForProduct(product) {
   const category = (product?.category || "").toLowerCase();
+  if (category.includes("blanket") || category.includes("duvet") || category.includes("comforter")) return "blankets";
+  if (category === "bed" || category.includes("bed frame") || category.includes("bedframe")) return "beds";
   if (category.includes("pillow")) return "pillows";
   if (category.includes("topper")) return "toppers";
   if (category.includes("bedding") || category.includes("sheet") || category.includes("protector")) return "bedding";
   return "mattresses";
+}
+
+function activeCollection() {
+  return ADMIN_COLLECTIONS.find((item) => item.key === activeCollectionKey) || ADMIN_COLLECTIONS[1];
+}
+
+function productCollectionLabel(product) {
+  return ADMIN_COLLECTIONS.find((item) => item.key === collectionKeyForProduct(product))?.label || "ທີ່ນອນ";
+}
+
+function collectionProducts(key = activeCollectionKey) {
+  return products.filter((product) => collectionKeyForProduct(product) === key);
+}
+
+function collectionCoverData() {
+  const promo = loadPromotionData();
+  return promo.categoryCovers && typeof promo.categoryCovers === "object" ? promo.categoryCovers : {};
+}
+
+function activeCategoryCover() {
+  return collectionCoverData()[activeCollectionKey] || {};
 }
 
 function placementLabel(product) {
@@ -473,6 +563,8 @@ function placementLabel(product) {
     mattresses: "Home + Mattress category + Detail",
     pillows: "Pillow category + Detail",
     toppers: "Topper category + Detail",
+    blankets: "Blanket category + Detail",
+    beds: "Bed category + Detail",
     bedding: "Bedding category + Detail"
   };
   return labels[collectionKeyForProduct(product)] || labels.mattresses;
@@ -502,17 +594,41 @@ function updateAdminStatus(product) {
   }
 }
 
+function renderCollectionTabs() {
+  if (!els.categoryTabs) return;
+  els.categoryTabs.innerHTML = ADMIN_COLLECTIONS.map((item) => {
+    const count = collectionProducts(item.key).length;
+    return `<button class="${item.key === activeCollectionKey ? "is-active" : ""}" type="button" data-admin-category="${item.key}"><span>${item.label}</span><small>${count} ລາຍການ</small></button>`;
+  }).join("");
+}
+
+function renderCategoryCoverEditor() {
+  if (!els.categoryCoverForm) return;
+  const collection = activeCollection();
+  const cover = activeCategoryCover();
+  els.categoryCoverKey.value = collection.key;
+  els.categoryCoverValue.value = cover.image || "";
+  els.categoryCoverTitle.textContent = `ແກ້ໄຂໜ້າປົກ: ${collection.label}`;
+  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າ collection ຂອງ ${collection.label}.`;
+  els.categoryCoverPreview.classList.toggle("has-image", Boolean(cover.image));
+  els.categoryCoverPreview.innerHTML = cover.image
+    ? `<img src="${cover.image}" alt="${collection.label} cover" />`
+    : `<span>${collection.label} cover preview</span>`;
+}
+
 function renderProducts() {
   const term = els.search.value.trim().toLowerCase();
-  const visible = products.filter((product) => !term || `${product.name} ${product.category} ${product.badge}`.toLowerCase().includes(term));
+  const visible = collectionProducts().filter((product) => !term || `${product.name} ${product.category} ${product.badge}`.toLowerCase().includes(term));
   els.productCount.textContent = products.length;
   els.saleCount.textContent = products.filter((product) => product.discountPercent > 0).length;
+  renderCollectionTabs();
+  renderCategoryCoverEditor();
   els.list.innerHTML = visible.map((product) => `
     <article class="admin-product ${product.id === activeProductId ? "is-active" : ""}" data-select-product="${product.id}">
       <div class="admin-thumb">${productImageMarkup(product)}</div>
       <div>
         <h3>${product.name}</h3>
-        <p>${product.category} • ${product.thickness || "-"} • ${product.firmness || "-"} • ${productPriceLabel(product)}</p>
+        <p>${productCollectionLabel(product)} • ${product.category} • ${productPriceLabel(product)}</p>
         <p>${product.badge || "No badge"} • ${product.sizes?.join(", ") || "-"}</p>
       </div>
       <div class="admin-actions">
@@ -520,7 +636,7 @@ function renderProducts() {
         <button type="button" data-delete-product="${product.id}">ລຶບ</button>
       </div>
     </article>
-  `).join("");
+  `).join("") || `<div class="admin-preview-empty">ຍັງບໍ່ມີສິນຄ້າໃນໝວດນີ້. ກົດ + ເພີ່ມ ເພື່ອສ້າງລາຍການໃໝ່.</div>`;
 }
 
 function formToProduct() {
@@ -607,6 +723,7 @@ function clearForm() {
   setField("id", "");
   setField("image", "");
   setField("images", "");
+  setField("category", activeCollection().category);
   els.formTitle.textContent = "ເພີ່ມສິນຄ້າໃໝ່";
   activeProductId = "";
   updateImagePreview("");
@@ -875,7 +992,7 @@ function savePromotionData(promotion) {
     localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promotion));
     localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
     renderBackupSummary();
-    publishSyncedStore();
+    publishSyncedStore(promotion);
     return true;
   } catch (error) {
     idbSet(PROMO_STORAGE_KEY, promotion)
@@ -886,9 +1003,17 @@ function savePromotionData(promotion) {
           // IndexedDB already saved the promotion; localStorage may be full.
         }
         renderBackupSummary();
-        showToast("ບັນທຶກແລ້ວ ຮູບຖືກເກັບໃນ IndexedDB");
+        publishSyncedStore(promotion);
+        showResult({
+          title: "ບັນທຶກສຳເລັດ",
+          message: "ບັນທຶກແລ້ວ ຮູບຖືກເກັບໃນ IndexedDB."
+        });
       })
-      .catch(() => showToast("ບັນທຶກບໍ່ໄດ້: browser storage ເຕັມ"));
+      .catch(() => showResult({
+        type: "error",
+        title: "ບັນທຶກບໍ່ສຳເລັດ",
+        message: "ບັນທຶກບໍ່ໄດ້: browser storage ເຕັມ."
+      }));
     return true;
   }
 }
@@ -981,11 +1106,23 @@ function scrollToProductForm() {
 }
 
 els.tabs.forEach((tab) => tab.addEventListener("click", () => setTab(tab.dataset.adminTab)));
+els.categoryTabs?.addEventListener("click", (event) => {
+  const key = event.target.closest("[data-admin-category]")?.dataset.adminCategory;
+  if (!key) return;
+  activeCollectionKey = key;
+  activeProductId = collectionProducts()[0]?.id || "";
+  els.search.value = "";
+  renderProducts();
+  const product = products.find((item) => item.id === activeProductId);
+  if (product) fillForm(product);
+  else clearForm();
+});
 els.search.addEventListener("input", renderProducts);
 els.clearForm.addEventListener("click", clearForm);
 els.newProduct.addEventListener("click", clearForm);
 els.addSample.addEventListener("click", () => {
-  const sample = productSeed(`sample-${Date.now()}`, "Kinglike Sample Product", "Hybrid", "ນຸ່ມແນ່ນ", "12 ນິ້ວ", 7500000, 4990000, "Sample");
+  const collection = activeCollection();
+  const sample = productSeed(`sample-${collection.key}-${Date.now()}`, collection.sample, collection.category, "ນຸ່ມແນ່ນ", "12 ນິ້ວ", 7500000, 4990000, "Sample");
   products.unshift(sample);
   activeProductId = sample.id;
   saveProducts();
@@ -1030,6 +1167,19 @@ els.importData.addEventListener("change", (event) => importBackup(event.target.f
 
 els.promoForm.addEventListener("input", renderPromoPreview);
 els.newPromoEvent?.addEventListener("click", clearPromoEventForm);
+els.confirmCancel?.addEventListener("click", closeConfirm);
+els.confirmModal?.addEventListener("click", (event) => {
+  if (event.target === els.confirmModal) closeConfirm();
+});
+els.confirmOk?.addEventListener("click", () => {
+  const action = confirmAction;
+  closeConfirm();
+  if (typeof action === "function") action();
+});
+els.resultOk?.addEventListener("click", closeResult);
+els.resultModal?.addEventListener("click", (event) => {
+  if (event.target === els.resultModal) closeResult();
+});
 
 els.form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -1038,14 +1188,23 @@ els.form.addEventListener("submit", async (event) => {
   const previousProducts = [...products];
   if (index >= 0) products[index] = product;
   else products.unshift(product);
+  activeCollectionKey = collectionKeyForProduct(product);
   activeProductId = product.id;
   if (!saveProducts()) {
     products = previousProducts;
+    showResult({
+      type: "error",
+      title: "ບັນທຶກບໍ່ສຳເລັດ",
+      message: "ບໍ່ສາມາດບັນທຶກສິນຄ້າໄດ້. ກະລຸນາລອງໃໝ່."
+    });
     return;
   }
   renderProducts();
   fillForm(product);
-  showToast("ບັນທຶກສິນຄ້າແລ້ວ");
+  showResult({
+    title: "ບັນທຶກສຳເລັດ",
+    message: `ສິນຄ້າ "${product.name}" ຖືກບັນທຶກແລ້ວ.`
+  });
 });
 
 els.list.addEventListener("click", (event) => {
@@ -1054,14 +1213,21 @@ els.list.addEventListener("click", (event) => {
   const selectId = event.target.closest("[data-select-product]")?.dataset.selectProduct;
 
   if (deleteId) {
-    products = products.filter((item) => item.id !== deleteId);
-    if (activeProductId === deleteId) activeProductId = products[0]?.id || "";
-    saveProducts();
-    renderProducts();
-    const next = products.find((item) => item.id === activeProductId);
-    if (next) fillForm(next);
-    else clearForm();
-    showToast("ລຶບສິນຄ້າແລ້ວ");
+    const product = products.find((item) => item.id === deleteId);
+    openConfirm({
+      title: "ລຶບສິນຄ້ານີ້ບໍ?",
+      message: product ? `ທ່ານຕ້ອງການລຶບ "${product.name}" ອອກຈາກຮ້ານບໍ?` : "ທ່ານຕ້ອງການລຶບຂໍ້ມູນນີ້ບໍ?",
+      onConfirm: () => {
+        products = products.filter((item) => item.id !== deleteId);
+        if (activeProductId === deleteId) activeProductId = collectionProducts()[0]?.id || "";
+        saveProducts();
+        renderProducts();
+        const next = products.find((item) => item.id === activeProductId);
+        if (next) fillForm(next);
+        else clearForm();
+        showToast("ລຶບສິນຄ້າແລ້ວ");
+      }
+    });
     return;
   }
 
@@ -1077,10 +1243,11 @@ els.list.addEventListener("click", (event) => {
 
 els.resetDemo.addEventListener("click", () => {
   products = [...defaultProducts];
-  activeProductId = products[0]?.id || "";
+  activeCollectionKey = "mattresses";
+  activeProductId = collectionProducts()[0]?.id || products[0]?.id || "";
   saveProducts();
   renderProducts();
-  fillForm(products[0]);
+  fillForm(products.find((item) => item.id === activeProductId) || products[0]);
   showToast("Reset demo ແລ້ວ");
 });
 
@@ -1094,8 +1261,50 @@ els.promoForm.addEventListener("submit", async (event) => {
     button: data.get("button").trim(),
     coverImage: data.get("coverImage")
   });
-  savePromotionData(draft);
-  showToast("ບັນທຶກ Cover / Promotion ແລ້ວ");
+  if (savePromotionData(draft)) {
+    showResult({
+      title: "ບັນທຶກສຳເລັດ",
+      message: "ບັນທຶກ Cover / Promotion ແລ້ວ."
+    });
+  } else {
+    showResult({
+      type: "error",
+      title: "ບັນທຶກບໍ່ສຳເລັດ",
+      message: "ບໍ່ສາມາດບັນທຶກ Cover / Promotion ໄດ້."
+    });
+  }
+});
+
+els.categoryCoverUpload?.addEventListener("change", (event) => {
+  readFileAsDataUrl(event.target.files[0], (dataUrl) => {
+    els.categoryCoverValue.value = dataUrl;
+    els.categoryCoverPreview.classList.add("has-image");
+    els.categoryCoverPreview.innerHTML = `<img src="${dataUrl}" alt="${activeCollection().label} cover" />`;
+    event.target.value = "";
+  }, { maxSize: 1200, quality: 0.72, maxBytes: 280000 });
+});
+
+els.categoryCoverForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const promo = loadPromotionData();
+  const categoryCovers = promo.categoryCovers && typeof promo.categoryCovers === "object" ? { ...promo.categoryCovers } : {};
+  categoryCovers[activeCollectionKey] = {
+    label: activeCollection().label,
+    image: await compactExistingImage(els.categoryCoverValue.value, 900, 0.62, 160000)
+  };
+  if (savePromotionData({ ...promo, categoryCovers })) {
+    renderCategoryCoverEditor();
+    showResult({
+      title: "ບັນທຶກສຳເລັດ",
+      message: `ບັນທຶກໜ້າປົກ ${activeCollection().label} ແລ້ວ.`
+    });
+  } else {
+    showResult({
+      type: "error",
+      title: "ບັນທຶກບໍ່ສຳເລັດ",
+      message: `ບໍ່ສາມາດບັນທຶກໜ້າປົກ ${activeCollection().label} ໄດ້.`
+    });
+  }
 });
 
 els.promoEventForm?.addEventListener("submit", async (event) => {
@@ -1107,7 +1316,11 @@ els.promoEventForm?.addEventListener("submit", async (event) => {
     image: await compactExistingImage(formItem.image, 560, 0.54, 80000)
   };
   if (!item.title) {
-    showToast("ກະລຸນາໃສ່ຫົວຂໍ້ Promotion / Event");
+    showResult({
+      type: "error",
+      title: "ບັນທຶກບໍ່ສຳເລັດ",
+      message: "ກະລຸນາໃສ່ຫົວຂໍ້ Promotion / Event."
+    });
     return;
   }
   const index = promo.events.findIndex((eventItem) => eventItem.id === item.id);
@@ -1118,7 +1331,16 @@ els.promoEventForm?.addEventListener("submit", async (event) => {
   if (savePromotionData(compactedPromo)) {
     renderPromoEventList();
     fillPromoEventForm(item);
-    showToast("ບັນທຶກ Promotion / Event ແລ້ວ");
+    showResult({
+      title: "ບັນທຶກສຳເລັດ",
+      message: "ບັນທຶກ Promotion / Event ແລ້ວ."
+    });
+  } else {
+    showResult({
+      type: "error",
+      title: "ບັນທຶກບໍ່ສຳເລັດ",
+      message: "ບໍ່ສາມາດບັນທຶກ Promotion / Event ໄດ້."
+    });
   }
 });
 
@@ -1142,10 +1364,18 @@ els.promoEventList?.addEventListener("click", (event) => {
   }
 
   if (deleteId) {
-    promo.events = promo.events.filter((item) => item.id !== deleteId);
-    savePromotionData(promo);
-    renderPromoEventList();
-    if (activePromoEventId === deleteId) clearPromoEventForm();
+    const item = promo.events.find((eventItem) => eventItem.id === deleteId);
+    openConfirm({
+      title: "ລຶບ Promotion / Event ນີ້ບໍ?",
+      message: item ? `ທ່ານຕ້ອງການລຶບ "${item.title}" ບໍ?` : "ທ່ານຕ້ອງການລຶບຂໍ້ມູນນີ້ບໍ?",
+      onConfirm: () => {
+        promo.events = promo.events.filter((eventItem) => eventItem.id !== deleteId);
+        savePromotionData(promo);
+        renderPromoEventList();
+        if (activePromoEventId === deleteId) clearPromoEventForm();
+        showToast("ລຶບ Promotion / Event ແລ້ວ");
+      }
+    });
   }
 });
 
@@ -1155,7 +1385,7 @@ async function initAdmin() {
     if (shouldUseSyncedStore(store) && Array.isArray(store.products) && store.products.length) {
       products = repairStoredData(store.products);
       productsCache = products;
-      activeProductId = products[0]?.id || "";
+      activeProductId = collectionProducts()[0]?.id || products[0]?.id || "";
       try {
         localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
       } catch (error) {
@@ -1176,10 +1406,11 @@ async function initAdmin() {
     }
   }
   products = await loadProductsAsync();
-  activeProductId = products[0]?.id || activeProductId;
+  activeProductId = collectionProducts()[0]?.id || products[0]?.id || activeProductId;
   await loadPromotionDataAsync();
   renderProducts();
-  if (products[0]) fillForm(products[0]);
+  if (activeProductId) fillForm(products.find((item) => item.id === activeProductId) || products[0]);
+  else clearForm();
   loadPromoForm();
   renderBackupSummary();
 }

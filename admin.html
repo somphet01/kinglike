@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260527-10" />
-    <link rel="stylesheet" href="admin.css?v=20260527-10" />
+    <link rel="stylesheet" href="styles.css?v=20260527-11" />
+    <link rel="stylesheet" href="admin.css?v=20260527-11" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -53,6 +53,26 @@
       </section>
 
       <section class="admin-panel is-active" data-admin-panel="products">
+        <div class="admin-category-strip" data-admin-categories></div>
+        <form class="admin-card admin-cover-editor" data-category-cover-form>
+          <input type="hidden" name="collectionKey" data-category-cover-key />
+          <input type="hidden" name="coverImage" data-category-cover-value />
+          <div class="admin-card-head">
+            <div>
+              <p class="eyebrow">CATEGORY COVER</p>
+              <h2 data-category-cover-title>ແກ້ໄຂໜ້າປົກ</h2>
+              <small data-category-cover-help>ເລືອກໝວດດ້ານເທິງ ແລ້ວອັບຮູບປົກຂອງໝວດນັ້ນ.</small>
+            </div>
+            <div class="admin-head-actions">
+              <label class="secondary-btn mini-btn admin-file-btn">
+                ອັບຮູບປົກ
+                <input name="coverUpload" type="file" accept="image/*" data-category-cover-upload />
+              </label>
+              <button class="primary-btn mini-btn" type="submit">ບັນທຶກປົກ</button>
+            </div>
+          </div>
+          <div class="admin-cover-preview" data-category-cover-preview>Cover preview</div>
+        </form>
         <div class="admin-workspace">
           <aside class="admin-card admin-catalog">
             <div class="admin-card-head">
@@ -65,7 +85,7 @@
                 <button class="primary-btn mini-btn" type="button" data-new-product>+ ເພີ່ມ</button>
               </div>
             </div>
-            <input class="admin-search" type="search" data-admin-search placeholder="ຄົ້ນຫາສິນຄ້າ..." />
+            <input class="admin-search" type="search" data-admin-search placeholder="ຄົ້ນຫາສິນຄ້າໃນໝວດນີ້..." />
             <div class="admin-list" data-admin-products></div>
           </aside>
 
@@ -127,12 +147,16 @@
               <label>
                 ປະເພດ
                 <select name="category">
+                  <option>Mattress</option>
+                  <option>Pillow</option>
+                  <option>Blanket</option>
+                  <option>Bed</option>
+                  <option>Topper</option>
                   <option>Hybrid</option>
                   <option>Latex</option>
                   <option>Memory Foam</option>
                   <option>Pocket Spring</option>
-                  <option>Pillow</option>
-                  <option>Topper</option>
+                  <option>Bedding</option>
                 </select>
               </label>
               <label>
@@ -361,6 +385,31 @@
       </section>
     </main>
 
+    <div class="admin-confirm" data-confirm-modal aria-hidden="true">
+      <article class="admin-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <span class="admin-confirm-icon">!</span>
+        <div>
+          <p class="eyebrow">CONFIRM DELETE</p>
+          <h2 id="confirm-title" data-confirm-title>ຢືນຢັນການລຶບ</h2>
+          <p data-confirm-message>ທ່ານຕ້ອງການລຶບຂໍ້ມູນນີ້ບໍ?</p>
+        </div>
+        <div class="admin-confirm-actions">
+          <button class="secondary-btn" type="button" data-confirm-cancel>ຍົກເລີກ</button>
+          <button class="primary-btn danger-btn" type="button" data-confirm-ok>ຕົກລົງ ລຶບ</button>
+        </div>
+      </article>
+    </div>
+    <div class="admin-result" data-result-modal aria-hidden="true">
+      <article class="admin-result-panel" role="dialog" aria-modal="true" aria-labelledby="result-title">
+        <span class="admin-result-icon" data-result-icon>✓</span>
+        <div>
+          <p class="eyebrow" data-result-kicker>SUCCESS</p>
+          <h2 id="result-title" data-result-title>ບັນທຶກສຳເລັດ</h2>
+          <p data-result-message>ຂໍ້ມູນຖືກບັນທຶກແລ້ວ.</p>
+        </div>
+        <button class="primary-btn" type="button" data-result-ok>ຕົກລົງ</button>
+      </article>
+    </div>
     <div class="admin-toast" data-toast></div>
     <script src="admin.js"></script>
   </body>

@@ -7,10 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260527-10" />
+    <link rel="stylesheet" href="styles.css?v=20260527-16" />
   </head>
   <body>
-    <header class="site-header" data-header>
+    <header class="site-header liquid-header" data-header>
       <button class="menu-btn" type="button" data-open-menu aria-label="Open menu">
         <span></span>
         <span></span>
@@ -21,8 +21,10 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#home">ໜ້າຫຼັກ</a>
-        <a href="#products">ທີ່ນອນ</a>
+        <a href="collection.html?category=mattresses">ທີ່ນອນ</a>
         <a href="collection.html?category=pillows">ໝອນ</a>
+        <a href="collection.html?category=blankets">ຜ້າຫົ່ມ</a>
+        <a href="collection.html?category=beds">ຕຽງນອນ</a>
         <a href="collection.html?category=toppers">ທັອບເປີ</a>
         <a href="#promotion">ໂປຣໂມຊັນ</a>
         <a href="#about">ກ່ຽວກັບເຮົາ</a>
@@ -51,8 +53,10 @@
       </div>
       <nav aria-label="Mobile navigation">
         <a href="#home">ໜ້າຫຼັກ</a>
-        <a href="#products">ທີ່ນອນ</a>
+        <a href="collection.html?category=mattresses">ທີ່ນອນ</a>
         <a href="collection.html?category=pillows">ໝອນ</a>
+        <a href="collection.html?category=blankets">ຜ້າຫົ່ມ</a>
+        <a href="collection.html?category=beds">ຕຽງນອນ</a>
         <a href="collection.html?category=toppers">ທັອບເປີ</a>
         <a href="#promotion">ໂປຣໂມຊັນ</a>
         <a href="#about">ກ່ຽວກັບເຮົາ</a>
@@ -65,6 +69,24 @@
     <main id="home">
       <section class="hero">
         <div class="sky-motion" aria-hidden="true"></div>
+        <div class="sky-celestial" aria-hidden="true">
+          <span class="sun-orb"></span>
+          <span class="moon-orb"></span>
+        </div>
+        <div class="sky-stars" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
         <div class="sky-clouds" aria-hidden="true">
           <span class="cloud cloud-one"></span>
           <span class="cloud cloud-two"></span>
@@ -88,7 +110,7 @@
             ແລະຫຼູຫຼາກວ່າທຸກຄືນ.
           </p>
           <div class="hero-actions">
-            <a class="primary-btn" href="#products">ເລືອກຊື້ທີ່ນອນ</a>
+            <a class="primary-btn" href="collection.html?category=mattresses">ເລືອກຊື້ທີ່ນອນ</a>
             <a class="secondary-btn" href="#promotion">ເບິ່ງໂປຣໂມຊັນ</a>
           </div>
         </div>
@@ -157,11 +179,17 @@
           <h2>ໝວດສິນຄ້າ</h2>
         </div>
         <div class="category-grid">
-          <a class="category-card mattress-card" href="#products">
+          <a class="category-card mattress-card" href="collection.html?category=mattresses">
             <span>ທີ່ນອນ</span>
           </a>
           <a class="category-card pillow-card" href="collection.html?category=pillows">
             <span>ໝອນ</span>
+          </a>
+          <a class="category-card bedding-card" href="collection.html?category=blankets">
+            <span>ຜ້າຫົ່ມ</span>
+          </a>
+          <a class="category-card mattress-card" href="collection.html?category=beds">
+            <span>ຕຽງນອນ</span>
           </a>
           <a class="category-card topper-card" href="collection.html?category=toppers">
             <span>ທັອບເປີ</span>

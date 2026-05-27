@@ -49,6 +49,12 @@ const collectionProducts = {
     product("topper-hotel", "Kinglike Hotel Topper", "Topper", "ນຸ່ມ", "4 ນິ້ວ", 3290000, 2390000, 27, "Hotel Grade"),
     product("topper-cool", "Kinglike Cool Topper", "Topper", "ນຸ່ມແນ່ນ", "Cooling fabric", 3590000, 2590000, 28, "New")
   ],
+  blankets: [
+    product("blanket-soft", "Kinglike Soft Blanket", "Blanket", "ນຸ່ມ", "Premium fiber", 1290000, 790000, 39, "New")
+  ],
+  beds: [
+    product("bed-luxury", "Kinglike Luxury Bed", "Bed", "ແຂງແຮງ", "Queen / King", 6900000, 4990000, 28, "Hotel Grade")
+  ],
   bedding: [
     product("sheet-gold", "Kinglike Gold Sheet Set", "Bedding", "ນຸ່ມ", "Cotton sateen", 1590000, 990000, 38, "Promotion"),
     product("protector-premium", "Kinglike Mattress Protector", "Bedding", "ນຸ່ມ", "Waterproof", 990000, 690000, 30, "New")
@@ -77,7 +83,10 @@ function product(id, name, category, firmness, thickness, price, salePrice, disc
   };
 }
 
+let adminProductsOverride = null;
+
 function loadAdminProducts() {
+  if (Array.isArray(adminProductsOverride)) return adminProductsOverride.map(normalizeAdminProduct);
   try {
     const saved = JSON.parse(localStorage.getItem(PRODUCT_STORAGE_KEY) || "[]");
     return Array.isArray(saved) ? saved.map(normalizeAdminProduct) : [];
@@ -167,6 +176,8 @@ function relatedTitle(product) {
   const key = productCollectionKey(product);
   if (key === "pillows") return "ໝອນແນະນຳ";
   if (key === "toppers") return "ທັອບເປີແນະນຳ";
+  if (key === "blankets") return "ຜ້າຫົ່ມແນະນຳ";
+  if (key === "beds") return "ຕຽງນອນແນະນຳ";
   if (key === "bedding") return "ອຸປະກອນການນອນແນະນຳ";
   return "ສິນຄ້າທີ່ໃກ້ຄຽງ";
 }
@@ -212,6 +223,8 @@ function discountPercent(price, salePrice) {
 
 function collectionFromAdminProduct(product) {
   const category = (product.category || "").toLowerCase();
+  if (category.includes("blanket") || category.includes("duvet") || category.includes("comforter")) return "blankets";
+  if (category === "bed" || category.includes("bed frame") || category.includes("bedframe")) return "beds";
   if (category.includes("pillow")) return "pillows";
   if (category.includes("topper")) return "toppers";
   if (category.includes("bedding") || category.includes("sheet") || category.includes("protector")) return "bedding";
@@ -281,7 +294,12 @@ async function hydrateSyncedStore() {
   try {
     const idbProducts = await idbGet(PRODUCT_STORAGE_KEY);
     if (Array.isArray(idbProducts) && idbProducts.length) {
-      localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(idbProducts));
+      adminProductsOverride = idbProducts;
+      try {
+        localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(idbProducts));
+      } catch (error) {
+        // Use the in-memory copy for this page load.
+      }
       products = getProductList(categoryKey);
       allProducts = mergedAllProducts();
       currentProduct = products.find((item) => item.id === id) || products[0];
@@ -293,7 +311,12 @@ async function hydrateSyncedStore() {
     // Keep local/static fallback.
   }
   if (!shouldUseSyncedStore(store) || !Array.isArray(store.products) || !store.products.length) return;
-  localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(store.products));
+  adminProductsOverride = store.products;
+  try {
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(store.products));
+  } catch (error) {
+    // Use the in-memory copy for this page load.
+  }
   if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
   products = getProductList(categoryKey);
   allProducts = mergedAllProducts();

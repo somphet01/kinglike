@@ -201,20 +201,25 @@ async function hydrateSyncedStore() {
   if (!shouldUseSyncedStore(store)) return;
   if (Array.isArray(store.products) && store.products.length) {
     products = repairStoredData(store.products);
-    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+    try {
+      localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+    } catch (error) {
+      // The in-memory products are still used for this page load.
+    }
     if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
     renderProducts();
     renderCart();
     renderWishlist();
   }
   if (store.promotion && typeof store.promotion === "object") {
+    const syncedPromotion = repairStoredData(store.promotion);
     try {
-      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(repairStoredData(store.promotion)));
+      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(syncedPromotion));
     } catch (error) {
       // Promotion may be stored in IndexedDB by the admin when localStorage is full.
     }
     if (store.updatedAt) localStorage.setItem(STORE_UPDATED_KEY, store.updatedAt);
-    renderPromotion();
+    renderPromotionData(syncedPromotion);
   }
 }
 
@@ -299,6 +304,7 @@ function repairStoredData(value) {
 
 const els = {
   header: document.querySelector("[data-header]"),
+  hero: document.querySelector(".hero"),
   products: document.querySelector("[data-products]"),
   pagination: document.querySelector("[data-products-pagination]"),
   cartDrawer: document.querySelector("[data-cart-drawer]"),
@@ -317,6 +323,49 @@ const els = {
   mobileMenu: document.querySelector("[data-mobile-menu]"),
   menuBackdrop: document.querySelector("[data-menu-backdrop]")
 };
+
+function currentLaoTimeParts() {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Vientiane",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date());
+  const value = (type) => Number(parts.find((part) => part.type === type)?.value || 0);
+  return {
+    hour: value("hour"),
+    minute: value("minute"),
+    second: value("second")
+  };
+}
+
+function updateHeroSky() {
+  if (!els.hero) return;
+  const { hour, minute, second } = currentLaoTimeParts();
+  const minutes = hour * 60 + minute + second / 60;
+  const dayStart = 5 * 60;
+  const sunriseEnd = 7 * 60;
+  const duskStart = 17 * 60;
+  const nightStart = 19 * 60;
+  const phase = minutes < dayStart || minutes >= nightStart
+    ? "night"
+    : minutes < sunriseEnd
+      ? "dawn"
+      : minutes < duskStart
+        ? "day"
+        : "dusk";
+  const daylightProgress = Math.min(1, Math.max(0, (minutes - dayStart) / (nightStart - dayStart)));
+  const nightMinutes = minutes >= nightStart ? minutes - nightStart : minutes + (24 * 60 - nightStart);
+  const nightProgress = Math.min(1, Math.max(0, nightMinutes / (10 * 60)));
+
+  els.hero.dataset.skyPhase = phase;
+  els.hero.style.setProperty("--sun-x", `${8 + daylightProgress * 84}%`);
+  els.hero.style.setProperty("--sun-y", `${64 - Math.sin(daylightProgress * Math.PI) * 48}%`);
+  els.hero.style.setProperty("--moon-x", `${10 + nightProgress * 78}%`);
+  els.hero.style.setProperty("--moon-y", `${28 + Math.sin(nightProgress * Math.PI) * 24}%`);
+  els.hero.style.setProperty("--sky-progress", daylightProgress.toFixed(3));
+}
 
 function formatKip(value) {
   return `${money(Number(value || 0))} ₭`;
@@ -631,10 +680,20 @@ function toggleWishlist(id) {
   renderWishlist();
 }
 
+function productCollectionKey(product) {
+  const category = (product?.category || "").toLowerCase();
+  if (category.includes("blanket") || category.includes("duvet") || category.includes("comforter")) return "blankets";
+  if (category === "bed" || category.includes("bed frame") || category.includes("bedframe")) return "beds";
+  if (category.includes("pillow")) return "pillows";
+  if (category.includes("topper")) return "toppers";
+  if (category.includes("bedding") || category.includes("sheet") || category.includes("protector")) return "bedding";
+  return "mattresses";
+}
+
 function openProductDetail(id) {
   const product = products.find((candidate) => candidate.id === id);
   if (!product) return;
-  window.location.href = `product.html?id=${encodeURIComponent(product.id)}&category=mattresses`;
+  window.location.href = `product.html?id=${encodeURIComponent(product.id)}&category=${encodeURIComponent(productCollectionKey(product))}`;
 }
 
 function removeFromCart(key) {
@@ -733,7 +792,7 @@ function buildOrderMessage(productId = "") {
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   const productLink = focusedProduct
-    ? new URL(`product.html?id=${encodeURIComponent(focusedProduct.id)}&category=mattresses`, window.location.href).toString()
+    ? new URL(`product.html?id=${encodeURIComponent(focusedProduct.id)}&category=${encodeURIComponent(productCollectionKey(focusedProduct))}`, window.location.href).toString()
     : window.location.href;
   return [
     "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
@@ -1047,6 +1106,8 @@ window.addEventListener("scroll", () => {
   els.header.classList.toggle("is-scrolled", window.scrollY > 24);
 });
 
+updateHeroSky();
+setInterval(updateHeroSky, 15000);
 renderProducts();
 renderPromotion();
 renderCart();
