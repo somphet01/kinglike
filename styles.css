@@ -4919,3 +4919,21 @@ main > .trust-policies {
     width: 100%;
   }
 }
+
+/* Discount emphasis: original prices and savings are red everywhere. */
+.regular-price,
+.detail-price .regular-price,
+[data-detail-regular-price],
+.save-line {
+  color: #ef3434 !important;
+}
+
+.regular-price,
+.detail-price .regular-price,
+[data-detail-regular-price] {
+  text-decoration-color: rgba(239, 52, 52, 0.72);
+}
+
+.save-line {
+  font-weight: 850;
+}
