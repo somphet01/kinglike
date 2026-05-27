@@ -4,8 +4,8 @@ const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const WHATSAPP_PHONE = "8562051777641";
-const MESSENGER_ID = "kinglike";
-const MESSENGER_URL = `https://m.me/${MESSENGER_ID}`;
+const MESSENGER_ID = "Kinglikesikai";
+const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
 const SYNC_STORE_URL = "/api/store";
 const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toString();
 const IDB_NAME = "kinglikeAdminStore";
@@ -827,9 +827,46 @@ function openChatOrder(productId = "") {
   modal.classList.add("is-open");
 }
 
+function copyChatMessage(message) {
+  const fallbackCopy = () => {
+    const textarea = document.createElement("textarea");
+    textarea.value = message;
+    textarea.setAttribute("readonly", "");
+    textarea.style.left = "-9999px";
+    textarea.style.position = "fixed";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  };
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(message).catch(fallbackCopy);
+  }
+  fallbackCopy();
+  return Promise.resolve();
+}
+
+function showMessengerCopyNotice(copied) {
+  const modal = document.querySelector("[data-chat-order-modal]");
+  const target = modal?.querySelector("[data-chat-error]");
+  if (!target) return;
+  target.classList.toggle("is-error", !copied);
+  target.textContent = copied
+    ? "ຄັດລອກລາຍການສັ່ງຊື້ແລ້ວ. ເປີດ Messenger ແລ້ວກົດວາງໃນແຊັດຮ້ານໄດ້ເລີຍ."
+    : "Messenger ບໍ່ຮອງຮັບຂໍ້ຄວາມອັດຕະໂນມັດ. ກະລຸນາກັບມາຄັດລອກຂໍ້ຄວາມອີກຄັ້ງ.";
+}
+
 async function sendChatDraft(channel, productId = "") {
   const items = chatItems(productId);
   const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີ ຂ້ອຍສົນໃຈສອບຖາມສິນຄ້າ Kinglike";
+  const url = channel === "messenger"
+    ? MESSENGER_URL
+    : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+  const chatWindow = window.open(url, "_blank");
+  if (!chatWindow) window.location.href = url;
+  if (channel === "messenger") {
+    copyChatMessage(message).then(() => showMessengerCopyNotice(true)).catch(() => showMessengerCopyNotice(false));
+  }
   const payload = {
     mode: "chat_draft",
     contactChannel: channel,
@@ -851,17 +888,13 @@ async function sendChatDraft(channel, productId = "") {
   } catch (draftError) {
     // Still let the customer continue to chat if local API is unavailable.
   }
-  const url = channel === "messenger"
-    ? MESSENGER_URL
-    : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank", "noopener");
 }
 
 async function submitChatDraft(channel) {
   const modal = ensureChatModal();
   const productId = modal.dataset.productId || "";
   await sendChatDraft(channel, productId);
-  modal.classList.remove("is-open");
+  if (channel !== "messenger") modal.classList.remove("is-open");
 }
 
 function checkout() {
@@ -869,7 +902,7 @@ function checkout() {
 }
 
 function buyNow(id) {
-  sendChatDraft("messenger", id);
+  openChatOrder(id);
 }
 
 function openDrawer(drawer) {

@@ -1,10 +1,10 @@
-const PRODUCT_STORAGE_KEY = "kinglikeProducts";
+﻿const PRODUCT_STORAGE_KEY = "kinglikeProducts";
 const CART_STORAGE_KEY = "kinglikeCart";
 const WISHLIST_STORAGE_KEY = "kinglikeWishlist";
 const STORE_UPDATED_KEY = "kinglikeStoreUpdatedAt";
 const WHATSAPP_PHONE = "8562051777641";
-const MESSENGER_ID = "kinglike";
-const MESSENGER_URL = `https://m.me/${MESSENGER_ID}`;
+const MESSENGER_ID = "Kinglikesikai";
+const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
 
@@ -31,50 +31,50 @@ const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toStri
 
 const collections = {
   mattresses: {
-    title: "ທີ່ນອນ",
+    title: "àº—àºµà»ˆàº™àº­àº™",
     kicker: "KINGLIKE MATTRESS TYPES",
-    copy: "ເລືອກທີ່ນອນຕາມວັດສະດຸທີ່ຕ້ອງການ ໂຟມ ຢາງພາລາ ສະປຣິງ ຫຼື hybrid.",
+    copy: "à»€àº¥àº·àº­àºàº—àºµà»ˆàº™àº­àº™àº•àº²àº¡àº§àº±àº”àºªàº°àº”àº¸àº—àºµà»ˆàº•à»‰àº­àº‡àºàº²àº™ à»‚àºŸàº¡ àº¢àº²àº‡àºžàº²àº¥àº² àºªàº°àº›àº£àº´àº‡ àº«àº¼àº· hybrid.",
     art: "topper",
     products: [
-      { ...product("foam-comfort", "Kinglike Foam Comfort", "Foam", "ນຸ່ມ", "10 ນິ້ວ", 5200000, 3590000, 31, "Foam"), type: "foam" },
-      { ...product("latex-natural", "Kinglike Natural Latex", "Latex", "ນຸ່ມແນ່ນ", "10 ນິ້ວ", 6900000, 4690000, 32, "Latex"), type: "latex" },
-      { ...product("spring-cloud", "Kinglike Foam Spring", "Hybrid", "ນຸ່ມແນ່ນ", "12 ນິ້ວ", 7800000, 5290000, 32, "Hybrid"), type: "foam-spring" },
-      { ...product("foam-latex-luxe", "Kinglike Foam Latex Luxe", "Foam + Latex", "ນຸ່ມ", "11 ນິ້ວ", 7400000, 5190000, 30, "Premium"), type: "foam-latex" },
-      { ...product("grand-hybrid", "Kinglike Grand Hybrid", "Foam + Spring + Latex", "ນຸ່ມແນ່ນ", "13 ນິ້ວ", 9200000, 6590000, 28, "Hotel Grade"), type: "foam-spring-latex" }
+      { ...product("foam-comfort", "Kinglike Foam Comfort", "Foam", "àº™àº¸à»ˆàº¡", "10 àº™àº´à»‰àº§", 5200000, 3590000, 31, "Foam"), type: "foam" },
+      { ...product("latex-natural", "Kinglike Natural Latex", "Latex", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "10 àº™àº´à»‰àº§", 6900000, 4690000, 32, "Latex"), type: "latex" },
+      { ...product("spring-cloud", "Kinglike Foam Spring", "Hybrid", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "12 àº™àº´à»‰àº§", 7800000, 5290000, 32, "Hybrid"), type: "foam-spring" },
+      { ...product("foam-latex-luxe", "Kinglike Foam Latex Luxe", "Foam + Latex", "àº™àº¸à»ˆàº¡", "11 àº™àº´à»‰àº§", 7400000, 5190000, 30, "Premium"), type: "foam-latex" },
+      { ...product("grand-hybrid", "Kinglike Grand Hybrid", "Foam + Spring + Latex", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "13 àº™àº´à»‰àº§", 9200000, 6590000, 28, "Hotel Grade"), type: "foam-spring-latex" }
     ]
   },
   pillows: {
-    title: "ໝອນ",
+    title: "à»àº­àº™",
     kicker: "KINGLIKE PILLOWS",
-    copy: "ໝອນພຣີມຽມ ນຸ່ມ ຮອງຮັບຄໍ ແລະຊ່ວຍໃຫ້ຫຼັບສະບາຍຕະຫຼອດຄືນ.",
+    copy: "à»àº­àº™àºžàº£àºµàº¡àº½àº¡ àº™àº¸à»ˆàº¡ àº®àº­àº‡àº®àº±àºšàº„à» à»àº¥àº°àºŠà»ˆàº§àºà»ƒàº«à»‰àº«àº¼àº±àºšàºªàº°àºšàº²àºàº•àº°àº«àº¼àº­àº”àº„àº·àº™.",
     art: "pillow",
     products: [
-      product("pillow-cloud", "Kinglike Cloud Pillow", "Pillow", "ນຸ່ມ", "Premium microfiber", 890000, 590000, 34, "Best Seller"),
-      product("pillow-latex", "Kinglike Latex Pillow", "Pillow", "ນຸ່ມແນ່ນ", "Natural latex", 1290000, 790000, 39, "Promotion"),
-      product("pillow-cool", "Kinglike Cool Gel Pillow", "Pillow", "ນຸ່ມ", "Cooling gel foam", 1490000, 990000, 34, "New"),
-      product("pillow-hotel", "Kinglike Hotel Pillow", "Pillow", "ນຸ່ມແນ່ນ", "Hotel fiber", 990000, 690000, 30, "Hotel Grade")
+      product("pillow-cloud", "Kinglike Cloud Pillow", "Pillow", "àº™àº¸à»ˆàº¡", "Premium microfiber", 890000, 590000, 34, "Best Seller"),
+      product("pillow-latex", "Kinglike Latex Pillow", "Pillow", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "Natural latex", 1290000, 790000, 39, "Promotion"),
+      product("pillow-cool", "Kinglike Cool Gel Pillow", "Pillow", "àº™àº¸à»ˆàº¡", "Cooling gel foam", 1490000, 990000, 34, "New"),
+      product("pillow-hotel", "Kinglike Hotel Pillow", "Pillow", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "Hotel fiber", 990000, 690000, 30, "Hotel Grade")
     ]
   },
   toppers: {
-    title: "ທັອບເປີ",
+    title: "àº—àº±àº­àºšà»€àº›àºµ",
     kicker: "KINGLIKE TOPPERS",
-    copy: "ເພີ່ມຄວາມນຸ່ມສະບາຍໃຫ້ທີ່ນອນເດີມ ນອນຫຼັບງ່າຍ ແລະຮອງຮັບດີຂຶ້ນ.",
+    copy: "à»€àºžàºµà»ˆàº¡àº„àº§àº²àº¡àº™àº¸à»ˆàº¡àºªàº°àºšàº²àºà»ƒàº«à»‰àº—àºµà»ˆàº™àº­àº™à»€àº”àºµàº¡ àº™àº­àº™àº«àº¼àº±àºšàº‡à»ˆàº²àº à»àº¥àº°àº®àº­àº‡àº®àº±àºšàº”àºµàº‚àº¶à»‰àº™.",
     art: "topper",
     products: [
-      product("topper-luxe", "Kinglike Luxe Topper", "Topper", "ນຸ່ມ", "3 ນິ້ວ", 2490000, 1690000, 32, "Best Seller"),
-      product("topper-latex", "Kinglike Latex Topper", "Topper", "ນຸ່ມແນ່ນ", "2 ນິ້ວ", 2890000, 1990000, 31, "Promotion"),
-      product("topper-hotel", "Kinglike Hotel Topper", "Topper", "ນຸ່ມ", "4 ນິ້ວ", 3290000, 2390000, 27, "Hotel Grade"),
-      product("topper-cool", "Kinglike Cool Topper", "Topper", "ນຸ່ມແນ່ນ", "Cooling fabric", 3590000, 2590000, 28, "New")
+      product("topper-luxe", "Kinglike Luxe Topper", "Topper", "àº™àº¸à»ˆàº¡", "3 àº™àº´à»‰àº§", 2490000, 1690000, 32, "Best Seller"),
+      product("topper-latex", "Kinglike Latex Topper", "Topper", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "2 àº™àº´à»‰àº§", 2890000, 1990000, 31, "Promotion"),
+      product("topper-hotel", "Kinglike Hotel Topper", "Topper", "àº™àº¸à»ˆàº¡", "4 àº™àº´à»‰àº§", 3290000, 2390000, 27, "Hotel Grade"),
+      product("topper-cool", "Kinglike Cool Topper", "Topper", "àº™àº¸à»ˆàº¡à»àº™à»ˆàº™", "Cooling fabric", 3590000, 2590000, 28, "New")
     ]
   },
   bedding: {
-    title: "ອຸປະກອນການນອນ",
+    title: "àº­àº¸àº›àº°àºàº­àº™àºàº²àº™àº™àº­àº™",
     kicker: "KINGLIKE BEDDING",
-    copy: "ຜ້າປູ ປອກໝອນ ແລະອຸປະກອນສຳລັບຫ້ອງນອນພຣີມຽມ.",
+    copy: "àºœà»‰àº²àº›àº¹ àº›àº­àºà»àº­àº™ à»àº¥àº°àº­àº¸àº›àº°àºàº­àº™àºªàº³àº¥àº±àºšàº«à»‰àº­àº‡àº™àº­àº™àºžàº£àºµàº¡àº½àº¡.",
     art: "bedding",
     products: [
-      product("sheet-gold", "Kinglike Gold Sheet Set", "Bedding", "ນຸ່ມ", "Cotton sateen", 1590000, 990000, 38, "Promotion"),
-      product("protector-premium", "Kinglike Mattress Protector", "Bedding", "ນຸ່ມ", "Waterproof", 990000, 690000, 30, "New")
+      product("sheet-gold", "Kinglike Gold Sheet Set", "Bedding", "àº™àº¸à»ˆàº¡", "Cotton sateen", 1590000, 990000, 38, "Promotion"),
+      product("protector-premium", "Kinglike Mattress Protector", "Bedding", "àº™àº¸à»ˆàº¡", "Waterproof", 990000, 690000, 30, "New")
     ]
   }
 };
@@ -91,7 +91,7 @@ function product(id, name, category, firmness, thickness, price, salePrice, disc
     discountPercent,
     badge,
     rating: 4.8,
-    sizes: ["ມາດຕະຖານ"],
+    sizes: ["àº¡àº²àº”àº•àº°àº–àº²àº™"],
     popular: Date.now()
   };
 }
@@ -116,7 +116,7 @@ function normalizeAdminProduct(item) {
     price,
     salePrice,
     discountPercent: item.discountPercent || discountPercent(price, salePrice),
-    sizes: Array.isArray(item.sizes) && item.sizes.length ? item.sizes : ["ມາດຕະຖານ"],
+    sizes: Array.isArray(item.sizes) && item.sizes.length ? item.sizes : ["àº¡àº²àº”àº•àº°àº–àº²àº™"],
     rating: item.rating || 4.8,
     freebies: Array.isArray(item.freebies) ? item.freebies.filter(Boolean) : [],
     popular: item.popular || Date.now(),
@@ -263,7 +263,7 @@ const els = {
 };
 
 function formatKip(value) {
-  return `${money(Number(value || 0))} ₭`;
+  return `${money(Number(value || 0))} â‚­`;
 }
 
 function productPrice(product, key) {
@@ -276,7 +276,7 @@ function productDiscountPercent(product) {
 
 function productBadgeText(product) {
   const discount = productDiscountPercent(product);
-  return discount > 0 ? `ຫຼຸດ ${discount}%` : product.badge || "New";
+  return discount > 0 ? `àº«àº¼àº¸àº” ${discount}%` : product.badge || "New";
 }
 
 function productBadgeClass(product) {
@@ -284,7 +284,7 @@ function productBadgeClass(product) {
 }
 
 function productSizes(product) {
-  return Array.isArray(product?.sizes) && product.sizes.length ? product.sizes.filter(Boolean) : ["ມາດຕະຖານ"];
+  return Array.isArray(product?.sizes) && product.sizes.length ? product.sizes.filter(Boolean) : ["àº¡àº²àº”àº•àº°àº–àº²àº™"];
 }
 
 function productSizeOptions(product) {
@@ -300,7 +300,7 @@ function productSizeOptions(product) {
 
 function productSizeOption(product, size = "") {
   const options = productSizeOptions(product);
-  return options.find((option) => option.size === size) || options[0] || { size: "ມາດຕະຖານ", salePrice: productPrice(product, "salePrice"), regularPrice: productPrice(product, "price") };
+  return options.find((option) => option.size === size) || options[0] || { size: "àº¡àº²àº”àº•àº°àº–àº²àº™", salePrice: productPrice(product, "salePrice"), regularPrice: productPrice(product, "price") };
 }
 
 function productDisplayPrice(product, key = "salePrice") {
@@ -343,17 +343,17 @@ function saveWishlist() {
 
 function renderCollectionMeta() {
   const typeLabels = {
-    foam: "ໂຟມ",
-    latex: "ຢາງພາລາ",
-    "foam-spring": "ໂຟມ + ສະປຣິງ",
-    "foam-latex": "ໂຟມ + ຢາງພາລາ",
-    "foam-spring-latex": "ໂຟມ + ສະປຣິງ + ຢາງພາລາ"
+    foam: "à»‚àºŸàº¡",
+    latex: "àº¢àº²àº‡àºžàº²àº¥àº²",
+    "foam-spring": "à»‚àºŸàº¡ + àºªàº°àº›àº£àº´àº‡",
+    "foam-latex": "à»‚àºŸàº¡ + àº¢àº²àº‡àºžàº²àº¥àº²",
+    "foam-spring-latex": "à»‚àºŸàº¡ + àºªàº°àº›àº£àº´àº‡ + àº¢àº²àº‡àºžàº²àº¥àº²"
   };
   const title = typeLabels[typeKey] || collection.title;
   document.title = `Kinglike - ${collection.title}`;
   els.title.textContent = title;
   els.kicker.textContent = collection.kicker;
-  els.copy.textContent = typeKey ? `ລວມສິນຄ້າປະເພດ ${title} ເພື່ອໃຫ້ເລືອກຮຸ່ນທີ່ເໝາະກັບການນອນຂອງທ່ານ.` : collection.copy;
+  els.copy.textContent = typeKey ? `àº¥àº§àº¡àºªàº´àº™àº„à»‰àº²àº›àº°à»€àºžàº” ${title} à»€àºžàº·à»ˆàº­à»ƒàº«à»‰à»€àº¥àº·àº­àºàº®àº¸à»ˆàº™àº—àºµà»ˆà»€à»àº²àº°àºàº±àºšàºàº²àº™àº™àº­àº™àº‚àº­àº‡àº—à»ˆàº²àº™.` : collection.copy;
   els.listTitle.textContent = title;
   els.art.className = `collection-art ${collection.art}-cover-art`;
 }
@@ -378,19 +378,19 @@ function productCard(product) {
       <div class="product-art ${collection.art}-product-art ${imageClass}">
         ${image ? `<img src="${image}" alt="${product.name}" />` : ""}
         <span class="${productBadgeClass(product)}">${productBadgeText(product)}</span>
-        <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="ສິນຄ້າທີ່ຖືກໃຈ">♡</button>
+        <button class="wishlist-toggle ${isWishlisted ? "is-active" : ""}" type="button" data-toggle-wishlist="${product.id}" aria-label="àºªàº´àº™àº„à»‰àº²àº—àºµà»ˆàº–àº·àºà»ƒàºˆ">â™¡</button>
       </div>
       <div class="product-body">
         <h3>${product.name}</h3>
-        <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
+        <div class="meta">${product.category} â€¢ ${product.thickness} â€¢ ${product.firmness} â€¢ â˜… ${product.rating}</div>
         <div class="sizes">${productSizes(product).map((size) => `<span>${size}</span>`).join("")}</div>
         <div class="prices">
           <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
           <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
         </div>
         <div class="card-actions">
-          <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
-          <button class="view-btn" type="button" data-open-detail="${product.id}">ລາຍລະອຽດ</button>
+          <button class="add-cart" type="button" data-add-cart="${product.id}">à»€àºžàºµà»ˆàº¡àº¥àº»àº”à»€àº‚àº±àº™</button>
+          <button class="view-btn" type="button" data-open-detail="${product.id}">àº¥àº²àºàº¥àº°àº­àº½àº”</button>
         </div>
       </div>
     </article>
@@ -403,7 +403,7 @@ function renderProducts() {
   state.page = Math.min(Math.max(1, state.page), pageCount);
   const start = (state.page - 1) * state.perPage;
   const pageItems = list.slice(start, start + state.perPage);
-  els.products.innerHTML = list.length ? pageItems.map(productCard).join("") : `<p class="meta">ບໍ່ພົບສິນຄ້າ</p>`;
+  els.products.innerHTML = list.length ? pageItems.map(productCard).join("") : `<p class="meta">àºšà»à»ˆàºžàº»àºšàºªàº´àº™àº„à»‰àº²</p>`;
   renderPagination(pageCount, list.length);
 }
 
@@ -415,10 +415,10 @@ function renderPagination(pageCount, totalItems) {
   }
   const pages = Array.from({ length: pageCount }, (_, index) => index + 1);
   els.pagination.innerHTML = `
-    <button type="button" data-product-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>ກ່ອນ</button>
-    ${pages.map((page) => `<button class="${page === state.page ? "is-active" : ""}" type="button" data-product-page="${page}" aria-label="ໜ້າ ${page}">${page}</button>`).join("")}
-    <button type="button" data-product-page="${state.page + 1}" ${state.page === pageCount ? "disabled" : ""}>ຕໍ່ໄປ</button>
-    <span>${totalItems} ລາຍການ</span>
+    <button type="button" data-product-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>àºà»ˆàº­àº™</button>
+    ${pages.map((page) => `<button class="${page === state.page ? "is-active" : ""}" type="button" data-product-page="${page}" aria-label="à»œà»‰àº² ${page}">${page}</button>`).join("")}
+    <button type="button" data-product-page="${state.page + 1}" ${state.page === pageCount ? "disabled" : ""}>àº•à»à»ˆà»„àº›</button>
+    <span>${totalItems} àº¥àº²àºàºàº²àº™</span>
   `;
 }
 
@@ -459,21 +459,21 @@ function renderCart() {
         <div class="drawer-item cart-line">
           <div class="cart-line-info">
             <strong>${product.name}</strong>
-            <div class="meta">${item.size || productSizeOption(product).size} • ${formatKip(item.unitPrice || productSizeOption(product, item.size).salePrice)}</div>
+            <div class="meta">${item.size || productSizeOption(product).size} â€¢ ${formatKip(item.unitPrice || productSizeOption(product, item.size).salePrice)}</div>
             <div class="cart-qty">
-              <button type="button" data-cart-decrease="${cartKey(product.id, item.size)}">−</button>
+              <button type="button" data-cart-decrease="${cartKey(product.id, item.size)}">âˆ’</button>
               <span>${item.qty}</span>
-              <button type="button" data-cart-increase="${cartKey(product.id, item.size)}">＋</button>
+              <button type="button" data-cart-increase="${cartKey(product.id, item.size)}">ï¼‹</button>
             </div>
           </div>
           <div class="cart-line-side">
             <strong>${formatKip((item.unitPrice || productSizeOption(product, item.size).salePrice) * item.qty)}</strong>
-            <button type="button" data-remove-cart="${cartKey(product.id, item.size)}">×</button>
+            <button type="button" data-remove-cart="${cartKey(product.id, item.size)}">Ã—</button>
           </div>
         </div>
       `;
     }).join("")
-    : `<p class="meta">ລົດເຂັນຍັງວ່າງຢູ່</p>`;
+    : `<p class="meta">àº¥àº»àº”à»€àº‚àº±àº™àºàº±àº‡àº§à»ˆàº²àº‡àº¢àº¹à»ˆ</p>`;
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   els.cartTotal.textContent = formatKip(total);
   els.cartCount.textContent = items.reduce((sum, item) => sum + item.qty, 0);
@@ -500,8 +500,8 @@ function updateCartQty(key, delta) {
 function renderWishlist() {
   const list = [...state.wishlist].map((id) => allProducts.find((product) => product.id === id)).filter(Boolean);
   els.wishlistItems.innerHTML = list.length
-    ? list.map((product) => `<div class="drawer-item"><div><strong>${product.name}</strong><div class="meta">${formatKip(product.salePrice)}</div></div><button type="button" data-add-cart="${product.id}">＋</button></div>`).join("")
-    : `<p class="meta">ຍັງບໍ່ມີສິນຄ້າທີ່ຖືກໃຈ</p>`;
+    ? list.map((product) => `<div class="drawer-item"><div><strong>${product.name}</strong><div class="meta">${formatKip(product.salePrice)}</div></div><button type="button" data-add-cart="${product.id}">ï¼‹</button></div>`).join("")
+    : `<p class="meta">àºàº±àº‡àºšà»à»ˆàº¡àºµàºªàº´àº™àº„à»‰àº²àº—àºµà»ˆàº–àº·àºà»ƒàºˆ</p>`;
   els.wishlistCount.textContent = list.length;
 }
 
@@ -518,34 +518,35 @@ function cartItemsWithProducts() {
 
 function buildOrderMessage() {
   const items = cartItemsWithProducts();
+  const fallbackMessage = "àºªàº°àºšàº²àºàº”àºµ àº‚à»‰àº­àºàºªàº»àº™à»ƒàºˆàºªàº­àºšàº–àº²àº¡àºªàº´àº™àº„à»‰àº² Kinglike";
   const itemLines = items.map((item, index) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
     return [
       `${index + 1}. ${item.product.name}`,
-      `   ລະຫັດສິນຄ້າ: ${item.product.sku || item.product.id || "-"}`,
-      `   ຂະໜາດ: ${item.size || productSizeOption(item.product).size}`,
-      `   ຈຳນວນ: ${item.qty}`,
-      `   ລາຄາ/ໜ່ວຍ: ${formatKip(unitPrice)}`,
-      `   ລວມ: ${formatKip(subtotal)}`
+      `   àº¥àº°àº«àº±àº”àºªàº´àº™àº„à»‰àº²: ${item.product.sku || item.product.id || "-"}`,
+      `   àº‚àº°à»œàº²àº”: ${item.size || productSizeOption(item.product).size}`,
+      `   àºˆàº³àº™àº§àº™: ${item.qty}`,
+      `   àº¥àº²àº„àº²/à»œà»ˆàº§àº: ${formatKip(unitPrice)}`,
+      `   àº¥àº§àº¡: ${formatKip(subtotal)}`
     ].join("\n");
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   return [
-    "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
+    "àºªàº°àºšàº²àºàº”àºµ àº‚à»‰àº­àºàºªàº»àº™à»ƒàºˆàºªàº±à»ˆàº‡àºŠàº·à»‰àºªàº´àº™àº„à»‰àº² Kinglike",
     "",
-    "ໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ",
-    "ຮ້ານ: Kinglike Product",
+    "à»ƒàºšà»àºˆà»‰àº‡àº¥àº²àº„àº² / à»ƒàºšàºˆàº­àº‡àºªàº´àº™àº„à»‰àº²",
+    "àº®à»‰àº²àº™: Kinglike Product",
     "",
-    "ລາຍການສິນຄ້າ:",
+    "àº¥àº²àºàºàº²àº™àºªàº´àº™àº„à»‰àº²:",
     itemLines.join("\n\n"),
     "",
-    `ຍອດລວມທີ່ຕ້ອງຊຳລະ: ${formatKip(total)}`,
+    `àºàº­àº”àº¥àº§àº¡àº—àºµà»ˆàº•à»‰àº­àº‡àºŠàº³àº¥àº°: ${formatKip(total)}`,
     "",
-    "ລິ້ງໜ້າສິນຄ້າ:",
+    "àº¥àº´à»‰àº‡à»œà»‰àº²àºªàº´àº™àº„à»‰àº²:",
     window.location.href,
     "",
-    "ກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ."
+    "àºàº°àº¥àº¸àº™àº²àº¢àº·àº™àº¢àº±àº™àºªàº´àº™àº„à»‰àº², àº‚àº°à»œàº²àº”, àºˆàº³àº™àº§àº™ à»àº¥àº° àº—àºµà»ˆàº¢àº¹à»ˆàºˆàº±àº”àºªàº»à»ˆàº‡. à»àº­àº”àº¡àº´àº™àºˆàº°à»àºˆà»‰àº‡àº„à»ˆàº²àºˆàº±àº”àºªàº»à»ˆàº‡ à»àº¥àº° àº‚àº±à»‰àº™àº•àº­àº™àºŠàº³àº¥àº°à»€àº‡àº´àº™àº­àºµàºàº„àº±à»‰àº‡."
   ].filter(Boolean).join("\n");
 }
 
@@ -568,10 +569,10 @@ function ensureChatModal() {
   modal.dataset.chatOrderModal = "";
   modal.innerHTML = `
     <div class="chat-order-panel">
-      <button class="close-btn" type="button" data-close-chat-order>×</button>
-      <p class="eyebrow">ສັ່ງຜ່ານແຊັດ</p>
-      <h2>ເລືອກຊ່ອງທາງຕິດຕໍ່</h2>
-      <p class="meta">ເລືອກ WhatsApp ຫຼື Messenger ລະບົບຈະສ້າງຂໍ້ຄວາມສິນຄ້າໃຫ້ອັດຕະໂນມັດ</p>
+      <button class="close-btn" type="button" data-close-chat-order>Ã—</button>
+      <p class="eyebrow">àºªàº±à»ˆàº‡àºœà»ˆàº²àº™à»àºŠàº±àº”</p>
+      <h2>à»€àº¥àº·àº­àºàºŠà»ˆàº­àº‡àº—àº²àº‡àº•àº´àº”àº•à»à»ˆ</h2>
+      <p class="meta">à»€àº¥àº·àº­àº WhatsApp àº«àº¼àº· Messenger àº¥àº°àºšàº»àºšàºˆàº°àºªà»‰àº²àº‡àº‚à»à»‰àº„àº§àº²àº¡àºªàº´àº™àº„à»‰àº²à»ƒàº«à»‰àº­àº±àº”àº•àº°à»‚àº™àº¡àº±àº”</p>
       <div class="chat-order-summary" data-chat-summary></div>
       <p class="checkout-alert" data-chat-error></p>
       <div class="chat-channel-actions">
@@ -592,14 +593,49 @@ function openChatOrder() {
   }
   const modal = ensureChatModal();
   modal.querySelector("[data-chat-summary]").innerHTML = items.map((item) => `
-    <div><strong>${item.product.name}</strong><span>${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)} x ${item.qty}</span></div>
+    <div><strong>${item.product.name}</strong><span>${item.size || productSizeOption(item.product).size} â€¢ ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)} x ${item.qty}</span></div>
   `).join("");
   modal.classList.add("is-open");
+}
+
+function copyChatMessage(message) {
+  const fallbackCopy = () => {
+    const textarea = document.createElement("textarea");
+    textarea.value = message;
+    textarea.setAttribute("readonly", "");
+    textarea.style.left = "-9999px";
+    textarea.style.position = "fixed";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  };
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(message).catch(fallbackCopy);
+  }
+  fallbackCopy();
+  return Promise.resolve();
+}
+
+function showMessengerCopyNotice(copied) {
+  const modal = document.querySelector("[data-chat-order-modal]");
+  const target = modal?.querySelector("[data-chat-error]");
+  if (!target) return;
+  target.classList.toggle("is-error", !copied);
+  target.textContent = copied
+    ? "ຄັດລອກລາຍການສັ່ງຊື້ແລ້ວ. ເປີດ Messenger ແລ້ວກົດວາງໃນແຊັດຮ້ານໄດ້ເລີຍ."
+    : "Messenger ບໍ່ຮອງຮັບຂໍ້ຄວາມອັດຕະໂນມັດ. ກະລຸນາກັບມາຄັດລອກຂໍ້ຄວາມອີກຄັ້ງ.";
 }
 
 async function sendChatDraft(channel) {
   const items = cartItemsWithProducts();
   const message = items.length ? buildOrderMessage() : "ສະບາຍດີ ຂ້ອຍສົນໃຈສອບຖາມສິນຄ້າ Kinglike";
+  const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+  const chatWindow = window.open(url, "_blank");
+  if (!chatWindow) window.location.href = url;
+  if (channel === "messenger") {
+    copyChatMessage(message).then(() => showMessengerCopyNotice(true)).catch(() => showMessengerCopyNotice(false));
+  }
   try {
     if (items.length) await fetch("/api/orders", {
       method: "POST",
@@ -624,14 +660,11 @@ async function sendChatDraft(channel) {
   } catch (error) {
     // Let customer continue to chat even if local API is unavailable.
   }
-  const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank", "noopener");
 }
-
 async function submitChatDraft(channel) {
   const modal = ensureChatModal();
   await sendChatDraft(channel);
-  modal.classList.remove("is-open");
+  if (channel !== "messenger") modal.classList.remove("is-open");
 }
 
 function checkout() {

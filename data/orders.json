@@ -1,6 +1,206 @@
 {
   "orders": [
     {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Gold Support\n   ລະຫັດສິນຄ້າ: KL-GS-1205\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 1\n   ລາຄາ/ໜ່ວຍ: 6,190,000 ₭\n   ລວມ: 6,190,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 6,190,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=gold-support&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=gold-support&category=mattresses",
+      "items": [
+        {
+          "productId": "gold-support",
+          "productName": "Kinglike Gold Support",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 6190000
+        }
+      ],
+      "id": "437600db-869e-415c-8681-bace90d2e3cf",
+      "createdAt": "2026-05-27T03:57:25.397Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Gold Support\n   ລະຫັດສິນຄ້າ: KL-GS-1205\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 1\n   ລາຄາ/ໜ່ວຍ: 6,190,000 ₭\n   ລວມ: 6,190,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 6,190,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=gold-support&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=gold-support&category=mattresses",
+      "items": [
+        {
+          "productId": "gold-support",
+          "productName": "Kinglike Gold Support",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 6190000
+        }
+      ],
+      "id": "cf3357b7-86e1-4c39-9b16-0fe8a92de12f",
+      "createdAt": "2026-05-27T03:53:18.392Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Gold Support\n   ລະຫັດສິນຄ້າ: KL-GS-1205\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 1\n   ລາຄາ/ໜ່ວຍ: 6,190,000 ₭\n   ລວມ: 6,190,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 6,190,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=gold-support&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=gold-support&category=mattresses",
+      "items": [
+        {
+          "productId": "gold-support",
+          "productName": "Kinglike Gold Support",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 6190000
+        }
+      ],
+      "id": "5d385cc7-c448-4918-9b86-fab5050ee479",
+      "createdAt": "2026-05-27T03:50:55.514Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Gold Support\n   ລະຫັດສິນຄ້າ: KL-GS-1205\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 1\n   ລາຄາ/ໜ່ວຍ: 6,190,000 ₭\n   ລວມ: 6,190,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 6,190,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=gold-support&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=gold-support&category=mattresses",
+      "items": [
+        {
+          "productId": "gold-support",
+          "productName": "Kinglike Gold Support",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 6190000
+        }
+      ],
+      "id": "f052f024-64c1-46e1-ba25-0a6d66c0449d",
+      "createdAt": "2026-05-27T03:45:40.760Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Cloud\n   ລະຫັດສິນຄ້າ: KL-RC-1201\n   ຂະໜາດ: 3.5 ຟຸດ\n   ຈຳນວນ: 1\n   ລາຄາ/ໜ່ວຍ: 5,290,000 ₭\n   ລວມ: 5,290,000 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 5,290,000 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=royal-cloud&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=royal-cloud&category=mattresses",
+      "items": [
+        {
+          "productId": "royal-cloud",
+          "productName": "Kinglike Royal Cloud",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 5290000
+        }
+      ],
+      "id": "fa421cbd-5922-490b-8f78-01de902c96b4",
+      "createdAt": "2026-05-27T03:44:34.392Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Cloud\n   ລະຫັດສິນຄ້າ: KL-RC-1201\n   ຂະໜາດ: 6 ຟຸດ\n   ຈຳນວນ: 3\n   ລາຄາ/ໜ່ວຍ: 6,559,600 ₭\n   ລວມ: 19,678,800 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 19,678,800 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=royal-cloud&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=royal-cloud&category=mattresses",
+      "items": [
+        {
+          "productId": "royal-cloud",
+          "productName": "Kinglike Royal Cloud",
+          "size": "6 ຟຸດ",
+          "quantity": 3,
+          "unitPrice": 6559600
+        }
+      ],
+      "id": "55ea0e74-bb05-4a29-99de-25a2ff762cf0",
+      "createdAt": "2026-05-27T03:32:53.069Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Cloud\n   ລະຫັດສິນຄ້າ: KL-RC-1201\n   ຂະໜາດ: 6 ຟຸດ\n   ຈຳນວນ: 3\n   ລາຄາ/ໜ່ວຍ: 6,559,600 ₭\n   ລວມ: 19,678,800 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 19,678,800 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=royal-cloud&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=royal-cloud&category=mattresses",
+      "items": [
+        {
+          "productId": "royal-cloud",
+          "productName": "Kinglike Royal Cloud",
+          "size": "6 ຟຸດ",
+          "quantity": 3,
+          "unitPrice": 6559600
+        }
+      ],
+      "id": "edec33e5-3ca0-4d2a-930d-5f05438a882c",
+      "createdAt": "2026-05-27T03:32:52.356Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Cloud\n   ລະຫັດສິນຄ້າ: KL-RC-1201\n   ຂະໜາດ: 6 ຟຸດ\n   ຈຳນວນ: 3\n   ລາຄາ/ໜ່ວຍ: 6,559,600 ₭\n   ລວມ: 19,678,800 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 19,678,800 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=royal-cloud&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=royal-cloud&category=mattresses",
+      "items": [
+        {
+          "productId": "royal-cloud",
+          "productName": "Kinglike Royal Cloud",
+          "size": "6 ຟຸດ",
+          "quantity": 3,
+          "unitPrice": 6559600
+        }
+      ],
+      "id": "3339e466-75e1-4dc0-8bb0-c88d5153fa77",
+      "createdAt": "2026-05-27T03:32:51.541Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Cloud\n   ລະຫັດສິນຄ້າ: KL-RC-1201\n   ຂະໜາດ: 6 ຟຸດ\n   ຈຳນວນ: 3\n   ລາຄາ/ໜ່ວຍ: 6,559,600 ₭\n   ລວມ: 19,678,800 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 19,678,800 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=royal-cloud&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=royal-cloud&category=mattresses",
+      "items": [
+        {
+          "productId": "royal-cloud",
+          "productName": "Kinglike Royal Cloud",
+          "size": "6 ຟຸດ",
+          "quantity": 3,
+          "unitPrice": 6559600
+        }
+      ],
+      "id": "626812f2-cdca-49fd-a110-426b49d7436a",
+      "createdAt": "2026-05-27T03:32:51.349Z"
+    },
+    {
+      "mode": "chat_draft",
+      "contactChannel": "messenger",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "chatMessage": "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike\nໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ\nຮ້ານ: Kinglike Product\nລາຍການສິນຄ້າ:\n1. Kinglike Royal Cloud\n   ລະຫັດສິນຄ້າ: KL-RC-1201\n   ຂະໜາດ: 6 ຟຸດ\n   ຈຳນວນ: 3\n   ລາຄາ/ໜ່ວຍ: 6,559,600 ₭\n   ລວມ: 19,678,800 ₭\nຍອດລວມທີ່ຕ້ອງຊຳລະ: 19,678,800 ₭\nລິ້ງສິນຄ້າ:\nhttp://localhost:4173/product.html?id=royal-cloud&category=mattresses\nກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ.",
+      "productLink": "http://localhost:4173/product.html?id=royal-cloud&category=mattresses",
+      "items": [
+        {
+          "productId": "royal-cloud",
+          "productName": "Kinglike Royal Cloud",
+          "size": "6 ຟຸດ",
+          "quantity": 3,
+          "unitPrice": 6559600
+        }
+      ],
+      "id": "1daff5aa-4937-4a33-82c5-b7df94a58c59",
+      "createdAt": "2026-05-27T03:32:50.924Z"
+    },
+    {
       "id": "ec7f650d-bbe5-43c7-bad9-305ac203a1c6",
       "orderCode": "KL260520ONUS",
       "customerName": "Website chat customer",
@@ -602,6 +802,66 @@
     }
   ],
   "logs": [
+    {
+      "id": "8834f85b-6c65-4ff4-80fd-128e2db2d44f",
+      "createdAt": "2026-05-27T03:57:25.397Z",
+      "type": "order",
+      "orderId": "437600db-869e-415c-8681-bace90d2e3cf"
+    },
+    {
+      "id": "e9629fb2-e3e9-493f-9b69-a5731ff96505",
+      "createdAt": "2026-05-27T03:53:18.392Z",
+      "type": "order",
+      "orderId": "cf3357b7-86e1-4c39-9b16-0fe8a92de12f"
+    },
+    {
+      "id": "b749de07-52cd-45a2-9627-bd4e06b54e0f",
+      "createdAt": "2026-05-27T03:50:55.514Z",
+      "type": "order",
+      "orderId": "5d385cc7-c448-4918-9b86-fab5050ee479"
+    },
+    {
+      "id": "4b3fb65f-d2b2-4d4a-a05d-0bbc018c571d",
+      "createdAt": "2026-05-27T03:45:40.760Z",
+      "type": "order",
+      "orderId": "f052f024-64c1-46e1-ba25-0a6d66c0449d"
+    },
+    {
+      "id": "aac0aa80-470f-4610-8fec-a03e03514911",
+      "createdAt": "2026-05-27T03:44:34.392Z",
+      "type": "order",
+      "orderId": "fa421cbd-5922-490b-8f78-01de902c96b4"
+    },
+    {
+      "id": "88cc6d6d-90db-4f3b-abe4-47d55b89422c",
+      "createdAt": "2026-05-27T03:32:53.069Z",
+      "type": "order",
+      "orderId": "55ea0e74-bb05-4a29-99de-25a2ff762cf0"
+    },
+    {
+      "id": "6b814d08-5a3f-47e8-bff2-679014427cde",
+      "createdAt": "2026-05-27T03:32:52.356Z",
+      "type": "order",
+      "orderId": "edec33e5-3ca0-4d2a-930d-5f05438a882c"
+    },
+    {
+      "id": "93d91a8c-f844-48b5-a1c1-b9955897a477",
+      "createdAt": "2026-05-27T03:32:51.541Z",
+      "type": "order",
+      "orderId": "3339e466-75e1-4dc0-8bb0-c88d5153fa77"
+    },
+    {
+      "id": "4d5415ea-bd94-4b16-b236-07c103bd7039",
+      "createdAt": "2026-05-27T03:32:51.349Z",
+      "type": "order",
+      "orderId": "626812f2-cdca-49fd-a110-426b49d7436a"
+    },
+    {
+      "id": "1172f081-5c1f-4a0c-aa5b-60dded291e26",
+      "createdAt": "2026-05-27T03:32:50.924Z",
+      "type": "order",
+      "orderId": "1daff5aa-4937-4a33-82c5-b7df94a58c59"
+    },
     {
       "id": "f4ee0bda-37ef-4ba5-abf9-f7c69713d490",
       "orderId": "ec7f650d-bbe5-43c7-bad9-305ac203a1c6",
