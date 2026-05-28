@@ -9273,6 +9273,31 @@ body > .site-header.liquid-header .menu-btn span {
   color: #ffffff !important;
 }
 
+main#home > .hero {
+  background:
+    radial-gradient(circle at 72% 26%, rgba(255, 255, 255, 0.96), transparent 28%),
+    radial-gradient(circle at 24% 72%, rgba(223, 255, 95, 0.16), transparent 24%),
+    linear-gradient(180deg, #f7f8f8 0%, #edf0f2 62%, #e7ebed 100%) !important;
+  color: var(--text) !important;
+}
+
+main#home > .hero h1,
+main#home > .hero h1 span,
+main#home > .hero .hero-copy p:not(.eyebrow),
+main#home > .hero .eyebrow {
+  color: var(--text) !important;
+}
+
+main#home > .hero .hero-copy p:not(.eyebrow) {
+  color: var(--muted) !important;
+}
+
+main#home > .hero .secondary-btn {
+  background: rgba(255, 255, 255, 0.78) !important;
+  border-color: rgba(7, 8, 9, 0.12) !important;
+  color: var(--text) !important;
+}
+
 .benefits,
 .section,
 .products-section,
@@ -9374,4 +9399,36 @@ body > .site-header.liquid-header .menu-btn span {
     linear-gradient(#ffffff 12px, transparent 12px) 0 0 / 32px 32px,
     #050607 !important;
   color: #050607 !important;
+}
+
+/* Keep every recommended/product-list band on the same dark stage. */
+.products-section,
+.related-products {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 32%),
+    linear-gradient(180deg, #050607 0%, #111315 100%) !important;
+  color: #ffffff !important;
+}
+
+.products-section .section-heading .eyebrow,
+.products-section .collection-toolbar .eyebrow,
+.related-products .section-heading .eyebrow {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.products-section .section-heading h2,
+.products-section .section-heading h2 span,
+.products-section .collection-toolbar h2,
+.related-products .section-heading h2,
+.related-products .section-heading h2 span {
+  color: #ffffff !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.22) !important;
+}
+
+main#home > section#products.products-section,
+body main#home > #products.section.products-section {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 32%),
+    linear-gradient(180deg, #050607 0%, #111315 100%) !important;
+  color: #ffffff !important;
 }
