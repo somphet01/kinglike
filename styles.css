@@ -9958,7 +9958,317 @@ body:not(.home-intro) .static-logo-hero .hero-stage {
     padding: 0 !important;
   }
 
-  body:not(.home-intro) .static-logo-hero .hero-cover-image {
+body:not(.home-intro) .static-logo-hero .hero-cover-image {
     object-position: center center !important;
   }
+}
+
+/* Sleephappy-style home cover carousel. */
+body:not(.home-intro) .cover-carousel-hero {
+  background: #eef1f2 !important;
+  display: block !important;
+  height: 100svh !important;
+  min-height: 100svh !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: relative !important;
+  scroll-margin-top: 0 !important;
+}
+
+.hero-carousel-track,
+.hero-carousel-slide {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.hero-carousel-slide {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  z-index: 0;
+}
+
+.hero-carousel-slide.is-active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.hero-carousel-slide img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  width: 100%;
+}
+
+.hero-carousel-dots {
+  align-items: center;
+  bottom: clamp(1.5rem, 4vw, 2.4rem);
+  display: flex;
+  gap: 0.55rem;
+  justify-content: center;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.hero-carousel-dots button {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(5, 6, 7, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(5, 6, 7, 0.14);
+  cursor: pointer;
+  height: 0.72rem;
+  padding: 0;
+  transition: background 0.22s ease, transform 0.22s ease, width 0.22s ease;
+  width: 0.72rem;
+}
+
+.hero-carousel-dots button.is-active {
+  background: #dfff5f;
+  transform: translateY(-1px);
+  width: 2.25rem;
+}
+
+.sleep-statement {
+  align-items: center;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.95), transparent 34%),
+    radial-gradient(circle at 50% 80%, rgba(223, 255, 95, 0.1), transparent 24%),
+    linear-gradient(180deg, #f7f8f8 0%, #eef1f2 70%, #e7ebed 100%) !important;
+  border-bottom: 1px solid rgba(14, 19, 24, 0.06);
+  border-top: 1px solid rgba(14, 19, 24, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: clamp(28rem, 52vw, 38rem);
+  overflow: hidden;
+  padding: clamp(5.5rem, 9vw, 8rem) 7vw;
+  position: relative;
+  text-align: center;
+  z-index: 0;
+}
+
+.sleep-statement::before {
+  background: #8f969d;
+  border-radius: 999px;
+  box-shadow:
+    1.6rem 0 0 rgba(143, 150, 157, 0.36),
+    3rem 0 0 rgba(143, 150, 157, 0.2);
+  content: "";
+  height: 0.62rem;
+  left: 50%;
+  position: absolute;
+  top: clamp(2.2rem, 4vw, 3.5rem);
+  transform: translateX(-2.1rem);
+  width: 1.55rem;
+}
+
+.sleep-statement-copy {
+  align-items: center;
+  color: #050607;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: min(94vw, 48rem);
+  text-align: center;
+  width: 100%;
+}
+
+.sleep-statement h2 {
+  color: #050607;
+  font-size: clamp(3.2rem, 7.4vw, 6.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0;
+  max-width: 13ch;
+  text-align: center;
+}
+
+.sleep-statement h2 span {
+  display: block;
+}
+
+.sleep-statement h2 span:nth-child(2) {
+  color: #8f969d;
+  text-shadow: 0 2px 0 rgba(5, 6, 7, 0.04);
+}
+
+.sleep-statement-copy > p:not(.eyebrow) {
+  color: rgba(5, 6, 7, 0.58);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 34rem;
+}
+
+.sleep-statement h2 span,
+.sleep-statement-copy > p {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.sleep-statement.is-visible h2 span,
+.sleep-statement.is-visible .sleep-statement-copy > p {
+  animation: sleepLineRise 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sleep-statement.is-visible h2 span:first-child {
+  animation-delay: 0.08s;
+}
+
+.sleep-statement.is-visible h2 span:nth-child(2) {
+  animation-delay: 0.24s;
+}
+
+.sleep-statement.is-visible .sleep-statement-copy > p {
+  animation-delay: 0.4s;
+}
+
+@keyframes sleepLineRise {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vertical-video-section {
+  background: linear-gradient(180deg, #eef1f2 0%, #ffffff 100%) !important;
+}
+
+.vertical-video-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.vertical-video-card {
+  background: #050607;
+  border-radius: 8px;
+  box-shadow: 0 18px 52px rgba(5, 6, 7, 0.16);
+  color: #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+.vertical-video-card video {
+  aspect-ratio: 9 / 16;
+  background: #111315;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.vertical-video-card div {
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 7, 0.86));
+  bottom: 0;
+  display: grid;
+  gap: 0.25rem;
+  left: 0;
+  padding: 2.8rem 1rem 1rem;
+  position: absolute;
+  right: 0;
+}
+
+.vertical-video-card span {
+  color: #dfff5f;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.vertical-video-card strong {
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+@media (max-width: 720px) {
+  body:not(.home-intro) .cover-carousel-hero {
+    height: 100svh !important;
+    min-height: 100svh !important;
+  }
+
+  .hero-carousel-slide img {
+    object-position: center center;
+  }
+
+  .sleep-statement {
+    align-items: center;
+    min-height: 27rem;
+    padding: 5.8rem 32px 5rem;
+    text-align: center;
+  }
+
+  .sleep-statement-copy {
+    align-items: center;
+    gap: 1rem;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .sleep-statement h2 {
+    font-size: clamp(3rem, 12vw, 4.7rem);
+    line-height: 1.1;
+    max-width: 12ch;
+  }
+
+  .sleep-statement-copy > p:not(.eyebrow) {
+    font-size: clamp(1rem, 4.1vw, 1.22rem);
+    line-height: 1.55;
+    max-width: 31rem;
+  }
+
+  .vertical-video-grid {
+    display: flex;
+    gap: 0.85rem;
+    margin-left: -32px;
+    margin-right: -32px;
+    overflow-x: auto;
+    padding: 0 32px 0.5rem;
+    scroll-snap-type: x mandatory;
+  }
+
+  .vertical-video-card {
+    flex: 0 0 min(74vw, 18rem);
+    scroll-snap-align: start;
+  }
+}
+
+/* Final home section order: cover first, statement second, services third. */
+body main > .cover-carousel-hero#home {
+  order: 0 !important;
+}
+
+body main > .sleep-statement {
+  order: 1 !important;
+}
+
+body main > .benefits {
+  order: 2 !important;
+}
+
+body main > .vertical-video-section {
+  order: 3 !important;
+}
+
+body main > #categories {
+  order: 4 !important;
+}
+
+body main > .products-section {
+  order: 5 !important;
+}
+
+body main > .about-contact {
+  order: 6 !important;
+}
+
+body main > .trust-policies {
+  order: 7 !important;
 }

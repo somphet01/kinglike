@@ -423,6 +423,52 @@
   width: 100%;
 }
 
+.hero-slide-admin-grid span {
+  aspect-ratio: 16 / 9;
+}
+
+.vertical-video-admin-list {
+  align-items: stretch;
+  display: grid;
+  gap: 10px;
+  justify-content: stretch;
+  text-align: left;
+}
+
+.video-admin-item {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(7, 8, 9, 0.1);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 76px minmax(0, 1fr);
+  padding: 10px;
+}
+
+.video-admin-item.is-paused {
+  opacity: 0.58;
+}
+
+.video-admin-item video {
+  aspect-ratio: 9 / 16;
+  background: #050607;
+  border-radius: 8px;
+  object-fit: cover;
+  width: 76px;
+}
+
+.video-admin-item strong,
+.video-admin-item span {
+  display: block;
+}
+
+.video-admin-item span {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
 .mini-btn,
 .admin-submit {
   border: 0;

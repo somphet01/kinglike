@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260528-25" />
-    <link rel="stylesheet" href="admin.css?v=20260528-03" />
+    <link rel="stylesheet" href="styles.css?v=20260529-12" />
+    <link rel="stylesheet" href="admin.css?v=20260529-12" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -279,6 +279,41 @@
             <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
           </form>
 
+          <form class="admin-card promo-admin" data-hero-slide-form>
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">HOME SLIDER</p>
+                <h2>ອັບຮູບສະໄລດ໌ໜ້າປົກ</h2>
+              </div>
+            </div>
+            <label>
+              ຮູບໜ້າປົກຫຼາຍຮູບ
+              <input name="heroSlideUpload" type="file" accept="image/*" multiple data-hero-slide-upload />
+              <small>ອັບໄດ້ຫຼາຍຮູບ. ໜ້າຫຼັກຈະເລື່ອນອັດຕະໂນມັດ ແລະມີຈຸດໃຫ້ກົດເລື່ອນ.</small>
+            </label>
+            <div class="admin-upload-preview" data-hero-slide-list>Hero slides preview</div>
+          </form>
+
+          <form class="admin-card promo-admin" data-video-form>
+            <div class="admin-card-head">
+              <div>
+                <p class="eyebrow">VERTICAL VIDEO</p>
+                <h2>ອັບຄລິບແນວຕັ້ງ</h2>
+              </div>
+            </div>
+            <label>
+              ຄລິບແນວຕັ້ງ
+              <input name="videoUpload" type="file" accept="video/mp4,video/webm,video/quicktime" data-video-upload />
+              <small>ແນະນຳ MP4/WebM ແນວຕັ້ງ 9:16 ແລະຂະໜາດບໍ່ເກີນ 8MB.</small>
+            </label>
+            <label>
+              ຫົວຂໍ້ຄລິບ
+              <input name="videoTitle" placeholder="Kinglike Essential Review" />
+            </label>
+            <button class="primary-btn admin-submit" type="submit">ເພີ່ມຄລິບ</button>
+            <div class="admin-upload-preview vertical-video-admin-list" data-video-list>Video preview</div>
+          </form>
+
           <form class="admin-card promo-admin" data-promo-event-form>
             <div class="admin-card-head">
               <div>
@@ -416,6 +451,6 @@
     </div>
     <div class="admin-toast" data-toast></div>
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="admin.js?v=20260528-03"></script>
+    <script src="admin.js?v=20260529-12"></script>
   </body>
 </html>

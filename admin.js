@@ -194,6 +194,12 @@ const els = {
   newPromoEvent: document.querySelector("[data-new-promo-event]"),
   promoEventImageUpload: document.querySelector("[data-promo-event-image-upload]"),
   promoEventImageValue: document.querySelector("[data-promo-event-image-value]"),
+  heroSlideForm: document.querySelector("[data-hero-slide-form]"),
+  heroSlideUpload: document.querySelector("[data-hero-slide-upload]"),
+  heroSlideList: document.querySelector("[data-hero-slide-list]"),
+  videoForm: document.querySelector("[data-video-form]"),
+  videoUpload: document.querySelector("[data-video-upload]"),
+  videoList: document.querySelector("[data-video-list]"),
   coverUpload: document.querySelector("[data-cover-image-upload]"),
   coverValue: document.querySelector("[data-cover-image-value]"),
   promoPreview: document.querySelector("[data-promo-preview]"),
@@ -884,10 +890,12 @@ function compactExistingImage(dataUrl, maxSize = 620, quality = 0.58, maxBytes =
 async function compactPromotionForStorage(promotion) {
   const compacted = { ...promotion, events: Array.isArray(promotion.events) ? [...promotion.events] : [] };
   compacted.coverImage = await compactExistingImage(compacted.coverImage, 760, 0.58, 130000);
+  compacted.heroSlides = await Promise.all((Array.isArray(compacted.heroSlides) ? compacted.heroSlides : []).filter(Boolean).map((image) => compactExistingImage(image, 1100, 0.66, 240000)));
   compacted.events = await Promise.all(compacted.events.map(async (item) => ({
     ...item,
     image: await compactExistingImage(item.image, 560, 0.54, 80000)
   })));
+  compacted.verticalVideos = (Array.isArray(compacted.verticalVideos) ? compacted.verticalVideos : []).filter((item) => item && item.src);
   return compacted;
 }
 
@@ -922,6 +930,21 @@ function readFilesAsDataUrls(files, callback) {
     .catch(() => showToast("ອ່ານຮູບບໍ່ສຳເລັດ"));
 }
 
+function readVideoAsDataUrl(file, callback) {
+  if (!file || !file.type.startsWith("video/")) return;
+  if (file.size > 8 * 1024 * 1024) {
+    showToast("ຄລິບໃຫຍ່ເກີນ 8MB");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onerror = () => showToast("ອ່ານຄລິບບໍ່ສຳເລັດ");
+  reader.onload = () => {
+    callback(reader.result);
+    showToast("ອັບຄລິບແລ້ວ ພ້ອມບັນທຶກ");
+  };
+  reader.readAsDataURL(file);
+}
+
 function loadPromoForm() {
   try {
     const promo = loadPromotionData();
@@ -933,6 +956,8 @@ function loadPromoForm() {
     els.promoForm.reset();
   }
   renderPromoPreview();
+  renderHeroSlideList();
+  renderVideoList();
   renderPromoEventList();
 }
 
@@ -945,6 +970,40 @@ function renderPromoPreview() {
   els.promoPreview.innerHTML = coverImage
     ? `<img src="${coverImage}" alt="${title}" />`
     : `<div class="promo-preview-copy"><p class="eyebrow">HOT DEAL</p><h3>${title}</h3><p>${text}</p><small>ຝັ່ງລູກຄ້າ: countdown + ກະດາດສີທອງຕອນເປີດໂປຣ</small></div>`;
+}
+
+function renderHeroSlideList() {
+  if (!els.heroSlideList) return;
+  const slides = Array.isArray(loadPromotionData().heroSlides) ? loadPromotionData().heroSlides.filter(Boolean) : [];
+  els.heroSlideList.innerHTML = slides.length ? `
+    <div class="admin-upload-grid hero-slide-admin-grid">
+      ${slides.map((image, index) => `
+        <span>
+          <img src="${image}" alt="Hero slide ${index + 1}" />
+          <b>Slide ${index + 1}</b>
+          <button type="button" data-remove-hero-slide="${index}" aria-label="Remove slide">×</button>
+        </span>
+      `).join("")}
+    </div>
+  ` : `<p class="meta">ຍັງບໍ່ມີຮູບສະໄລດ໌. ໜ້າຫຼັກຈະໃຊ້ຮູບປົກພື້ນຖານ.</p>`;
+}
+
+function renderVideoList() {
+  if (!els.videoList) return;
+  const videos = Array.isArray(loadPromotionData().verticalVideos) ? loadPromotionData().verticalVideos : [];
+  els.videoList.innerHTML = videos.length ? videos.map((item) => `
+    <article class="video-admin-item ${item.active === false ? "is-paused" : ""}">
+      <video src="${item.src}" muted playsinline controls preload="metadata"></video>
+      <div>
+        <strong>${item.title || "Kinglike video"}</strong>
+        <span>${item.active === false ? "ປິດຢູ່" : "ສະແດງໜ້າຫຼັກ"}</span>
+        <div class="admin-mini-actions">
+          <button type="button" data-toggle-video="${item.id}">${item.active === false ? "ເປີດ" : "ປິດ"}</button>
+          <button type="button" data-delete-video="${item.id}">ລຶບ</button>
+        </div>
+      </div>
+    </article>
+  `).join("") : `<p class="meta">ຍັງບໍ່ມີຄລິບແນວຕັ້ງ.</p>`;
 }
 
 function loadPromotionData() {
@@ -1218,6 +1277,33 @@ els.promoEventImageUpload?.addEventListener("change", (event) => {
   }, { maxSize: 820, quality: 0.7, maxBytes: 180000 });
 });
 
+els.heroSlideUpload?.addEventListener("change", (event) => {
+  readFilesAsDataUrls(event.target.files, async (dataUrls) => {
+    const promo = loadPromotionData();
+    const slides = Array.isArray(promo.heroSlides) ? promo.heroSlides.filter(Boolean) : [];
+    const compactedPromo = await compactPromotionForStorage({ ...promo, heroSlides: [...slides, ...dataUrls] });
+    savePromotionData(compactedPromo);
+    renderHeroSlideList();
+    event.target.value = "";
+  });
+});
+
+els.heroSlideList?.addEventListener("click", (event) => {
+  const removeIndex = event.target.closest("[data-remove-hero-slide]")?.dataset.removeHeroSlide;
+  if (removeIndex === undefined) return;
+  const promo = loadPromotionData();
+  const slides = Array.isArray(promo.heroSlides) ? [...promo.heroSlides] : [];
+  slides.splice(Number(removeIndex), 1);
+  savePromotionData({ ...promo, heroSlides: slides });
+  renderHeroSlideList();
+});
+
+els.videoUpload?.addEventListener("change", (event) => {
+  readVideoAsDataUrl(event.target.files[0], (dataUrl) => {
+    els.videoForm.dataset.videoSrc = dataUrl;
+  });
+});
+
 els.exportData.addEventListener("click", exportBackup);
 els.exportPublish?.addEventListener("click", exportPublishStore);
 els.importData.addEventListener("change", (event) => importBackup(event.target.files[0]));
@@ -1330,6 +1416,54 @@ els.promoForm.addEventListener("submit", async (event) => {
       message: "ບໍ່ສາມາດບັນທຶກ Cover / Promotion ໄດ້."
     });
   }
+});
+
+els.videoForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const src = els.videoForm.dataset.videoSrc || "";
+  const title = (els.videoForm.elements.videoTitle?.value || "Kinglike video").trim();
+  if (!src) {
+    showResult({
+      type: "error",
+      title: "ຍັງບໍ່ມີຄລິບ",
+      message: "ກະລຸນາອັບຄລິບແນວຕັ້ງກ່ອນບັນທຶກ."
+    });
+    return;
+  }
+  const promo = loadPromotionData();
+  const videos = Array.isArray(promo.verticalVideos) ? [...promo.verticalVideos] : [];
+  videos.unshift({
+    id: `video-${Date.now()}`,
+    title,
+    src,
+    active: true
+  });
+  const compactedPromo = await compactPromotionForStorage({ ...promo, verticalVideos: videos });
+  if (savePromotionData(compactedPromo)) {
+    els.videoForm.reset();
+    delete els.videoForm.dataset.videoSrc;
+    renderVideoList();
+    showResult({
+      title: "ບັນທຶກສຳເລັດ",
+      message: "ຄລິບແນວຕັ້ງຈະສະແດງໃນໜ້າຫຼັກແລ້ວ."
+    });
+  }
+});
+
+els.videoList?.addEventListener("click", (event) => {
+  const toggleId = event.target.closest("[data-toggle-video]")?.dataset.toggleVideo;
+  const deleteId = event.target.closest("[data-delete-video]")?.dataset.deleteVideo;
+  if (!toggleId && !deleteId) return;
+  const promo = loadPromotionData();
+  let videos = Array.isArray(promo.verticalVideos) ? [...promo.verticalVideos] : [];
+  if (toggleId) {
+    videos = videos.map((item) => item.id === toggleId ? { ...item, active: item.active === false } : item);
+  }
+  if (deleteId) {
+    videos = videos.filter((item) => item.id !== deleteId);
+  }
+  savePromotionData({ ...promo, verticalVideos: videos });
+  renderVideoList();
 });
 
 els.categoryCoverUpload?.addEventListener("change", (event) => {

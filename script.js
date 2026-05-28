@@ -12,6 +12,10 @@ const STATIC_STORE_URL = new URL("data/store.json", window.location.href).toStri
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
 
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
 const defaultProducts = [
   {
     id: "royal-cloud",
@@ -275,6 +279,8 @@ const state = {
 const money = new Intl.NumberFormat("lo-LA").format;
 let promoPopupDismissed = false;
 let bestSellerOrderIds = [];
+let heroCarouselTimer = null;
+let heroCarouselIndex = 0;
 
 const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
 const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
@@ -307,6 +313,10 @@ function repairStoredData(value) {
 const els = {
   header: document.querySelector("[data-header]"),
   hero: document.querySelector(".hero"),
+  heroTrack: document.querySelector("[data-hero-track]"),
+  heroDots: document.querySelector("[data-hero-dots]"),
+  homeVideosSection: document.querySelector("[data-home-videos-section]"),
+  homeVideos: document.querySelector("[data-home-videos]"),
   products: document.querySelector("[data-products]"),
   pagination: document.querySelector("[data-products-pagination]"),
   cartDrawer: document.querySelector("[data-cart-drawer]"),
@@ -562,6 +572,8 @@ function renderPromotionData(promotion) {
   }
 
   const activeEvents = (promotion.events || []).filter((item) => item.active !== false && item.title);
+  renderHeroCarousel(promotion, activeEvents);
+  renderHomeVideos(promotion);
   if (eventSection && eventGrid) {
     eventSection.hidden = !activeEvents.length;
     eventGrid.innerHTML = activeEvents.map((item) => `
@@ -583,6 +595,76 @@ function renderPromotionData(promotion) {
 
   renderPromoPopup(promotion, activeEvents);
   updatePromoCountdowns();
+}
+
+function heroSlideSources(promotion, activeEvents = []) {
+  const customSlides = Array.isArray(promotion.heroSlides) ? promotion.heroSlides.filter(Boolean) : [];
+  const coverSlide = promotion.coverImage ? [promotion.coverImage] : [];
+  const eventSlides = activeEvents.map((item) => item.image).filter(Boolean);
+  return [...customSlides, ...coverSlide, ...eventSlides, "assets/ES-1.webp"].filter((source, index, list) => source && list.indexOf(source) === index);
+}
+
+function setHeroSlide(index) {
+  const slides = els.heroTrack?.querySelectorAll(".hero-carousel-slide") || [];
+  const dots = els.heroDots?.querySelectorAll("[data-hero-slide]") || [];
+  if (!slides.length) return;
+  heroCarouselIndex = (index + slides.length) % slides.length;
+  slides.forEach((slide, slideIndex) => slide.classList.toggle("is-active", slideIndex === heroCarouselIndex));
+  dots.forEach((dot, dotIndex) => dot.classList.toggle("is-active", dotIndex === heroCarouselIndex));
+}
+
+function startHeroCarousel(total) {
+  if (heroCarouselTimer) window.clearInterval(heroCarouselTimer);
+  if (total <= 1) return;
+  heroCarouselTimer = window.setInterval(() => setHeroSlide(heroCarouselIndex + 1), 4800);
+}
+
+function renderHeroCarousel(promotion, activeEvents = []) {
+  if (!els.heroTrack || !els.heroDots) return;
+  const slides = heroSlideSources(promotion, activeEvents);
+  els.heroTrack.innerHTML = slides.map((source, index) => `
+    <article class="hero-carousel-slide ${index === 0 ? "is-active" : ""}">
+      <img src="${source}" alt="Kinglike cover ${index + 1}" />
+    </article>
+  `).join("");
+  els.heroDots.hidden = slides.length <= 1;
+  els.heroDots.innerHTML = slides.map((_, index) => `
+    <button class="${index === 0 ? "is-active" : ""}" type="button" data-hero-slide="${index}" aria-label="Cover slide ${index + 1}"></button>
+  `).join("");
+  heroCarouselIndex = 0;
+  startHeroCarousel(slides.length);
+}
+
+function renderHomeVideos(promotion) {
+  if (!els.homeVideosSection || !els.homeVideos) return;
+  const videos = (Array.isArray(promotion.verticalVideos) ? promotion.verticalVideos : []).filter((item) => item && item.src && item.active !== false);
+  els.homeVideosSection.hidden = !videos.length;
+  els.homeVideos.innerHTML = videos.map((item, index) => `
+    <article class="vertical-video-card">
+      <video src="${item.src}" muted playsinline loop controls preload="metadata"></video>
+      <div>
+        <span>0${index + 1}</span>
+        <strong>${item.title || "Kinglike video"}</strong>
+      </div>
+    </article>
+  `).join("");
+}
+
+function initLineAnimations() {
+  const sections = document.querySelectorAll("[data-animate-lines]");
+  if (!sections.length) return;
+  if (!("IntersectionObserver" in window)) {
+    sections.forEach((section) => section.classList.add("is-visible"));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.35 });
+  sections.forEach((section) => observer.observe(section));
 }
 
 function promoCountdownParts(endsAt) {
@@ -1208,6 +1290,13 @@ els.mobileMenu.querySelectorAll("a").forEach((link) => {
   link.addEventListener("click", closeMobileMenu);
 });
 
+els.heroDots?.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-hero-slide]");
+  if (!target) return;
+  setHeroSlide(Number(target.dataset.heroSlide || 0));
+  startHeroCarousel(els.heroTrack?.querySelectorAll(".hero-carousel-slide").length || 0);
+});
+
 els.searchInput.addEventListener("input", (event) => {
   state.search = event.target.value;
   state.page = 1;
@@ -1244,4 +1333,9 @@ renderProducts();
 renderPromotion();
 renderCart();
 renderWishlist();
+initLineAnimations();
 hydrateSyncedStore();
+
+if (window.location.hash === "#home" || window.location.hash === "") {
+  window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "auto" }));
+}

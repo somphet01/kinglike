@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260529-11" />
+    <link rel="stylesheet" href="styles.css?v=20260529-20" />
   </head>
   <body>
     <header class="site-header liquid-header" data-header>
@@ -66,74 +66,22 @@
     </aside>
     <div class="menu-backdrop" data-menu-backdrop></div>
 
-    <main id="home">
-      <section class="hero static-logo-hero">
-        <img class="hero-cover-image" src="assets/ES-1.webp" alt="" />
-        <div class="hero-motion-mark" aria-hidden="true">
-          <span class="motion-dot dot-1"></span>
-          <span class="motion-dot dot-2"></span>
-          <span class="motion-dot dot-3"></span>
-          <span class="motion-dot dot-4"></span>
-          <span class="motion-dot dot-5"></span>
-          <span class="motion-dot dot-6"></span>
-          <img src="assets/kinglike-logo-tight.png" alt="" />
+    <main>
+      <section class="cover-carousel-hero" id="home" data-hero-carousel aria-label="Kinglike cover promotion">
+        <div class="hero-carousel-track" data-hero-track>
+          <article class="hero-carousel-slide is-active">
+            <img src="assets/ES-1.webp" alt="Kinglike mattress cover" />
+          </article>
         </div>
-        <div class="sky-motion" aria-hidden="true"></div>
-        <div class="sky-celestial" aria-hidden="true">
-          <span class="sun-orb"></span>
-          <span class="moon-orb"></span>
-        </div>
-        <div class="sky-stars" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div class="sky-clouds" aria-hidden="true">
-          <span class="cloud cloud-one"></span>
-          <span class="cloud cloud-two"></span>
-          <span class="cloud cloud-three"></span>
-        </div>
-        <div class="sky-birds" aria-hidden="true">
-          <span class="bird bird-one"></span>
-          <span class="bird bird-two"></span>
-          <span class="bird bird-three"></span>
-          <span class="bird bird-four"></span>
-          <span class="bird bird-five"></span>
-          <span class="bird bird-six"></span>
-          <span class="bird bird-seven"></span>
-          <span class="bird bird-eight"></span>
-        </div>
-        <div class="hero-copy">
-          <p class="eyebrow">KINGLIKE PREMIUM SLEEP</p>
-          <h1>Sleep in <span>Luxury</span> Every Night</h1>
-          <p>
-            ທີ່ນອນພຣີມຽມສຳລັບການພັກຜ່ອນທີ່ເລິກກວ່າ ນຸ່ມກວ່າ
-            ແລະຫຼູຫຼາກວ່າທຸກຄືນ.
-          </p>
-          <div class="hero-actions">
-            <a class="primary-btn" href="collection.html?category=mattresses">ເລືອກຊື້ທີ່ນອນ</a>
-            <a class="secondary-btn" href="promotion.html">ເບິ່ງໂປຣໂມຊັນ</a>
-          </div>
-        </div>
-        <div class="hero-stage" aria-label="Animated mattress preview">
-          <div class="mattress-model">
-            <img class="hero-mattress-image" src="assets/hero-mattress-current.png" alt="Kinglike premium mattress" />
-            <div class="mattress-top"></div>
-            <div class="mattress-side"></div>
-            <div class="mattress-shadow"></div>
-          </div>
-        </div>
+        <div class="hero-carousel-dots" data-hero-dots aria-label="Cover slide controls"></div>
       </section>
 
+      <section class="sleep-statement" data-animate-lines aria-label="Kinglike sleep statement">
+        <div class="sleep-statement-copy">
+          <h2><span>Kinglike Sleep</span><span>Luxury Every Night</span></h2>
+          <p>ຄວາມນຸ່ມສະບາຍທີ່ອອກແບບໃຫ້ພັກຜ່ອນໄດ້ເລິກກວ່າທຸກຄືນ</p>
+        </div>
+      </section>
 
       <section class="benefits" aria-label="Highlights">
         <article>
@@ -181,6 +129,14 @@
           <h2>ປຶກສາແອດມິນ</h2>
           <p>ຊ່ວຍເລືອກຄວາມນຸ່ມ ຂະໜາດ ແລະຮຸ່ນທີ່ເໝາະກັບທ່ານ.</p>
         </article>
+      </section>
+
+      <section class="section vertical-video-section" data-home-videos-section hidden>
+        <div class="section-heading">
+          <p class="eyebrow">KINGLIKE STORIES</p>
+          <h2>ຄລິບແນວຕັ້ງ</h2>
+        </div>
+        <div class="vertical-video-grid" data-home-videos></div>
       </section>
 
       <section class="section" id="categories">
@@ -339,6 +295,6 @@
     </div>
 
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="script.js?v=20260528-05"></script>
+    <script src="script.js?v=20260529-20"></script>
   </body>
 </html>
