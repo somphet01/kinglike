@@ -1081,6 +1081,8 @@ async function submitChatDraft(channel) {
 }
 
 function checkout() {
+  closeDrawer(els.cartDrawer);
+  closeDrawer(els.wishlistDrawer);
   openChatOrder();
 }
 

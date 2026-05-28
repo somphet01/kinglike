@@ -8406,6 +8406,272 @@ body > .site-header.liquid-header .icon-btn {
   }
 }
 
+/* Mobile search and checkout polish. */
+@media (max-width: 980px) {
+  body > .site-header.liquid-header .header-search {
+    overflow: hidden !important;
+    transition: flex-basis 0.22s ease, width 0.22s ease, background 0.18s ease !important;
+  }
+
+  body > .site-header.liquid-header .header-search input {
+    background: transparent !important;
+    border: 0 !important;
+    color: #050505 !important;
+    display: block !important;
+    font-size: 13px !important;
+    min-width: 0 !important;
+    opacity: 0 !important;
+    outline: 0 !important;
+    padding: 0 0 0 6px !important;
+    pointer-events: none !important;
+    transition: opacity 0.16s ease, width 0.22s ease !important;
+    width: 0 !important;
+  }
+
+  body > .site-header.liquid-header .header-search:focus-within {
+    background: rgba(255, 255, 255, 0.42) !important;
+    border-radius: 999px !important;
+    flex-basis: min(138px, calc(100vw - 254px)) !important;
+    width: min(138px, calc(100vw - 254px)) !important;
+  }
+
+  body > .site-header.liquid-header .header-search:focus-within input {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    width: min(96px, calc(100vw - 294px)) !important;
+  }
+
+  .chat-order-modal {
+    z-index: 1300 !important;
+  }
+
+  .chat-channel-actions button {
+    border: 0 !important;
+    border-radius: 999px !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14) !important;
+    color: #fff !important;
+  }
+
+  .chat-channel-actions [data-chat-channel="whatsapp"] {
+    background: linear-gradient(135deg, #075e54, #25d366) !important;
+  }
+
+  .chat-channel-actions [data-chat-channel="messenger"] {
+    background: linear-gradient(135deg, #006aff, #8a3ffc) !important;
+  }
+
+  .drawer:not(.is-open) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* White motion-brand hero: dots gather into the Kinglike logo, then the copy appears. */
+.logo-motion-hero {
+  align-items: center !important;
+  background: #fff !important;
+  color: #050505 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-height: 100svh !important;
+  overflow: hidden !important;
+  padding: clamp(6rem, 13vh, 9rem) clamp(1.25rem, 5vw, 4rem) clamp(3rem, 8vh, 5rem) !important;
+  position: relative !important;
+  text-align: center !important;
+}
+
+.logo-motion-hero::before,
+.logo-motion-hero::after,
+.logo-motion-hero .sky-motion,
+.logo-motion-hero .sky-celestial,
+.logo-motion-hero .sky-stars,
+.logo-motion-hero .sky-clouds,
+.logo-motion-hero .sky-birds,
+.logo-motion-hero .hero-stage,
+.logo-motion-hero .mattress-model,
+.logo-motion-hero .hero-mattress-image,
+.logo-motion-hero .mattress-top,
+.logo-motion-hero .mattress-side,
+.logo-motion-hero .mattress-shadow {
+  display: none !important;
+}
+
+.hero-motion-mark {
+  display: grid;
+  height: clamp(8rem, 28vw, 14rem);
+  margin-bottom: clamp(1.4rem, 4vw, 2.6rem);
+  place-items: center;
+  position: relative;
+  width: min(78vw, 24rem);
+  z-index: 2;
+}
+
+.hero-motion-mark img {
+  animation: logoReveal 5.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  display: block;
+  filter: grayscale(1) brightness(0) contrast(1.18);
+  max-width: min(68vw, 18rem);
+  opacity: 0;
+  transform: translateY(8px) scale(0.94);
+  width: 100%;
+}
+
+.motion-dot {
+  animation: dotGather 5.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: #050505;
+  border-radius: 999px;
+  height: 8px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  width: 8px;
+}
+
+.dot-1 { --x: -42vw; --y: -18vh; animation-delay: 0s; }
+.dot-2 { --x: 38vw; --y: -14vh; animation-delay: 0.06s; }
+.dot-3 { --x: -34vw; --y: 16vh; animation-delay: 0.12s; }
+.dot-4 { --x: 32vw; --y: 20vh; animation-delay: 0.18s; }
+.dot-5 { --x: -6vw; --y: -28vh; animation-delay: 0.24s; }
+.dot-6 { --x: 9vw; --y: 26vh; animation-delay: 0.3s; }
+
+.logo-motion-hero .hero-copy {
+  align-items: center !important;
+  animation: heroCopyRise 5.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  color: #050505 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+  max-width: min(94vw, 48rem) !important;
+  opacity: 0;
+  padding: 0 !important;
+  position: relative !important;
+  transform: translateY(18px);
+  z-index: 2 !important;
+}
+
+.logo-motion-hero .eyebrow {
+  color: #050505 !important;
+  letter-spacing: 0.1em !important;
+}
+
+.logo-motion-hero h1 {
+  color: #050505 !important;
+  font-size: clamp(3.2rem, 11vw, 8rem) !important;
+  line-height: 0.9 !important;
+  margin: 0 !important;
+  max-width: 10ch !important;
+}
+
+.logo-motion-hero h1 span {
+  color: #050505 !important;
+}
+
+.logo-motion-hero .hero-copy p:not(.eyebrow) {
+  color: rgba(5, 5, 5, 0.62) !important;
+  font-size: clamp(1rem, 2vw, 1.35rem) !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  max-width: 34rem !important;
+}
+
+.logo-motion-hero .hero-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.75rem !important;
+  justify-content: center !important;
+  margin-top: 0.5rem !important;
+}
+
+.logo-motion-hero .secondary-btn {
+  background: rgba(255, 255, 255, 0.68) !important;
+  border-color: rgba(5, 5, 5, 0.12) !important;
+  color: #050505 !important;
+}
+
+@keyframes dotGather {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.6);
+  }
+  14% {
+    opacity: 1;
+  }
+  46% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  64% {
+    opacity: 0.82;
+    transform: translate(0, 0) scale(0.55);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2);
+  }
+}
+
+@keyframes logoReveal {
+  0%,
+  45% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  64%,
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes heroCopyRise {
+  0%,
+  58% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  78%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .logo-motion-hero {
+    min-height: 92svh !important;
+    padding-top: 6rem !important;
+  }
+
+  .hero-motion-mark {
+    height: 7.2rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .hero-motion-mark img {
+    max-width: min(68vw, 14rem);
+  }
+
+  .motion-dot {
+    height: 6px;
+    width: 6px;
+  }
+
+  .logo-motion-hero h1 {
+    font-size: clamp(3.05rem, 15vw, 4.6rem) !important;
+  }
+
+  .logo-motion-hero .hero-actions {
+    width: 100% !important;
+  }
+
+  .logo-motion-hero .hero-actions .primary-btn,
+  .logo-motion-hero .hero-actions .secondary-btn {
+    flex: 1 1 11rem !important;
+  }
+}
+
 /* Top-pill drawer pass: cart and wishlist open with the same slide-down feel as the menu. */
 @media (max-width: 980px) {
   body > .site-header.liquid-header .icon-btn[data-open-cart] span {
@@ -8452,7 +8718,7 @@ body > .site-header.liquid-header .icon-btn {
     box-shadow: 0 22px 70px rgba(0, 0, 0, 0.12) !important;
     color: #050505 !important;
     left: max(24px, env(safe-area-inset-left)) !important;
-    max-height: 66px !important;
+    max-height: 58px !important;
     max-width: none !important;
     opacity: 0 !important;
     overflow: hidden !important;
@@ -8488,7 +8754,7 @@ body > .site-header.liquid-header .icon-btn {
     align-items: center !important;
     border: 0 !important;
     display: flex !important;
-    height: 66px !important;
+    height: 58px !important;
     justify-content: space-between !important;
     padding: 0 !important;
   }
@@ -8697,15 +8963,15 @@ body > .site-header.liquid-header .icon-btn {
 /* Exact slide-down pass: the same top pill grows downward, with compact shop icons kept in place. */
 @media (max-width: 980px) {
   body > .site-header.liquid-header {
-    height: 66px !important;
-    padding: 0 18px !important;
+    height: 58px !important;
+    padding: 0 16px !important;
   }
 
   body > .site-header.liquid-header .brand img,
   .mobile-menu-head img {
-    height: 26px !important;
-    max-width: 112px !important;
-    width: 112px !important;
+    height: 23px !important;
+    max-width: 100px !important;
+    width: 100px !important;
   }
 
   body > .site-header.liquid-header .header-actions {
@@ -8766,7 +9032,7 @@ body > .site-header.liquid-header .icon-btn {
 
   .mobile-menu {
     clip-path: none !important;
-    max-height: 66px !important;
+    max-height: 58px !important;
     opacity: 0 !important;
     padding-left: 18px !important;
     padding-right: 18px !important;
@@ -8793,7 +9059,7 @@ body > .site-header.liquid-header .icon-btn {
   }
 
   .mobile-menu-head {
-    height: 66px !important;
+    height: 58px !important;
     padding: 0 0 !important;
   }
 
@@ -8805,5 +9071,60 @@ body > .site-header.liquid-header .icon-btn {
     opacity: 0 !important;
     pointer-events: none !important;
     transition: opacity 0.08s ease !important;
+  }
+}
+
+/* Final override: mobile search must expand and accept typing. */
+@media (max-width: 980px) {
+  body > .site-header.liquid-header .header-search {
+    overflow: hidden !important;
+    transition: flex-basis 0.22s ease, width 0.22s ease, background 0.18s ease !important;
+  }
+
+  body > .site-header.liquid-header .header-search input {
+    background: transparent !important;
+    border: 0 !important;
+    color: #050505 !important;
+    display: block !important;
+    font-size: 13px !important;
+    min-width: 0 !important;
+    opacity: 0 !important;
+    outline: 0 !important;
+    padding: 0 0 0 6px !important;
+    pointer-events: none !important;
+    transition: opacity 0.16s ease, width 0.22s ease !important;
+    width: 0 !important;
+  }
+
+  body > .site-header.liquid-header .header-search:focus-within {
+    background: rgba(255, 255, 255, 0.42) !important;
+    border-radius: 999px !important;
+    flex-basis: min(138px, calc(100vw - 254px)) !important;
+    width: min(138px, calc(100vw - 254px)) !important;
+  }
+
+  body > .site-header.liquid-header .header-search:focus-within input {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    width: min(96px, calc(100vw - 294px)) !important;
+  }
+
+  .chat-order-modal {
+    z-index: 1300 !important;
+  }
+
+  .chat-channel-actions button {
+    border: 0 !important;
+    border-radius: 999px !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14) !important;
+    color: #fff !important;
+  }
+
+  .chat-channel-actions [data-chat-channel="whatsapp"] {
+    background: linear-gradient(135deg, #075e54, #25d366) !important;
+  }
+
+  .chat-channel-actions [data-chat-channel="messenger"] {
+    background: linear-gradient(135deg, #006aff, #8a3ffc) !important;
   }
 }
