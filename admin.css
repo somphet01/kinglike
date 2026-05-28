@@ -1595,3 +1595,112 @@
     transition: none !important;
   }
 }
+
+/* Maximize-inspired admin theme layer. */
+.admin-body {
+  background:
+    radial-gradient(circle at 78% 8%, rgba(223, 255, 95, 0.18), transparent 26%),
+    linear-gradient(180deg, #f7f8f8 0%, #e7ebed 100%) !important;
+  color: var(--text) !important;
+}
+
+.admin-header {
+  background: rgba(247, 248, 248, 0.86) !important;
+  border-bottom-color: rgba(7, 8, 9, 0.1) !important;
+  box-shadow: 0 14px 38px rgba(8, 10, 12, 0.08) !important;
+}
+
+.admin-nav a,
+.admin-dashboard-hero p:not(.eyebrow),
+.admin-tabs button,
+.admin-stats small,
+.admin-card p,
+.admin-product p,
+.order-row p,
+.status-log p {
+  color: var(--muted) !important;
+}
+
+.admin-dashboard-hero h1,
+.admin-card h2,
+.admin-card h3,
+.admin-category-strip span,
+.admin-product strong,
+.status-log h3,
+.admin-stats span {
+  color: var(--text) !important;
+}
+
+.admin-stats article,
+.admin-tabs,
+.admin-category-strip button,
+.admin-card,
+.admin-preview-card,
+.admin-product,
+.promo-event-admin-item,
+.order-row,
+.backup-import,
+.map-card,
+.status-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(7, 8, 9, 0.1) !important;
+  box-shadow: 0 18px 48px rgba(8, 10, 12, 0.08) !important;
+  color: var(--text) !important;
+}
+
+.admin-tabs button.is-active,
+.admin-category-strip button.is-active,
+.primary-btn,
+.mini-btn.is-primary,
+.admin-submit,
+.status-actions button.is-active {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #050607 !important;
+  box-shadow: 0 14px 34px rgba(164, 195, 45, 0.24) !important;
+}
+
+.admin-card input,
+.admin-card textarea,
+.admin-card select,
+.admin-search,
+.status-actions button,
+.secondary-btn,
+.mini-btn {
+  background: #ffffff !important;
+  border-color: rgba(7, 8, 9, 0.12) !important;
+  color: var(--text) !important;
+}
+
+.admin-card input:focus,
+.admin-card textarea:focus,
+.admin-card select:focus,
+.admin-search:focus {
+  border-color: var(--gold-soft) !important;
+  box-shadow: 0 0 0 4px rgba(223, 255, 95, 0.22) !important;
+}
+
+.admin-file-btn,
+.backup-import {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(223, 255, 95, 0.18), transparent 32%),
+    linear-gradient(180deg, #ffffff, #edf1f2) !important;
+  border-color: rgba(7, 8, 9, 0.12) !important;
+}
+
+.admin-product.is-active,
+.promo-event-admin-item.is-active,
+.order-row.is-active {
+  border-color: var(--gold-soft) !important;
+  box-shadow: 0 16px 38px rgba(164, 195, 45, 0.18) !important;
+}
+
+.admin-preview-art,
+.admin-product-thumb,
+.promo-preview-art,
+.status-product-thumb {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.92), transparent 32%),
+    linear-gradient(180deg, #ffffff, #e7ebed) !important;
+  border-color: rgba(7, 8, 9, 0.1) !important;
+}

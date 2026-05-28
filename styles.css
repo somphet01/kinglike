@@ -9128,3 +9128,250 @@ body > .site-header.liquid-header .icon-btn {
     background: linear-gradient(135deg, #006aff, #8a3ffc) !important;
   }
 }
+
+/* Maximize-inspired monochrome/lime theme layer. */
+:root {
+  --black: #050607;
+  --black-2: #111315;
+  --surface: #f7f8f8;
+  --surface-2: #eef0f1;
+  --surface-3: #e2e5e7;
+  --gold: #dfff5f;
+  --gold-soft: #a7b85a;
+  --text: #070809;
+  --muted: #5f6469;
+  --subtle: #8b9298;
+  --line: rgba(7, 8, 9, 0.11);
+  --shadow: 0 24px 70px rgba(8, 10, 12, 0.11);
+  --stage: #16191c;
+  --accent: #dfff5f;
+  --glass: rgba(255, 255, 255, 0.78);
+  --glass-strong: rgba(255, 255, 255, 0.92);
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -16%, rgba(255, 255, 255, 0.88), transparent 30%),
+    linear-gradient(180deg, #f6f7f7 0%, #e6e9eb 48%, #f7f8f8 100%) !important;
+  color: var(--text) !important;
+}
+
+main,
+.product-page main,
+.collection-page main {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 242, 244, 0.98)) !important;
+}
+
+.site-header,
+.site-header.is-scrolled,
+body > .site-header.liquid-header {
+  background: rgba(247, 248, 248, 0.82) !important;
+  border-color: rgba(7, 8, 9, 0.1) !important;
+  box-shadow: 0 18px 50px rgba(8, 10, 12, 0.1) !important;
+  color: var(--text) !important;
+}
+
+.main-nav {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border-color: rgba(7, 8, 9, 0.08) !important;
+}
+
+.main-nav a,
+.mobile-menu nav a,
+.drawer-item .meta,
+.meta,
+.product-body .meta,
+.detail-info p,
+.detail-info li,
+.checkout-card p,
+.order-summary {
+  color: var(--muted) !important;
+}
+
+.main-nav a:hover,
+.header-search span,
+.section-heading h2 span,
+.sale-price,
+.detail-price strong,
+.checkout-total-row strong,
+.checkout-line b {
+  color: var(--text) !important;
+}
+
+.header-search,
+.icon-btn,
+.lang-btn,
+.line-btn,
+.admin-link,
+.close-btn,
+.secondary-btn,
+.view-btn,
+.wishlist-toggle,
+.pagination button,
+.filters select,
+.collection-toolbar select,
+.checkout-card input,
+.checkout-card textarea,
+.checkout-card select,
+.tracking-form input {
+  background: rgba(255, 255, 255, 0.74) !important;
+  border-color: rgba(7, 8, 9, 0.1) !important;
+  color: var(--text) !important;
+}
+
+.menu-btn span,
+body > .site-header.liquid-header .menu-btn span {
+  background: var(--text) !important;
+}
+
+.icon-btn small,
+.primary-btn,
+.add-cart,
+.buy-now,
+.checkout-submit,
+.admin-submit,
+.pagination button.is-active,
+.pagination button:hover:not(:disabled),
+.wishlist-toggle.is-active,
+.badge,
+.full-btn {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #050607 !important;
+  box-shadow: 0 16px 38px rgba(164, 195, 45, 0.26) !important;
+}
+
+.line-btn,
+.line-contact {
+  background: #050607 !important;
+  border-color: #050607 !important;
+  color: #ffffff !important;
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 64% 32%, rgba(255, 255, 255, 0.16), transparent 20%),
+    linear-gradient(180deg, #0b0d0f 0%, #1a1d20 48%, #eef1f2 100%) !important;
+  color: #ffffff !important;
+}
+
+.hero h1,
+.hero h1 span,
+.hero-copy p:not(.eyebrow),
+.hero .eyebrow {
+  color: #ffffff !important;
+}
+
+.hero-copy p:not(.eyebrow) {
+  opacity: 0.76;
+}
+
+.hero .secondary-btn {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+}
+
+.benefits,
+.section,
+.products-section,
+.promo,
+.about-contact,
+.trust-policies,
+.mattress-types,
+.collection-page,
+.checkout-page,
+.order-page,
+.product-detail-page,
+.promotion-page {
+  background:
+    linear-gradient(180deg, #f7f8f8 0%, #e9ecee 100%) !important;
+  color: var(--text) !important;
+}
+
+.collection-cover,
+.promo-event-card,
+.promotion-hero,
+.checkout-hero {
+  background:
+    radial-gradient(circle at 76% 24%, rgba(223, 255, 95, 0.2), transparent 28%),
+    linear-gradient(135deg, #101315 0%, #202327 52%, #f0f3f4 100%) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.collection-cover h1,
+.collection-cover p,
+.collection-cover .eyebrow,
+.promotion-hero h1,
+.promotion-hero p,
+.checkout-hero h1,
+.checkout-hero p {
+  color: #ffffff !important;
+}
+
+.benefits article,
+.type-card,
+.product-card,
+.category-card,
+.trust-policies article,
+.contact-box,
+.checkout-card,
+.order-tracker,
+.detail-buybox,
+.detail-info section,
+.drawer,
+.chat-order-panel,
+.promo-popup-panel,
+.detail-panel,
+.order-status-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(7, 8, 9, 0.1) !important;
+  box-shadow: var(--shadow) !important;
+  color: var(--text) !important;
+}
+
+.product-art,
+.detail-hero-art,
+.filters,
+.checkout-payment,
+.drawer-total,
+.detail-thumbs button,
+.sizes span {
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255, 255, 255, 0.9), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #e8ecee 100%) !important;
+  border-color: rgba(7, 8, 9, 0.1) !important;
+  color: var(--text) !important;
+}
+
+.product-body,
+.site-footer {
+  background: #ffffff !important;
+  color: var(--text) !important;
+}
+
+.site-footer p,
+.site-footer a,
+.regular-price,
+.filters label,
+.checkout-form label,
+.checkout-form small,
+.order-status-card p {
+  color: var(--muted) !important;
+}
+
+.badge.is-discount,
+.checkout-alert.is-error {
+  background: #111315 !important;
+  color: #ffffff !important;
+}
+
+.payment-qr {
+  background:
+    linear-gradient(90deg, #ffffff 12px, transparent 12px) 0 0 / 32px 32px,
+    linear-gradient(#ffffff 12px, transparent 12px) 0 0 / 32px 32px,
+    #050607 !important;
+  color: #050607 !important;
+}
