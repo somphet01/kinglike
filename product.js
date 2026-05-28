@@ -84,6 +84,8 @@ function product(id, name, category, firmness, thickness, price, salePrice, disc
 }
 
 let adminProductsOverride = null;
+let activeGalleryItems = [];
+let activeGalleryIndex = 0;
 
 function loadAdminProducts() {
   if (Array.isArray(adminProductsOverride)) return adminProductsOverride.map(normalizeAdminProduct);
@@ -382,6 +384,29 @@ function cartKey(id, size = "") {
   return `${id}__${size || ""}`;
 }
 
+function detailBenefitIcon(type) {
+  const icons = {
+    delivery: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h3l4 4v2h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+    warranty: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-2.9 8.5-7 10-4.1-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+    inspect: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/><path d="M8.5 11l1.7 1.7 3.5-3.8"/></svg>',
+    support: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M4 13v3a2 2 0 0 0 2 2h1v-7H6a2 2 0 0 0-2 2z"/><path d="M20 13v3a2 2 0 0 1-2 2h-1v-7h1a2 2 0 0 1 2 2z"/><path d="M9 19c1 1 5 1 6 0"/></svg>',
+    gift: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16v10H4z"/><path d="M3 7h18v3H3z"/><path d="M12 7v13"/><path d="M12 7c-1.8-3-5.8-2.2-5 1 2.4.2 4-.2 5-1z"/><path d="M12 7c1.8-3 5.8-2.2 5 1-2.4.2-4-.2-5-1z"/></svg>'
+  };
+  return icons[type] || icons.inspect;
+}
+
+function detailBenefitCard(type, title, text, extraClass = "") {
+  return `
+    <article class="detail-benefit-card ${extraClass}">
+      <span class="detail-benefit-icon">${detailBenefitIcon(type)}</span>
+      <div>
+        <strong>${title}</strong>
+        <p>${text}</p>
+      </div>
+    </article>
+  `;
+}
+
 function loadCart() {
   try {
     const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
@@ -415,7 +440,7 @@ function renderProduct() {
   els.page.innerHTML = `
     <div class="detail-layout">
       <div class="detail-gallery">
-        <div class="detail-hero-art ${productCollectionKey(currentProduct) === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero>
+        <div class="detail-hero-art ${productCollectionKey(currentProduct) === "pillows" ? "pillow-detail-art" : ""} ${imageClass}" data-gallery-hero data-open-gallery="0">
           ${heroImage ? `<img src="${heroImage}" alt="${currentProduct.name}" data-gallery-hero-image />` : ""}
           ${heroImage ? "" : `<span class="image-placeholder detail-image-placeholder">ຍັງບໍ່ມີຮູບສິນຄ້າ</span>`}
           <span class="${productBadgeClass(currentProduct)}">${productBadgeText(currentProduct)}</span>
@@ -461,11 +486,11 @@ function renderProduct() {
       </aside>
     </div>
     <div class="detail-benefits">
-      <div>ສົ່ງຟຣີທົ່ວປະເທດ</div>
-      <div>ຮັບປະກັນ ${currentProduct.warranty}</div>
-      <div>ກວດສອບສິນຄ້າກ່ອນຮັບ</div>
-      <div>ມີທີມງານແນະນຳ</div>
-      ${productFreebies(currentProduct).length ? `<div class="detail-gift-benefit">ຂອງແຖມ: ${productFreebies(currentProduct).join(", ")}</div>` : ""}
+      ${detailBenefitCard("delivery", "ຈັດສົ່ງຟຣີທົ່ວນະຄອນຫຼວງ", "ຈັດສົ່ງໄວ ແລະປະສານງານກ່ອນສົ່ງ.")}
+      ${detailBenefitCard("warranty", `ຮັບປະກັນ ${currentProduct.warranty}`, "ຄຸ້ມຄອງຕາມເງື່ອນໄຂຂອງຮ້ານ.")}
+      ${detailBenefitCard("inspect", "ກວດສອບກ່ອນຮັບ", "ກວດສະພາບ ແລະຂະໜາດສິນຄ້າກ່ອນຮັບໄດ້.")}
+      ${detailBenefitCard("support", "ມີທີມງານແນະນຳ", "ຊ່ວຍເລືອກຮຸ່ນ ຂະໜາດ ແລະຄວາມນຸ່ມ.")}
+      ${productFreebies(currentProduct).length ? detailBenefitCard("gift", "ຂອງແຖມ", productFreebies(currentProduct).join(", "), "detail-gift-benefit") : ""}
     </div>
     <div class="detail-info">
       <section>
@@ -509,20 +534,78 @@ function renderRelatedProducts() {
 
 function bindGallery(gallery) {
   if (!gallery.length) return;
+  activeGalleryItems = gallery.filter((item) => item.image);
   let activeIndex = 0;
   const hero = els.page.querySelector("[data-gallery-hero]");
   const heroImage = els.page.querySelector("[data-gallery-hero-image]");
   const thumbs = els.page.querySelectorAll("[data-gallery-index]");
   const setActive = (index) => {
     activeIndex = (index + gallery.length) % gallery.length;
+    activeGalleryIndex = activeIndex;
     const item = gallery[activeIndex];
     hero.classList.toggle("has-admin-image", Boolean(item.image));
+    hero.dataset.openGallery = String(activeIndex);
     if (item.image && heroImage) heroImage.src = item.image;
     thumbs.forEach((thumb) => thumb.classList.toggle("is-active", Number(thumb.dataset.galleryIndex) === activeIndex));
   };
   thumbs.forEach((thumb) => thumb.addEventListener("click", () => setActive(Number(thumb.dataset.galleryIndex))));
+  hero?.addEventListener("click", (event) => {
+    if (event.target.closest(".gallery-nav")) return;
+    openImageLightbox(activeIndex);
+  });
   els.page.querySelector("[data-gallery-prev]")?.addEventListener("click", () => setActive(activeIndex - 1));
   els.page.querySelector("[data-gallery-next]")?.addEventListener("click", () => setActive(activeIndex + 1));
+}
+
+function ensureImageLightbox() {
+  let modal = document.querySelector("[data-image-lightbox]");
+  if (modal) return modal;
+  modal = document.createElement("div");
+  modal.className = "image-lightbox";
+  modal.dataset.imageLightbox = "";
+  modal.innerHTML = `
+    <div class="image-lightbox-panel">
+      <button class="image-lightbox-close" type="button" data-close-image-lightbox aria-label="Close image">×</button>
+      <button class="image-lightbox-nav image-lightbox-prev" type="button" data-lightbox-prev aria-label="Previous image">‹</button>
+      <figure>
+        <img alt="" data-lightbox-image />
+        <figcaption data-lightbox-caption></figcaption>
+      </figure>
+      <button class="image-lightbox-nav image-lightbox-next" type="button" data-lightbox-next aria-label="Next image">›</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function renderImageLightbox() {
+  const modal = ensureImageLightbox();
+  const images = activeGalleryItems;
+  const item = images[activeGalleryIndex] || images[0];
+  if (!item) return;
+  modal.querySelector("[data-lightbox-image]").src = item.image;
+  modal.querySelector("[data-lightbox-image]").alt = item.label || currentProduct.name;
+  modal.querySelector("[data-lightbox-caption]").textContent = item.label || currentProduct.name;
+  modal.classList.toggle("has-single-image", images.length <= 1);
+}
+
+function openImageLightbox(index = 0) {
+  const images = activeGalleryItems;
+  if (!images.length) return;
+  activeGalleryIndex = Math.max(0, Math.min(index, images.length - 1));
+  renderImageLightbox();
+  ensureImageLightbox().classList.add("is-open");
+}
+
+function closeImageLightbox() {
+  document.querySelector("[data-image-lightbox]")?.classList.remove("is-open");
+}
+
+function moveImageLightbox(delta) {
+  const images = activeGalleryItems;
+  if (!images.length) return;
+  activeGalleryIndex = (activeGalleryIndex + delta + images.length) % images.length;
+  renderImageLightbox();
 }
 
 function flyToHeaderIcon(source, target) {
@@ -881,6 +964,22 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-image-lightbox]")) {
+    closeImageLightbox();
+    return;
+  }
+  if (event.target.closest("[data-lightbox-prev]")) {
+    moveImageLightbox(-1);
+    return;
+  }
+  if (event.target.closest("[data-lightbox-next]")) {
+    moveImageLightbox(1);
+    return;
+  }
+  if (event.target.matches("[data-image-lightbox]")) {
+    closeImageLightbox();
+    return;
+  }
   if (event.target.closest("[data-close-chat-order]")) {
     ensureChatModal().classList.remove("is-open");
     return;
@@ -904,6 +1003,14 @@ document.addEventListener("click", (event) => {
     if (saleTarget) saleTarget.textContent = formatKip(sizeButton.dataset.sizeSale);
     if (regularTarget) regularTarget.textContent = formatKip(sizeButton.dataset.sizeRegular);
   }
+});
+
+document.addEventListener("keydown", (event) => {
+  const modal = document.querySelector("[data-image-lightbox]");
+  if (!modal?.classList.contains("is-open")) return;
+  if (event.key === "Escape") closeImageLightbox();
+  if (event.key === "ArrowLeft") moveImageLightbox(-1);
+  if (event.key === "ArrowRight") moveImageLightbox(1);
 });
 
 document.querySelector("[data-open-cart]").addEventListener("click", () => openDrawer(els.cartDrawer));
