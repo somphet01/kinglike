@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260528-04" />
-    <link rel="stylesheet" href="admin.css?v=20260527-11" />
+    <link rel="stylesheet" href="styles.css?v=20260528-08" />
+    <link rel="stylesheet" href="admin.css?v=20260528-02" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -48,8 +48,6 @@
       <section class="admin-tabs" aria-label="Admin sections">
         <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
         <button type="button" data-admin-tab="promotion">Cover / Promotion</button>
-        <button type="button" data-admin-tab="backup">Backup</button>
-        <button type="button" data-admin-tab="help">ຄູ່ມືຈຸດທີ່ຈະສະແດງ</button>
       </section>
 
       <section class="admin-panel is-active" data-admin-panel="products">
@@ -122,7 +120,7 @@
               ຮູບສິນຄ້າ
               <input name="imageUpload" type="file" accept="image/*" data-product-image-upload />
               <small>ເພີ່ມຮູບທີລະຮູບໄດ້. ຮູບໃໝ່ຈະຕໍ່ທ້າຍຂອງເກົ່າ, ຮູບທຳອິດຈະສະແດງຢູ່ card.</small>
-              <small>ຂະໜາດຮູບທີ່ແນະນຳ: 1200 x 900 px (4:3). ຮູບຈະສະແດງເຕັມກອບ ແລະບໍ່ຕັດຮູບ.</small>
+              <small>ຂະໜາດຮູບທີ່ແນະນຳ: 1200 x 1200 px (1:1). ຮູບຈະສະແດງເຕັມກອບ ແລະບໍ່ຕັດຮູບ.</small>
             </label>
             <div class="admin-upload-preview" data-product-image-preview>Product image preview</div>
 
@@ -413,6 +411,6 @@
     </div>
     <div class="admin-toast" data-toast></div>
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="admin.js"></script>
+    <script src="admin.js?v=20260528-02"></script>
   </body>
 </html>

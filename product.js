@@ -86,6 +86,7 @@ function product(id, name, category, firmness, thickness, price, salePrice, disc
 let adminProductsOverride = null;
 let activeGalleryItems = [];
 let activeGalleryIndex = 0;
+let galleryAutoTimer = null;
 
 function loadAdminProducts() {
   if (Array.isArray(adminProductsOverride)) return adminProductsOverride.map(normalizeAdminProduct);
@@ -449,11 +450,18 @@ function renderProduct() {
             <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Next image">›</button>
           ` : ""}
         </div>
+        ${gallery.length > 1 ? `
+          <div class="gallery-dots" data-gallery-dots aria-label="Product image slides">
+            ${gallery.map((item, index) => `
+              <button class="${index === 0 ? "is-active" : ""}" type="button" data-gallery-dot="${index}" aria-label="${item.label || `Image ${index + 1}`}"></button>
+            `).join("")}
+          </div>
+        ` : ""}
         <div class="detail-thumbs" data-gallery-thumbs>
           ${gallery.map((item, index) => `
             <button class="${index === 0 ? "is-active" : ""} ${item.image ? "" : "is-empty"}" type="button" data-gallery-index="${index}">
               ${item.image ? `<img src="${item.image}" alt="${item.label}" />` : ""}
-              <span>${item.label}</span>
+              ${item.image ? "" : `<span>${item.label}</span>`}
             </button>
           `).join("")}
         </div>
@@ -475,13 +483,13 @@ function renderProduct() {
           <label>ຈຳນວນ</label>
           <div class="qty-control">
             <button type="button" data-detail-qty-decrease>−</button>
-            <span data-detail-qty>1</span>
+            <input data-detail-qty type="number" min="1" step="1" inputmode="numeric" value="1" aria-label="ຈຳນວນ" />
             <button type="button" data-detail-qty-increase>＋</button>
           </div>
         </div>
         <div class="detail-actions">
           <button class="add-cart" type="button" data-add-cart="${currentProduct.id}">ເພີ່ມລົດເຂັນ</button>
-          <button class="buy-now" type="button" data-buy-now="${currentProduct.id}">ຊື້ທັນທີ</button>
+          <button class="buy-now" type="button" data-buy-now="${currentProduct.id}">ສັ່ງຊື້</button>
         </div>
       </aside>
     </div>
@@ -534,11 +542,15 @@ function renderRelatedProducts() {
 
 function bindGallery(gallery) {
   if (!gallery.length) return;
+  if (galleryAutoTimer) window.clearInterval(galleryAutoTimer);
   activeGalleryItems = gallery.filter((item) => item.image);
   let activeIndex = 0;
   const hero = els.page.querySelector("[data-gallery-hero]");
   const heroImage = els.page.querySelector("[data-gallery-hero-image]");
   const thumbs = els.page.querySelectorAll("[data-gallery-index]");
+  const dots = els.page.querySelectorAll("[data-gallery-dot]");
+  let swipeStartX = 0;
+  let swipeStartY = 0;
   const setActive = (index) => {
     activeIndex = (index + gallery.length) % gallery.length;
     activeGalleryIndex = activeIndex;
@@ -547,14 +559,48 @@ function bindGallery(gallery) {
     hero.dataset.openGallery = String(activeIndex);
     if (item.image && heroImage) heroImage.src = item.image;
     thumbs.forEach((thumb) => thumb.classList.toggle("is-active", Number(thumb.dataset.galleryIndex) === activeIndex));
+    dots.forEach((dot) => dot.classList.toggle("is-active", Number(dot.dataset.galleryDot) === activeIndex));
   };
-  thumbs.forEach((thumb) => thumb.addEventListener("click", () => setActive(Number(thumb.dataset.galleryIndex))));
+  const restartAutoSlide = () => {
+    if (galleryAutoTimer) window.clearInterval(galleryAutoTimer);
+    if (gallery.length <= 1) return;
+    galleryAutoTimer = window.setInterval(() => setActive(activeIndex + 1), 3000);
+  };
+  thumbs.forEach((thumb) => thumb.addEventListener("click", () => {
+    setActive(Number(thumb.dataset.galleryIndex));
+    restartAutoSlide();
+  }));
+  dots.forEach((dot) => dot.addEventListener("click", () => {
+    setActive(Number(dot.dataset.galleryDot));
+    restartAutoSlide();
+  }));
   hero?.addEventListener("click", (event) => {
     if (event.target.closest(".gallery-nav")) return;
     openImageLightbox(activeIndex);
   });
-  els.page.querySelector("[data-gallery-prev]")?.addEventListener("click", () => setActive(activeIndex - 1));
-  els.page.querySelector("[data-gallery-next]")?.addEventListener("click", () => setActive(activeIndex + 1));
+  hero?.addEventListener("pointerdown", (event) => {
+    swipeStartX = event.clientX;
+    swipeStartY = event.clientY;
+  });
+  hero?.addEventListener("pointerup", (event) => {
+    if (!swipeStartX) return;
+    const deltaX = event.clientX - swipeStartX;
+    const deltaY = event.clientY - swipeStartY;
+    swipeStartX = 0;
+    swipeStartY = 0;
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    setActive(activeIndex + (deltaX < 0 ? 1 : -1));
+    restartAutoSlide();
+  });
+  els.page.querySelector("[data-gallery-prev]")?.addEventListener("click", () => {
+    setActive(activeIndex - 1);
+    restartAutoSlide();
+  });
+  els.page.querySelector("[data-gallery-next]")?.addEventListener("click", () => {
+    setActive(activeIndex + 1);
+    restartAutoSlide();
+  });
+  restartAutoSlide();
 }
 
 function ensureImageLightbox() {
@@ -759,7 +805,27 @@ function selectedDetailSize(product) {
 }
 
 function selectedDetailQty(container = document) {
-  return Math.max(1, Number(container.querySelector("[data-detail-qty]")?.textContent || 1));
+  const qtyTarget = container.querySelector("[data-detail-qty]");
+  const rawValue = qtyTarget && "value" in qtyTarget ? qtyTarget.value : qtyTarget?.textContent;
+  return Math.max(1, Math.floor(Number(rawValue || 1) || 1));
+}
+
+let lastDetailQtyStepAt = 0;
+
+function adjustDetailQtyFromEvent(event) {
+  const qtyDecrease = event.target.closest("[data-detail-qty-decrease]");
+  const qtyIncrease = event.target.closest("[data-detail-qty-increase]");
+  if (!qtyDecrease && !qtyIncrease) return false;
+  const now = Date.now();
+  if (event.type === "click" && now - lastDetailQtyStepAt < 350) return true;
+  const qtyTarget = event.target.closest(".qty-control")?.querySelector("[data-detail-qty]");
+  const current = Math.max(1, Math.floor(Number(qtyTarget?.value || qtyTarget?.textContent || 1) || 1));
+  const next = String(Math.max(1, current + (qtyIncrease ? 1 : -1)));
+  if (qtyTarget && "value" in qtyTarget) qtyTarget.value = next;
+  else if (qtyTarget) qtyTarget.textContent = next;
+  lastDetailQtyStepAt = now;
+  event.preventDefault();
+  return true;
 }
 
 function channelIcon(channel) {
@@ -986,13 +1052,7 @@ document.addEventListener("click", (event) => {
   }
   const channel = event.target.closest("[data-chat-channel]")?.dataset.chatChannel;
   if (channel) submitChatDraft(channel);
-  const qtyDecrease = event.target.closest("[data-detail-qty-decrease]");
-  const qtyIncrease = event.target.closest("[data-detail-qty-increase]");
-  if (qtyDecrease || qtyIncrease) {
-    const qtyTarget = event.target.closest(".qty-control")?.querySelector("[data-detail-qty]");
-    const current = Math.max(1, Number(qtyTarget?.textContent || 1));
-    if (qtyTarget) qtyTarget.textContent = String(Math.max(1, current + (qtyIncrease ? 1 : -1)));
-  }
+  if (adjustDetailQtyFromEvent(event)) return;
   const sizeButton = event.target.closest("[data-size-option]");
   if (sizeButton) {
     const group = sizeButton.closest(".size-options");
@@ -1003,6 +1063,22 @@ document.addEventListener("click", (event) => {
     if (saleTarget) saleTarget.textContent = formatKip(sizeButton.dataset.sizeSale);
     if (regularTarget) regularTarget.textContent = formatKip(sizeButton.dataset.sizeRegular);
   }
+});
+
+document.addEventListener("pointerup", (event) => {
+  adjustDetailQtyFromEvent(event);
+});
+
+document.addEventListener("input", (event) => {
+  const qtyTarget = event.target.closest("[data-detail-qty]");
+  if (!qtyTarget) return;
+  qtyTarget.value = qtyTarget.value.replace(/[^\d]/g, "");
+});
+
+document.addEventListener("change", (event) => {
+  const qtyTarget = event.target.closest("[data-detail-qty]");
+  if (!qtyTarget) return;
+  qtyTarget.value = String(Math.max(1, Math.floor(Number(qtyTarget.value || 1) || 1)));
 });
 
 document.addEventListener("keydown", (event) => {

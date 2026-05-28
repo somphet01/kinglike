@@ -221,6 +221,7 @@ let productsCache = null;
 let products = loadProducts();
 let activeCollectionKey = "mattresses";
 let activeProductId = products.find((product) => collectionKeyForProduct(product) === activeCollectionKey)?.id || products[0]?.id || "";
+let recentlyAddedProductId = "";
 let activePromoEventId = "";
 let confirmAction = null;
 
@@ -310,15 +311,16 @@ async function loadProductsAsync() {
 }
 
 function saveProducts() {
-  productsCache = products;
+  const productsToSave = products.filter((product) => !product._draft);
+  productsCache = productsToSave;
   try {
-    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(products));
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(productsToSave));
     localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
     renderBackupSummary();
     publishSyncedStore();
     return true;
   } catch (error) {
-    idbSet(PRODUCT_STORAGE_KEY, products)
+        idbSet(PRODUCT_STORAGE_KEY, productsToSave)
       .then(() => {
         try {
           localStorage.setItem(STORE_UPDATED_KEY, new Date().toISOString());
@@ -587,10 +589,10 @@ function updateImagePreview(src) {
 }
 
 function updateAdminStatus(product) {
-  if (els.adminMode) els.adminMode.textContent = activeProductId ? "Editing product" : "New product";
+  if (els.adminMode) els.adminMode.textContent = activeProductId && !product?._draft ? "Editing product" : "New product";
   if (els.adminPlacement) els.adminPlacement.textContent = placementLabel(product);
   if (els.viewProduct) {
-    const canView = Boolean(product?.name && activeProductId);
+    const canView = Boolean(product?.name && activeProductId && !product?._draft);
     els.viewProduct.href = canView ? productDetailUrl(product) : "index.html#products";
     els.viewProduct.classList.toggle("is-disabled", !canView);
   }
@@ -621,17 +623,18 @@ function renderCategoryCoverEditor() {
 function renderProducts() {
   const term = els.search.value.trim().toLowerCase();
   const visible = collectionProducts().filter((product) => !term || `${product.name} ${product.category} ${product.badge}`.toLowerCase().includes(term));
-  els.productCount.textContent = products.length;
-  els.saleCount.textContent = products.filter((product) => product.discountPercent > 0).length;
+  const savedProducts = products.filter((product) => !product._draft);
+  els.productCount.textContent = savedProducts.length;
+  els.saleCount.textContent = savedProducts.filter((product) => product.discountPercent > 0).length;
   renderCollectionTabs();
   renderCategoryCoverEditor();
   els.list.innerHTML = visible.map((product) => `
-    <article class="admin-product ${product.id === activeProductId ? "is-active" : ""}" data-select-product="${product.id}">
+    <article class="admin-product ${product.id === activeProductId ? "is-active" : ""} ${product.id === recentlyAddedProductId ? "is-new" : ""} ${product._draft ? "is-draft" : ""}" data-select-product="${product.id}">
       <div class="admin-thumb">${productImageMarkup(product)}</div>
       <div>
-        <h3>${product.name}</h3>
-        <p>${productCollectionLabel(product)} • ${product.category} • ${productPriceLabel(product)}</p>
-        <p>${product.badge || "No badge"} • ${product.sizes?.join(", ") || "-"}</p>
+        <h3>${product.name || "ສິນຄ້າໃໝ່"}</h3>
+        <p>${product._draft ? "ລາຍການໃໝ່ • ຍັງບໍ່ໄດ້ບັນທຶກ" : `${productCollectionLabel(product)} • ${product.category} • ${productPriceLabel(product)}`}</p>
+        <p>${product._draft ? "ກອກຂໍ້ມູນດ້ານຂວາແລ້ວກົດບັນທຶກ" : `${product.badge || "No badge"} • ${product.sizes?.join(", ") || "-"}`}</p>
       </div>
       <div class="admin-actions">
         <button type="button" data-edit-product="${product.id}">ແກ້ໄຂ</button>
@@ -639,6 +642,56 @@ function renderProducts() {
       </div>
     </article>
   `).join("") || `<div class="admin-preview-empty">ຍັງບໍ່ມີສິນຄ້າໃນໝວດນີ້. ກົດ + ເພີ່ມ ເພື່ອສ້າງລາຍການໃໝ່.</div>`;
+}
+
+function createBlankProductDraft() {
+  const collection = activeCollection();
+  const id = `draft-${collection.key}-${Date.now()}`;
+  return {
+    id,
+    name: "",
+    image: "",
+    images: [],
+    sku: "",
+    category: collection.category,
+    firmness: "",
+    thickness: "",
+    sizes: [],
+    sizePrices: {},
+    price: 0,
+    salePrice: 0,
+    discountPercent: 0,
+    badge: "",
+    rating: "",
+    popular: Date.now(),
+    stock: "",
+    warranty: "",
+    freebies: [],
+    materials: [],
+    description: "",
+    _draft: true
+  };
+}
+
+function addBlankProductDraft() {
+  const draft = createBlankProductDraft();
+  products = products.filter((product) => !(product._draft && collectionKeyForProduct(product) === activeCollectionKey));
+  products.unshift(draft);
+  activeProductId = draft.id;
+  recentlyAddedProductId = draft.id;
+  els.search.value = "";
+  fillForm(draft);
+  requestAnimationFrame(() => {
+    const added = els.list.querySelector(`[data-select-product="${draft.id}"]`);
+    added?.classList.add("is-new");
+  });
+  scrollToProductForm();
+  setTimeout(() => {
+    if (recentlyAddedProductId === draft.id) {
+      recentlyAddedProductId = "";
+      renderProducts();
+    }
+  }, 1200);
 }
 
 function formToProduct() {
@@ -693,7 +746,7 @@ function fillForm(product) {
   setField("firmness", product.firmness || "ນຸ່ມ");
   setField("thickness", product.thickness || "");
   setField("sizes", product.sizes?.join(", ") || "");
-  setField("sizePrices", formatSizePrices(product));
+  setField("sizePrices", product._draft ? "" : formatSizePrices(product));
   setField("price", product.price || "");
   setField("salePrice", product.salePrice || "");
   setField("discountPercent", product.discountPercent || "");
@@ -703,7 +756,7 @@ function fillForm(product) {
   setField("freebies", product.freebies?.join(", ") || "");
   setField("materials", product.materials?.join(", ") || "");
   setField("description", product.description || "");
-  els.formTitle.textContent = "ແກ້ໄຂສິນຄ້າ";
+  els.formTitle.textContent = product._draft ? "ເພີ່ມສິນຄ້າໃໝ່" : "ແກ້ໄຂສິນຄ້າ";
   activeProductId = product.id;
   updateImagePreview(images);
   updateAdminStatus(product);
@@ -1121,7 +1174,7 @@ els.categoryTabs?.addEventListener("click", (event) => {
 });
 els.search.addEventListener("input", renderProducts);
 els.clearForm.addEventListener("click", clearForm);
-els.newProduct.addEventListener("click", clearForm);
+els.newProduct.addEventListener("click", addBlankProductDraft);
 els.addSample.addEventListener("click", () => {
   const collection = activeCollection();
   const sample = productSeed(`sample-${collection.key}-${Date.now()}`, collection.sample, collection.category, "ນຸ່ມແນ່ນ", "12 ນິ້ວ", 7500000, 4990000, "Sample");
