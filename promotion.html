@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike Promotion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=20260528-19" />
+  </head>
+  <body class="promotion-page">
+    <header class="site-header liquid-header" data-header>
+      <button class="menu-btn" type="button" data-open-menu aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <a class="brand" href="index.html#home" aria-label="Kinglike home">
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="index.html#home">ໜ້າຫຼັກ</a>
+        <a href="collection.html?category=mattresses">ທີ່ນອນ</a>
+        <a href="collection.html?category=pillows">ໝອນ</a>
+        <a href="collection.html?category=blankets">ຜ້າຫົ່ມ</a>
+        <a href="collection.html?category=beds">ຕຽງນອນ</a>
+        <a href="collection.html?category=toppers">ທັອບເປີ</a>
+        <a href="promotion.html" aria-current="page">ໂປຣໂມຊັນ</a>
+      </nav>
+      <div class="header-actions">
+        <a class="admin-link" href="admin.html">Admin</a>
+        <button class="lang-btn" type="button">LO / EN</button>
+      </div>
+    </header>
+
+    <aside class="mobile-menu" data-mobile-menu>
+      <div class="mobile-menu-head">
+        <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
+        <button class="close-btn" type="button" data-close-menu>×</button>
+      </div>
+      <nav aria-label="Mobile navigation">
+        <a href="index.html#home">ໜ້າຫຼັກ</a>
+        <a href="collection.html?category=mattresses">ທີ່ນອນ</a>
+        <a href="collection.html?category=pillows">ໝອນ</a>
+        <a href="collection.html?category=blankets">ຜ້າຫົ່ມ</a>
+        <a href="collection.html?category=beds">ຕຽງນອນ</a>
+        <a href="collection.html?category=toppers">ທັອບເປີ</a>
+        <a href="promotion.html">ໂປຣໂມຊັນ</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </aside>
+    <div class="menu-backdrop" data-menu-backdrop></div>
+
+    <main class="promotion-main">
+      <section class="promotion-hero" data-promotion-hero>
+        <div class="gold-paper-burst promotion-burst" aria-hidden="true">
+          <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i>
+          <i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i>
+        </div>
+        <div class="promotion-copy">
+          <p class="eyebrow" data-promotion-badge>HOT PROMOTION</p>
+          <h1 data-promotion-title>ໂປຣໂມຊັນພິເສດ Kinglike</h1>
+          <p data-promotion-text>ເລືອກຊຸດທີ່ນອນພຣີມຽມ ພ້ອມຂອງແຖມ ແລະລາຄາພິເສດກ່ອນໝົດເວລາ.</p>
+          <div class="promotion-countdown-wrap">
+            <span>ເຫຼືອເວລາ</span>
+            <div class="promo-countdown promo-countdown-large" data-promotion-countdown>
+              <b data-count-days>0</b><small>ມື້</small>
+              <b data-count-hours>00</b><small>ຊົ່ວໂມງ</small>
+              <b data-count-minutes>00</b><small>ນາທີ</small>
+              <b data-count-seconds>00</b><small>ວິ</small>
+            </div>
+            <small data-promotion-end-label></small>
+          </div>
+          <a class="primary-btn" href="index.html#products" data-promotion-button>ເລືອກຊື້ສິນຄ້າ</a>
+        </div>
+        <div class="promotion-art" data-promotion-art>
+          <div class="promotion-prize-card">
+            <span>SALE</span>
+            <strong>ພິເສດ</strong>
+            <small>Kinglike Premium Sleep</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="section promotion-list-section">
+        <div class="section-heading">
+          <p class="eyebrow">PROMOTION / EVENT</p>
+          <h2>ໂປຣໂມຊັນທັງໝົດ</h2>
+        </div>
+        <div class="promotion-special-grid" data-promotion-events></div>
+        <div class="promotion-empty" data-promotion-empty hidden>
+          <h3>ຍັງບໍ່ມີໂປຣໂມຊັນໃໝ່</h3>
+          <p>ແອດມິນສາມາດເພີ່ມໂປຣໂມຊັນໄດ້ຈາກໜ້າ Admin.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="floating-contact-group">
+      <button class="floating-line whatsapp-contact" type="button" data-line-contact data-line-channel="whatsapp"><span class="contact-icon whatsapp-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12.04 3.5a8.45 8.45 0 0 0-7.27 12.75L3.8 20.5l4.36-.94a8.45 8.45 0 1 0 3.88-16.06Zm0 1.55a6.9 6.9 0 0 1 5.86 10.54 6.9 6.9 0 0 1-8.98 2.34l-.31-.18-2.44.53.54-2.38-.2-.32a6.9 6.9 0 0 1 5.53-10.53Z"/></svg></span><span>WhatsApp</span></button>
+      <button class="floating-line messenger-contact" type="button" data-line-contact data-line-channel="messenger"><span class="contact-icon messenger-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3C6.76 3 2.5 6.94 2.5 11.78c0 2.76 1.38 5.22 3.54 6.82v3.05l3.24-1.78c.86.24 1.77.37 2.72.37 5.24 0 9.5-3.94 9.5-8.78S17.24 3 12 3Zm.95 11.82-2.42-2.58-4.72 2.58 5.18-5.5 2.48 2.58 4.66-2.58-5.18 5.5Z"/></svg></span><span>Messenger</span></button>
+    </div>
+
+    <div class="promo-popup" data-promo-popup aria-hidden="true">
+      <article class="promo-popup-panel" data-promo-popup-panel>
+        <button class="promo-popup-close" type="button" data-close-promo-popup aria-label="Close promotion">×</button>
+        <div data-promo-popup-content></div>
+      </article>
+    </div>
+
+    <script src="ui-sounds.js?v=20260527-41"></script>
+    <script src="promotion.js?v=20260528-03"></script>
+  </body>
+</html>

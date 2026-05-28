@@ -571,6 +571,7 @@ function renderPromotionData(promotion) {
           <span>${item.badge || "PROMOTION"}</span>
           <h3>${item.title}</h3>
           ${item.text ? `<p>${item.text}</p>` : ""}
+          ${promoCountdownMarkup(item)}
           <div class="promo-event-foot">
             ${item.date ? `<small>${item.date}</small>` : "<small>Kinglike</small>"}
             <a href="${item.link || "#products"}">${item.button || "ເບິ່ງສິນຄ້າ"}</a>
@@ -581,6 +582,61 @@ function renderPromotionData(promotion) {
   }
 
   renderPromoPopup(promotion, activeEvents);
+  updatePromoCountdowns();
+}
+
+function promoCountdownParts(endsAt) {
+  if (!endsAt) return null;
+  const end = new Date(endsAt);
+  if (Number.isNaN(end.getTime())) return null;
+  const diff = end.getTime() - Date.now();
+  if (diff <= 0) return null;
+  const totalSeconds = Math.floor(diff / 1000);
+  return {
+    days: Math.floor(totalSeconds / 86400),
+    hours: Math.floor((totalSeconds % 86400) / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60
+  };
+}
+
+function promoCountdownEnd(item) {
+  if (item?.endsAt) {
+    const end = new Date(item.endsAt);
+    if (!Number.isNaN(end.getTime()) && end.getTime() > Date.now()) return end.toISOString();
+  }
+  const fallback = new Date();
+  fallback.setDate(fallback.getDate() + 3);
+  fallback.setHours(23, 59, 59, 0);
+  return fallback.toISOString();
+}
+
+function promoCountdownMarkup(item) {
+  const endsAt = promoCountdownEnd(item);
+  if (!promoCountdownParts(endsAt)) return "";
+  return `
+    <div class="promo-countdown" data-promo-countdown="${endsAt}">
+      <b data-count-days>0</b><small>ມື້</small>
+      <b data-count-hours>0</b><small>ຊົ່ວໂມງ</small>
+      <b data-count-minutes>0</b><small>ນາທີ</small>
+      <b data-count-seconds>0</b><small>ວິ</small>
+    </div>
+  `;
+}
+
+function updatePromoCountdowns() {
+  document.querySelectorAll("[data-promo-countdown]").forEach((node) => {
+    const parts = promoCountdownParts(node.dataset.promoCountdown);
+    if (!parts) {
+      node.hidden = true;
+      return;
+    }
+    node.hidden = false;
+    node.querySelector("[data-count-days]").textContent = String(parts.days);
+    node.querySelector("[data-count-hours]").textContent = String(parts.hours).padStart(2, "0");
+    node.querySelector("[data-count-minutes]").textContent = String(parts.minutes).padStart(2, "0");
+    node.querySelector("[data-count-seconds]").textContent = String(parts.seconds).padStart(2, "0");
+  });
 }
 
 function renderPromoPopup(promotion, activeEvents) {
@@ -600,21 +656,19 @@ function renderPromoPopup(promotion, activeEvents) {
   if (!popupItem) return;
 
   content.innerHTML = `
-    <div class="promo-popup-art ${popupItem.image ? "has-image" : ""}">
-      ${popupItem.image ? `<img src="${popupItem.image}" alt="${popupItem.title}" />` : ""}
-    </div>
-    <div class="promo-popup-copy">
-      <span>${popupItem.badge || "PROMOTION"}</span>
-      <h2>${popupItem.title}</h2>
-      ${popupItem.text ? `<p>${popupItem.text}</p>` : ""}
-      ${popupItem.date ? `<small>${popupItem.date}</small>` : ""}
-      <a class="primary-btn" href="${popupItem.link || "#products"}" data-close-promo-popup>${popupItem.button || "ເບິ່ງສິນຄ້າ"}</a>
+    <div class="promo-popup-simple">
+      <div class="promo-popup-art ${popupItem.image ? "has-image" : ""}">
+        ${popupItem.image ? `<img src="${popupItem.image}" alt="${popupItem.title}" />` : `<span>${popupItem.badge || "PROMOTION"}</span>`}
+      </div>
+      <div class="promo-popup-bottom">
+        ${promoCountdownMarkup(popupItem)}
+        <a class="primary-btn" href="promotion.html" data-close-promo-popup>ເບິ່ງໂປຣໂມຊັນ</a>
+      </div>
     </div>
   `;
-  requestAnimationFrame(() => {
-    popup.classList.add("is-open");
-    popup.setAttribute("aria-hidden", "false");
-  });
+  popup.classList.add("is-open");
+  popup.setAttribute("aria-hidden", "false");
+  updatePromoCountdowns();
 }
 
 function closePromoPopup() {
@@ -1183,6 +1237,7 @@ window.addEventListener("scroll", () => {
 
 updateHeroSky();
 setInterval(updateHeroSky, 15000);
+setInterval(updatePromoCountdowns, 1000);
 renderProducts();
 renderPromotion();
 renderCart();

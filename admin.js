@@ -944,7 +944,7 @@ function renderPromoPreview() {
   els.promoPreview.classList.toggle("has-cover", Boolean(coverImage));
   els.promoPreview.innerHTML = coverImage
     ? `<img src="${coverImage}" alt="${title}" />`
-    : `<div class="promo-preview-copy"><p class="eyebrow">HOT DEAL</p><h3>${title}</h3><p>${text}</p></div>`;
+    : `<div class="promo-preview-copy"><p class="eyebrow">HOT DEAL</p><h3>${title}</h3><p>${text}</p><small>ຝັ່ງລູກຄ້າ: countdown + ກະດາດສີທອງຕອນເປີດໂປຣ</small></div>`;
 }
 
 function loadPromotionData() {
@@ -998,6 +998,7 @@ function promoEventFromForm() {
     id,
     badge: (data.get("badge") || "PROMOTION").trim(),
     date: (data.get("date") || "").trim(),
+    endsAt: (data.get("endsAt") || "").trim(),
     title: (data.get("title") || "").trim(),
     text: (data.get("text") || "").trim(),
     button: (data.get("button") || "ເບິ່ງສິນຄ້າ").trim(),
@@ -1012,6 +1013,7 @@ function fillPromoEventForm(eventItem) {
   els.promoEventForm.elements.id.value = eventItem.id;
   els.promoEventForm.elements.badge.value = eventItem.badge || "";
   els.promoEventForm.elements.date.value = eventItem.date || "";
+  if (els.promoEventForm.elements.endsAt) els.promoEventForm.elements.endsAt.value = eventItem.endsAt || "";
   els.promoEventForm.elements.title.value = eventItem.title || "";
   els.promoEventForm.elements.text.value = eventItem.text || "";
   els.promoEventForm.elements.button.value = eventItem.button || "";
