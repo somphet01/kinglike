@@ -281,6 +281,32 @@ let promoPopupDismissed = false;
 let bestSellerOrderIds = [];
 let heroCarouselTimer = null;
 let heroCarouselIndex = 0;
+const HERO_COVER_SLIDES = [
+  {
+    src: "assets/cover-bedroom-green.png",
+    eyebrow: "Kinglike Collection",
+    title: "ຫ້ອງນອນທີ່ຮູ້ສຶກພັກຜ່ອນຕັ້ງແຕ່ວິນາທີທຳອິດ",
+    text: "Premium comfort for every night."
+  },
+  {
+    src: "assets/cover-bedroom-classic.png",
+    eyebrow: "Luxury Sleep",
+    title: "ສຳຜັດຄວາມນຸ່ມ ແລະ ການຮອງຮັບທີ່ລົງຕົວ",
+    text: "Designed for calm, elegant bedrooms."
+  },
+  {
+    src: "assets/cover-bedroom-modern.png",
+    eyebrow: "Deep Rest",
+    title: "ດີໄຊນ໌ສະອາດ ນອນສະບາຍ ເໝາະກັບທຸກຫ້ອງ",
+    text: "Balanced support with a premium look."
+  },
+  {
+    src: "assets/cover-bedroom-bright.png",
+    eyebrow: "Fresh Morning",
+    title: "ເລີ່ມຕົ້ນທຸກເຊົ້າດ້ວຍການນອນທີ່ດີກວ່າ",
+    text: "Soft style, steady comfort."
+  }
+];
 
 const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
 const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
@@ -598,10 +624,7 @@ function renderPromotionData(promotion) {
 }
 
 function heroSlideSources(promotion, activeEvents = []) {
-  const customSlides = Array.isArray(promotion.heroSlides) ? promotion.heroSlides.filter(Boolean) : [];
-  const coverSlide = promotion.coverImage ? [promotion.coverImage] : [];
-  const eventSlides = activeEvents.map((item) => item.image).filter(Boolean);
-  return [...customSlides, ...coverSlide, ...eventSlides, "assets/ES-1.webp"].filter((source, index, list) => source && list.indexOf(source) === index);
+  return HERO_COVER_SLIDES;
 }
 
 function setHeroSlide(index) {
@@ -622,9 +645,14 @@ function startHeroCarousel(total) {
 function renderHeroCarousel(promotion, activeEvents = []) {
   if (!els.heroTrack || !els.heroDots) return;
   const slides = heroSlideSources(promotion, activeEvents);
-  els.heroTrack.innerHTML = slides.map((source, index) => `
+  els.heroTrack.innerHTML = slides.map((slide, index) => `
     <article class="hero-carousel-slide ${index === 0 ? "is-active" : ""}">
-      <img src="${source}" alt="Kinglike cover ${index + 1}" />
+      <img src="${slide.src}" alt="Kinglike cover ${index + 1}" />
+      <div class="hero-cover-copy">
+        <p>${slide.eyebrow}</p>
+        <h1>${slide.title}</h1>
+        <span>${slide.text}</span>
+      </div>
     </article>
   `).join("");
   els.heroDots.hidden = slides.length <= 1;
