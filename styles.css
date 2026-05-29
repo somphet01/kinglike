@@ -10252,86 +10252,191 @@ body:not(.home-intro) .cover-carousel-hero {
 }
 
 .vertical-video-section {
-  background: linear-gradient(180deg, #eef1f2 0%, #ffffff 100%) !important;
+  background: #f7f8fa !important;
+  border-bottom: 1px solid rgba(123, 132, 143, 0.16);
+  border-top: 1px solid rgba(123, 132, 143, 0.16);
+  padding-bottom: clamp(3rem, 5.8vw, 5.4rem) !important;
+  padding-top: clamp(3rem, 5.8vw, 5.4rem) !important;
+}
+
+.vertical-video-shell {
+  margin: 0 auto;
+  max-width: min(82rem, calc(100vw - 5rem));
+  position: relative;
 }
 
 .vertical-video-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 0.25rem 0.35rem 1rem;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.vertical-video-grid::-webkit-scrollbar {
+  display: none;
 }
 
 .vertical-video-card {
   background: #050607;
+  border: 1px solid rgba(18, 22, 26, 0.1);
   border-radius: 8px;
-  box-shadow: 0 18px 52px rgba(5, 6, 7, 0.16);
+  box-shadow: 0 18px 44px rgba(18, 22, 26, 0.13);
   color: #ffffff;
+  flex: 0 0 clamp(170px, 13.8vw, 215px);
   overflow: hidden;
   position: relative;
+  scroll-snap-align: start;
 }
 
 .vertical-video-card video {
   aspect-ratio: 9 / 16;
   background: #111315;
   display: block;
+  height: auto;
   object-fit: cover;
   width: 100%;
 }
 
-.vertical-video-card div {
-  background: linear-gradient(180deg, transparent, rgba(5, 6, 7, 0.86));
+.vertical-video-caption {
+  background: linear-gradient(180deg, transparent, rgba(5, 6, 7, 0.88));
   bottom: 0;
   display: grid;
-  gap: 0.25rem;
+  gap: 0.28rem;
   left: 0;
-  padding: 2.8rem 1rem 1rem;
+  padding: 3.4rem 1rem 1rem;
   position: absolute;
   right: 0;
 }
 
-.vertical-video-card span {
+.vertical-video-caption span {
   color: #dfff5f;
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
-.vertical-video-card strong {
+.vertical-video-caption strong {
   color: #ffffff;
-  font-size: 1rem;
+  display: -webkit-box;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.video-mute-btn,
+.video-scroll-btn {
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.video-mute-btn {
+  background: rgba(18, 18, 18, 0.62);
+  border-radius: 999px;
+  height: 2.1rem;
+  position: absolute;
+  right: 0.72rem;
+  top: 0.72rem;
+  width: 2.1rem;
+  z-index: 2;
+}
+
+.video-mute-btn::before {
+  background: #ffffff;
+  clip-path: polygon(0 34%, 34% 34%, 70% 8%, 70% 92%, 34% 66%, 0 66%);
+  content: "";
+  height: 0.88rem;
+  width: 0.92rem;
+}
+
+.video-mute-btn::after {
+  background: #ffffff;
+  border-radius: 999px;
+  content: "";
+  height: 0.12rem;
+  position: absolute;
+  right: 0.54rem;
+  top: 1rem;
+  transform: rotate(45deg);
+  width: 0.78rem;
+}
+
+.video-mute-btn.is-sound-on::after {
+  opacity: 0;
+}
+
+.video-scroll-btn {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(125, 134, 143, 0.2);
+  border-radius: 999px;
+  box-shadow: 0 12px 30px rgba(15, 21, 29, 0.14);
+  height: 3.15rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3.15rem;
+  z-index: 3;
+}
+
+.video-scroll-btn::before {
+  border-right: 2px solid #1c2732;
+  border-top: 2px solid #1c2732;
+  content: "";
+  height: 0.62rem;
+  width: 0.62rem;
+}
+
+.video-scroll-btn.is-left {
+  left: -1.6rem;
+}
+
+.video-scroll-btn.is-left::before {
+  transform: rotate(-135deg);
+}
+
+.video-scroll-btn.is-right {
+  right: -1.6rem;
+}
+
+.video-scroll-btn.is-right::before {
+  transform: rotate(45deg);
 }
 
 @media (max-width: 720px) {
   body:not(.home-intro) .cover-carousel-hero {
-    background: #111111 !important;
-    height: min(100svh, 74vw) !important;
-    min-height: 19rem !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
   }
 
   .hero-carousel-slide::before {
-    background-position: var(--cover-mobile-position, center center);
-    filter: blur(18px) saturate(1.05);
-    opacity: 0.72;
-    transform: scale(1.08);
+    opacity: 0;
   }
 
   .hero-carousel-slide img {
-    object-fit: contain;
-    object-position: center center;
-    position: relative;
-    z-index: 1;
+    object-fit: cover;
+    object-position: var(--cover-mobile-position, center center);
   }
 
   .hero-carousel-slide::after {
     background:
-      linear-gradient(180deg, rgba(5, 6, 7, 0.04), rgba(5, 6, 7, 0.02) 48%, rgba(5, 6, 7, 0.5)),
-      linear-gradient(90deg, rgba(5, 6, 7, 0.28), rgba(5, 6, 7, 0.02) 58%, rgba(5, 6, 7, 0.18));
+      linear-gradient(180deg, rgba(5, 6, 7, 0.02), rgba(5, 6, 7, 0.03) 34%, rgba(5, 6, 7, 0.62)),
+      linear-gradient(90deg, rgba(5, 6, 7, 0.2), rgba(5, 6, 7, 0.02));
   }
 
   .hero-cover-copy {
-    bottom: clamp(2.75rem, 8vw, 3.6rem);
-    gap: 0.34rem;
+    bottom: clamp(7.4rem, 14svh, 8.7rem);
+    gap: 0.48rem;
     left: 1.1rem;
-    max-width: min(12rem, calc(100vw - 2.2rem));
+    max-width: min(15.8rem, calc(100vw - 2.2rem));
     padding-left: 0.8rem;
     right: auto;
     top: auto;
@@ -10343,12 +10448,12 @@ body:not(.home-intro) .cover-carousel-hero {
   }
 
   .hero-cover-copy p {
-    font-size: clamp(0.52rem, 1.9vw, 0.62rem);
+    font-size: clamp(0.58rem, 2.05vw, 0.66rem);
     letter-spacing: 0.12em;
   }
 
   .hero-cover-copy h1 {
-    font-size: clamp(1.16rem, 5.4vw, 1.72rem);
+    font-size: clamp(1.42rem, 6.4vw, 2.05rem);
     line-height: 0.98;
     max-width: 12ch;
   }
@@ -10367,7 +10472,7 @@ body:not(.home-intro) .cover-carousel-hero {
   }
 
   .hero-carousel-dots {
-    bottom: 0.9rem;
+    bottom: clamp(1.3rem, 4.4svh, 2rem);
   }
 
   .sleep-statement {
@@ -10396,19 +10501,30 @@ body:not(.home-intro) .cover-carousel-hero {
     max-width: 31rem;
   }
 
+  .vertical-video-section {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .vertical-video-shell {
+    max-width: 100%;
+  }
+
   .vertical-video-grid {
-    display: flex;
-    gap: 0.85rem;
-    margin-left: -32px;
-    margin-right: -32px;
-    overflow-x: auto;
-    padding: 0 32px 0.5rem;
-    scroll-snap-type: x mandatory;
+    gap: 0.8rem;
+    padding: 0 24px 0.6rem;
   }
 
   .vertical-video-card {
-    flex: 0 0 min(74vw, 18rem);
-    scroll-snap-align: start;
+    flex-basis: min(58vw, 13.25rem);
+  }
+
+  .video-scroll-btn {
+    display: none;
+  }
+
+  .vertical-video-caption {
+    padding: 3rem 0.82rem 0.82rem;
   }
 }
 
@@ -10421,11 +10537,11 @@ body main > .sleep-statement {
   order: 1 !important;
 }
 
-body main > .benefits {
+body main > .vertical-video-section {
   order: 2 !important;
 }
 
-body main > .vertical-video-section {
+body main > .benefits {
   order: 3 !important;
 }
 

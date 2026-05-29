@@ -355,6 +355,7 @@ const els = {
   heroDots: document.querySelector("[data-hero-dots]"),
   homeVideosSection: document.querySelector("[data-home-videos-section]"),
   homeVideos: document.querySelector("[data-home-videos]"),
+  videoScrollButtons: document.querySelectorAll("[data-video-scroll]"),
   products: document.querySelector("[data-products]"),
   pagination: document.querySelector("[data-products-pagination]"),
   cartDrawer: document.querySelector("[data-cart-drawer]"),
@@ -654,6 +655,33 @@ function startHeroCarousel(total) {
   heroCarouselTimer = window.setInterval(() => setHeroSlide(heroCarouselIndex + 1), 4800);
 }
 
+let heroSwipeStartX = 0;
+let heroSwipeStartY = 0;
+let heroSwipeActive = false;
+
+function handleHeroSwipeStart(event) {
+  const touch = event.touches?.[0];
+  if (!touch) return;
+  heroSwipeStartX = touch.clientX;
+  heroSwipeStartY = touch.clientY;
+  heroSwipeActive = true;
+}
+
+function handleHeroSwipeEnd(event) {
+  if (!heroSwipeActive) return;
+  const touch = event.changedTouches?.[0];
+  heroSwipeActive = false;
+  if (!touch) return;
+
+  const deltaX = touch.clientX - heroSwipeStartX;
+  const deltaY = touch.clientY - heroSwipeStartY;
+  if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+
+  const total = els.heroTrack?.querySelectorAll(".hero-carousel-slide").length || 0;
+  setHeroSlide(heroCarouselIndex + (deltaX < 0 ? 1 : -1));
+  startHeroCarousel(total);
+}
+
 function renderHeroCarousel(promotion, activeEvents = []) {
   if (!els.heroTrack || !els.heroDots) return;
   const slides = heroSlideSources(promotion, activeEvents);
@@ -678,16 +706,36 @@ function renderHeroCarousel(promotion, activeEvents = []) {
 function renderHomeVideos(promotion) {
   if (!els.homeVideosSection || !els.homeVideos) return;
   const videos = (Array.isArray(promotion.verticalVideos) ? promotion.verticalVideos : []).filter((item) => item && item.src && item.active !== false);
-  els.homeVideosSection.hidden = !videos.length;
-  els.homeVideos.innerHTML = videos.map((item, index) => `
-    <article class="vertical-video-card">
-      <video src="${item.src}" muted playsinline loop controls preload="metadata"></video>
-      <div>
-        <span>0${index + 1}</span>
+  const defaultVideos = [
+    { title: "Kinglike sleep review", src: "assets/videos/kinglike-story-01.mp4" },
+    { title: "Mattress comfort test", src: "assets/videos/kinglike-story-02.mp4" },
+    { title: "Bedroom mood clip", src: "assets/videos/kinglike-story-03.mp4" },
+    { title: "Luxury room moment", src: "assets/videos/kinglike-story-04.mp4" },
+    { title: "Kinglike customer clip", src: "assets/videos/kinglike-story-05.mp4" }
+  ];
+  const activeVideos = videos.length ? videos : defaultVideos;
+  els.homeVideosSection.hidden = false;
+  els.homeVideos.innerHTML = activeVideos.map((item, index) => `
+    <article class="vertical-video-card" data-video-card>
+      <video src="${item.src}" muted playsinline loop autoplay preload="metadata"></video>
+      <button class="video-mute-btn" type="button" data-toggle-home-video aria-label="Toggle video sound"></button>
+      <div class="vertical-video-caption">
+        <span>${String(index + 1).padStart(2, "0")}</span>
         <strong>${item.title || "Kinglike video"}</strong>
       </div>
     </article>
   `).join("");
+  initHomeVideoPlayback();
+}
+
+function initHomeVideoPlayback() {
+  const videos = els.homeVideos?.querySelectorAll("video") || [];
+  if (!videos.length) return;
+  videos.forEach((video) => {
+    video.muted = true;
+    video.loop = true;
+    video.play().catch(() => {});
+  });
 }
 
 function initLineAnimations() {
@@ -1292,6 +1340,27 @@ document.addEventListener("click", (event) => {
   if (detailId) openProductDetail(detailId);
 });
 
+els.homeVideos?.addEventListener("click", (event) => {
+  const toggle = event.target.closest("[data-toggle-home-video]");
+  if (!toggle) return;
+  const video = toggle.closest("[data-video-card]")?.querySelector("video");
+  if (!video) return;
+  video.muted = !video.muted;
+  toggle.classList.toggle("is-sound-on", !video.muted);
+  if (video.paused) video.play().catch(() => {});
+});
+
+els.videoScrollButtons?.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (!els.homeVideos) return;
+    const direction = Number(button.dataset.videoScroll || 1);
+    els.homeVideos.scrollBy({
+      left: direction * Math.max(260, els.homeVideos.clientWidth * 0.72),
+      behavior: "smooth",
+    });
+  });
+});
+
 document.addEventListener("click", (event) => {
   if (event.target.closest("[data-close-chat-order]")) {
     ensureChatModal().classList.remove("is-open");
@@ -1336,6 +1405,9 @@ els.heroDots?.addEventListener("click", (event) => {
   setHeroSlide(Number(target.dataset.heroSlide || 0));
   startHeroCarousel(els.heroTrack?.querySelectorAll(".hero-carousel-slide").length || 0);
 });
+
+els.heroTrack?.addEventListener("touchstart", handleHeroSwipeStart, { passive: true });
+els.heroTrack?.addEventListener("touchend", handleHeroSwipeEnd, { passive: true });
 
 els.searchInput.addEventListener("input", (event) => {
   state.search = event.target.value;
