@@ -283,28 +283,40 @@ let heroCarouselTimer = null;
 let heroCarouselIndex = 0;
 const HERO_COVER_SLIDES = [
   {
-    src: "assets/cover-bedroom-green.png",
-    eyebrow: "Kinglike Collection",
-    title: "ຫ້ອງນອນທີ່ຮູ້ສຶກພັກຜ່ອນຕັ້ງແຕ່ວິນາທີທຳອິດ",
-    text: "Premium comfort for every night."
+    src: "assets/cover-luxury-bright.png",
+    eyebrow: "Kinglike Suite",
+    titleLight: "Luxury",
+    titleStrong: "Every Night",
+    text: "ຫ້ອງນອນສະຫງົບ ກັບຄວາມນຸ່ມທີ່ຮູ້ສຶກໄດ້",
+    desktopPosition: "center center",
+    mobilePosition: "50% 54%"
   },
   {
-    src: "assets/cover-bedroom-classic.png",
-    eyebrow: "Luxury Sleep",
-    title: "ສຳຜັດຄວາມນຸ່ມ ແລະ ການຮອງຮັບທີ່ລົງຕົວ",
-    text: "Designed for calm, elegant bedrooms."
+    src: "assets/cover-luxury-modern.png",
+    eyebrow: "Deep Comfort",
+    titleLight: "Calm",
+    titleStrong: "Support",
+    text: "ດີໄຊນ໌ຮ່ວມສະໄໝ ຮອງຮັບຮ່າງກາຍໃຫ້ພັກເຕັມທີ່",
+    desktopPosition: "center center",
+    mobilePosition: "50% 54%"
   },
   {
-    src: "assets/cover-bedroom-modern.png",
-    eyebrow: "Deep Rest",
-    title: "ດີໄຊນ໌ສະອາດ ນອນສະບາຍ ເໝາະກັບທຸກຫ້ອງ",
-    text: "Balanced support with a premium look."
+    src: "assets/cover-luxury-green.png",
+    eyebrow: "Premium Rest",
+    titleLight: "Soft",
+    titleStrong: "Balance",
+    text: "ພື້ນທີ່ຫ້ອງນອນທີ່ດູຫຼູ ແລະ ນອນສະບາຍທຸກຄືນ",
+    desktopPosition: "center center",
+    mobilePosition: "50% 55%"
   },
   {
-    src: "assets/cover-bedroom-bright.png",
-    eyebrow: "Fresh Morning",
-    title: "ເລີ່ມຕົ້ນທຸກເຊົ້າດ້ວຍການນອນທີ່ດີກວ່າ",
-    text: "Soft style, steady comfort."
+    src: "assets/cover-luxury-suite.png",
+    eyebrow: "Evening Luxury",
+    titleLight: "Rest",
+    titleStrong: "Beautifully",
+    text: "ສຳຜັດຫ້ອງນອນບັນຍາກາດໂຮງແຮມ ໃນທຸກມື້",
+    desktopPosition: "center center",
+    mobilePosition: "48% 54%"
   }
 ];
 
@@ -646,11 +658,11 @@ function renderHeroCarousel(promotion, activeEvents = []) {
   if (!els.heroTrack || !els.heroDots) return;
   const slides = heroSlideSources(promotion, activeEvents);
   els.heroTrack.innerHTML = slides.map((slide, index) => `
-    <article class="hero-carousel-slide ${index === 0 ? "is-active" : ""}">
+    <article class="hero-carousel-slide ${index === 0 ? "is-active" : ""}" style="--cover-image: url('${slide.src}'); --cover-position: ${slide.desktopPosition || "center center"}; --cover-mobile-position: ${slide.mobilePosition || slide.desktopPosition || "center center"};">
       <img src="${slide.src}" alt="Kinglike cover ${index + 1}" />
       <div class="hero-cover-copy">
         <p>${slide.eyebrow}</p>
-        <h1>${slide.title}</h1>
+        <h1><span>${slide.titleLight}</span><strong>${slide.titleStrong}</strong></h1>
         <span>${slide.text}</span>
       </div>
     </article>
