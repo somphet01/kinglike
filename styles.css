@@ -12903,6 +12903,133 @@ body main > .store-faq {
   }
 }
 
+/* Mobile collection page: keep the rest-style choices compact before products. */
+@media (max-width: 640px) {
+  .collection-family {
+    gap: 14px !important;
+    padding-bottom: 24px !important;
+    padding-top: 30px !important;
+  }
+
+  .collection-family > div:first-child {
+    display: grid !important;
+    gap: 6px !important;
+  }
+
+  .collection-family h2 {
+    font-size: 30px !important;
+    line-height: 1.05 !important;
+    max-width: 11ch !important;
+  }
+
+  .collection-family-grid {
+    display: flex !important;
+    gap: 10px !important;
+    grid-template-columns: none !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+    overflow-x: auto !important;
+    padding: 0 20px 8px !important;
+    scroll-padding-left: 20px !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: none !important;
+  }
+
+  .collection-family-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .collection-family-grid a {
+    align-content: start !important;
+    flex: 0 0 min(74vw, 260px) !important;
+    gap: 8px !important;
+    min-height: 118px !important;
+    padding: 14px !important;
+    scroll-snap-align: start !important;
+  }
+
+  .collection-family-grid strong {
+    font-size: 21px !important;
+  }
+
+  .collection-family-grid span {
+    display: -webkit-box !important;
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+    overflow: hidden !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  .collection-products {
+    padding-top: 30px !important;
+  }
+}
+
+/* Mobile home services: keep the four selling points compact above the fold. */
+@media (max-width: 640px) {
+  body main > .benefits {
+    gap: 10px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    padding: 34px 14px 38px !important;
+  }
+
+  body main > .benefits article,
+  body main > .benefits article:first-child {
+    border: 1px solid rgba(5, 6, 7, 0.12) !important;
+    border-radius: 12px !important;
+    gap: 7px !important;
+    min-height: 128px !important;
+    padding: 12px !important;
+  }
+
+  body main > .benefits article:first-child {
+    border-color: #050607 !important;
+  }
+
+  body main > .benefits .benefit-icon {
+    height: 24px !important;
+    width: 24px !important;
+  }
+
+  body main > .benefits .benefit-icon svg {
+    height: 22px !important;
+    width: 22px !important;
+  }
+
+  body main > .benefits h2 {
+    font-size: clamp(14px, 4vw, 17px) !important;
+    line-height: 1.18 !important;
+  }
+
+  body main > .benefits p {
+    display: -webkit-box !important;
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+    overflow: hidden !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  body main > .benefits {
+    gap: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  body main > .benefits article,
+  body main > .benefits article:first-child {
+    min-height: 118px !important;
+    padding: 10px !important;
+  }
+
+  body main > .benefits h2 {
+    font-size: 13px !important;
+  }
+}
+
 /* Impeccable polish: pricing blocks should read as the decision point, not loose text. */
 .product-card .prices,
 .related-product-card .prices {
@@ -13019,6 +13146,93 @@ body main > .store-faq {
   .detail-buybox .save-line {
     border-radius: 10px !important;
     width: 100% !important;
+  }
+}
+
+/* Keep home service cards visually consistent; the first card should not be highlighted. */
+body main > .benefits article:first-child {
+  background: transparent !important;
+  border-left: 1px solid rgba(5, 6, 7, 0.14) !important;
+  border-radius: 0 !important;
+  color: #050607 !important;
+}
+
+body main > .benefits article:first-child .benefit-icon,
+body main > .benefits article:first-child h2 {
+  color: #050607 !important;
+}
+
+body main > .benefits article:first-child p {
+  color: #596068 !important;
+}
+
+@media (max-width: 640px) {
+  body main > .benefits article:first-child {
+    border: 1px solid rgba(5, 6, 7, 0.12) !important;
+    border-radius: 12px !important;
+  }
+}
+
+/* Product cards only show the entry price; full price details live on detail pages. */
+.product-card .prices,
+.related-product-card .prices {
+  gap: 3px !important;
+  margin: 12px 0 14px !important;
+}
+
+/* Dynamic island header: reveal on upward scroll, tuck away when idle. */
+body > .site-header.liquid-header,
+body > .site-header.liquid-header.is-scrolled {
+  transform-origin: 50% 0 !important;
+  transition:
+    transform 0.54s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.36s ease,
+    filter 0.54s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform !important;
+}
+
+body > .site-header.liquid-header.is-header-hidden {
+  filter: saturate(0.95) !important;
+  opacity: 0.92 !important;
+  transform: translate3d(0, calc(-100% + 8px), 0) scaleX(0.62) !important;
+}
+
+body > .site-header.liquid-header.is-header-hidden:hover,
+body > .site-header.liquid-header.is-header-hidden:focus-within,
+body:has(.mobile-menu.is-open) > .site-header.liquid-header {
+  filter: none !important;
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scaleX(1) !important;
+}
+
+body > .site-header.liquid-header::after {
+  background: rgba(5, 5, 5, 0.64) !important;
+  border-radius: 999px !important;
+  bottom: -7px !important;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14) !important;
+  content: "" !important;
+  height: 4px !important;
+  left: 50% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  transform: translateX(-50%) scaleX(0.55) !important;
+  transition:
+    opacity 0.28s ease,
+    transform 0.54s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  width: min(86px, 28vw) !important;
+}
+
+body > .site-header.liquid-header.is-header-hidden::after {
+  opacity: 1 !important;
+  transform: translateX(-50%) scaleX(1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body > .site-header.liquid-header,
+  body > .site-header.liquid-header.is-scrolled,
+  body > .site-header.liquid-header::after {
+    transition-duration: 0.01ms !important;
   }
 }
 

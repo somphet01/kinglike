@@ -1,4 +1,4 @@
-const PROMO_STORAGE_KEY = "kinglikePromotion";
+﻿const PROMO_STORAGE_KEY = "kinglikePromotion";
 const STORE_DB_NAME = "kinglikeAdminStore";
 const STORE_DB_VERSION = 1;
 const STORE_OBJECT = "records";
@@ -7,14 +7,15 @@ const MESSENGER_URL = "https://www.messenger.com/t/Kinglikesikai";
 
 const defaultPromotion = {
   badge: "HOT PROMOTION",
-  title: "ໂປຣໂມຊັນພິເສດ Kinglike",
-  text: "ເລືອກຊຸດທີ່ນອນພຣີມຽມ ພ້ອມຂອງແຖມ ແລະລາຄາພິເສດກ່ອນໝົດເວລາ.",
-  button: "ເລືອກຊື້ສິນຄ້າ",
+  title: "à»‚àº›àº£à»‚àº¡àºŠàº±àº™àºžàº´à»€àºªàº” Kinglike",
+  text: "à»€àº¥àº·àº­àºàºŠàº¸àº”àº—àºµà»ˆàº™àº­àº™àºžàº£àºµàº¡àº½àº¡ àºžà»‰àº­àº¡àº‚àº­àº‡à»àº–àº¡ à»àº¥àº°àº¥àº²àº„àº²àºžàº´à»€àºªàº”àºà»ˆàº­àº™à»àº»àº”à»€àº§àº¥àº².",
+  button: "à»€àº¥àº·àº­àºàºŠàº·à»‰àºªàº´àº™àº„à»‰àº²",
   link: "index.html#products",
   events: []
 };
 
 const els = {
+  header: document.querySelector("[data-header]"),
   menu: document.querySelector("[data-mobile-menu]"),
   menuBackdrop: document.querySelector("[data-menu-backdrop]"),
   openMenu: document.querySelector("[data-open-menu]"),
@@ -32,6 +33,44 @@ const els = {
   popup: document.querySelector("[data-promo-popup]"),
   popupContent: document.querySelector("[data-promo-popup-content]")
 };
+
+function initHeaderReveal() {
+  if (!els.header) return;
+  const idleDelay = 2000;
+  let lastY = window.scrollY;
+  let hideTimer = 0;
+  const canHide = () => !els.menu?.classList.contains("is-open") && !els.header.matches(":focus-within");
+  const showHeader = () => {
+    els.header.classList.remove("is-header-hidden");
+    window.clearTimeout(hideTimer);
+    if (canHide()) hideTimer = window.setTimeout(() => {
+      if (canHide()) els.header.classList.add("is-header-hidden");
+    }, idleDelay);
+  };
+  const hideHeader = () => {
+    window.clearTimeout(hideTimer);
+    if (canHide()) els.header.classList.add("is-header-hidden");
+  };
+  window.addEventListener("scroll", () => {
+    const currentY = window.scrollY;
+    const delta = currentY - lastY;
+    els.header.classList.toggle("is-scrolled", currentY > 24);
+    if (Math.abs(delta) >= 4) {
+      if (delta < 0) showHeader();
+      else if (currentY > 12) hideHeader();
+      lastY = Math.max(0, currentY);
+    }
+  }, { passive: true });
+  window.addEventListener("mousemove", (event) => {
+    if (event.clientY <= 22) showHeader();
+  }, { passive: true });
+  window.addEventListener("touchstart", (event) => {
+    if (event.touches?.[0]?.clientY <= 36) showHeader();
+  }, { passive: true });
+  els.header.addEventListener("focusin", showHeader);
+  els.header.addEventListener("mouseenter", showHeader);
+  showHeader();
+}
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -127,10 +166,10 @@ function countdownMarkup(item, large = false) {
   const end = getPromoEnd(item);
   return `
     <div class="promo-countdown ${large ? "promo-countdown-large" : ""}" data-promo-countdown="${end}">
-      <b data-count-days>0</b><small>ມື້</small>
-      <b data-count-hours>00</b><small>ຊົ່ວໂມງ</small>
-      <b data-count-minutes>00</b><small>ນາທີ</small>
-      <b data-count-seconds>00</b><small>ວິ</small>
+      <b data-count-days>0</b><small>àº¡àº·à»‰</small>
+      <b data-count-hours>00</b><small>àºŠàº»à»ˆàº§à»‚àº¡àº‡</small>
+      <b data-count-minutes>00</b><small>àº™àº²àº—àºµ</small>
+      <b data-count-seconds>00</b><small>àº§àº´</small>
     </div>
   `;
 }
@@ -148,7 +187,7 @@ function updateCountdowns() {
 
 function endLabel(item) {
   const date = new Date(getPromoEnd(item));
-  return `ໝົດເວລາ: ${date.toLocaleDateString("lo-LA", { day: "2-digit", month: "long", year: "numeric" })} ${date.toLocaleTimeString("lo-LA", { hour: "2-digit", minute: "2-digit" })}`;
+  return `à»àº»àº”à»€àº§àº¥àº²: ${date.toLocaleDateString("lo-LA", { day: "2-digit", month: "long", year: "numeric" })} ${date.toLocaleTimeString("lo-LA", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 function renderHero(promotion, lead) {
@@ -186,7 +225,7 @@ function renderEvents(events) {
         ${item.text ? `<p>${escapeHtml(item.text)}</p>` : ""}
         ${countdownMarkup(item)}
         <small>${escapeHtml(item.date || endLabel(item))}</small>
-        <a class="primary-btn" href="${escapeHtml(item.link || "index.html#products")}">${escapeHtml(item.button || "ເລືອກຊື້ສິນຄ້າ")}</a>
+        <a class="primary-btn" href="${escapeHtml(item.link || "index.html#products")}">${escapeHtml(item.button || "à»€àº¥àº·àº­àºàºŠàº·à»‰àºªàº´àº™àº„à»‰àº²")}</a>
       </div>
     </article>
   `).join("");
@@ -201,7 +240,7 @@ function showPopup(item) {
       </div>
       <div class="promo-popup-bottom">
         ${countdownMarkup(item)}
-        <a class="primary-btn" href="promotion.html" data-close-promo-popup>ເບິ່ງໂປຣໂມຊັນ</a>
+        <a class="primary-btn" href="promotion.html" data-close-promo-popup>à»€àºšàº´à»ˆàº‡à»‚àº›àº£à»‚àº¡àºŠàº±àº™</a>
       </div>
     </div>
   `;
@@ -233,7 +272,7 @@ function bindUi() {
     const lineTarget = event.target.closest("[data-line-contact]");
     if (lineTarget) {
       const channel = lineTarget.dataset.lineChannel;
-      const message = "ສະບາຍດີ ສົນໃຈໂປຣໂມຊັນ Kinglike";
+      const message = "àºªàº°àºšàº²àºàº”àºµ àºªàº»àº™à»ƒàºˆà»‚àº›àº£à»‚àº¡àºŠàº±àº™ Kinglike";
       const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank", "noopener");
     }
@@ -242,6 +281,7 @@ function bindUi() {
 
 async function init() {
   bindUi();
+  initHeaderReveal();
   const promotion = await loadPromotion();
   const events = promotion.events.filter((item) => item && item.active !== false && item.title);
   const lead = events[0] || null;

@@ -202,9 +202,9 @@ function relatedProductCard(product) {
         <h3>${product.name}</h3>
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness}</div>
         <div class="prices" aria-label="ລາຄາສິນຄ້າ">
-          <span class="price-label">ລາຄາພິເສດ</span>
-          <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
-          <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
+          <span class="price-label">ລາຄາເລີ່ມຕົ້ນ</span>
+          <strong class="sale-price">${productCardPrice(product)}</strong>
+          <span class="regular-price">${productCardPrice(product, "regularPrice")}</span>
           ${savingLabel ? `<span class="save-chip">${savingLabel}</span>` : ""}
         </div>
         <div class="card-actions">
@@ -382,6 +382,12 @@ function productDisplayPrice(product, key = "salePrice") {
   const min = Math.min(...prices);
   const max = Math.max(...prices);
   return min === max ? formatKip(min) : `${formatKip(min)} - ${formatKip(max)}`;
+}
+
+function productCardPrice(product, key = "salePrice") {
+  const prices = productSizeOptions(product).map((option) => option[key]).filter((value) => value > 0);
+  if (!prices.length) return formatKip(productPrice(product, key));
+  return formatKip(Math.min(...prices));
 }
 
 function productSavingLabel(product) {
@@ -1000,6 +1006,7 @@ function buyNow(idToBuy) {
 }
 
 function openDrawer(drawer) {
+  window.kinglikeRevealHeader?.();
   drawer.classList.add("is-open");
 }
 
@@ -1130,9 +1137,44 @@ document.querySelector("[data-open-menu]").addEventListener("click", openMobileM
 document.querySelector("[data-close-menu]").addEventListener("click", closeMobileMenu);
 els.menuBackdrop.addEventListener("click", closeMobileMenu);
 
-window.addEventListener("scroll", () => {
-  els.header.classList.toggle("is-scrolled", window.scrollY > 24);
-});
+function initHeaderReveal() {
+  if (!els.header) return;
+  const idleDelay = 2000;
+  let lastY = window.scrollY;
+  let hideTimer = 0;
+  const canHide = () => !els.mobileMenu?.classList.contains("is-open") && !els.header.matches(":focus-within");
+  const showHeader = () => {
+    els.header.classList.remove("is-header-hidden");
+    window.clearTimeout(hideTimer);
+    if (canHide()) hideTimer = window.setTimeout(() => {
+      if (canHide()) els.header.classList.add("is-header-hidden");
+    }, idleDelay);
+  };
+  const hideHeader = () => {
+    window.clearTimeout(hideTimer);
+    if (canHide()) els.header.classList.add("is-header-hidden");
+  };
+  window.addEventListener("scroll", () => {
+    const currentY = window.scrollY;
+    const delta = currentY - lastY;
+    els.header.classList.toggle("is-scrolled", currentY > 24);
+    if (Math.abs(delta) >= 4) {
+      if (delta < 0) showHeader();
+      else if (currentY > 12) hideHeader();
+      lastY = Math.max(0, currentY);
+    }
+  }, { passive: true });
+  window.addEventListener("mousemove", (event) => {
+    if (event.clientY <= 22) showHeader();
+  }, { passive: true });
+  window.addEventListener("touchstart", (event) => {
+    if (event.touches?.[0]?.clientY <= 36) showHeader();
+  }, { passive: true });
+  els.header.addEventListener("focusin", showHeader);
+  els.header.addEventListener("mouseenter", showHeader);
+  window.kinglikeRevealHeader = showHeader;
+  showHeader();
+}
 
 window.addEventListener("popstate", () => {
   const nextParams = new URLSearchParams(window.location.search);
@@ -1141,6 +1183,7 @@ window.addEventListener("popstate", () => {
   if (nextProduct) openProductPage(nextProduct, false);
 });
 
+initHeaderReveal();
 renderProduct();
 renderCart();
 renderWishlist();

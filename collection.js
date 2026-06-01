@@ -401,6 +401,12 @@ function productDisplayPrice(product, key = "salePrice") {
   return min === max ? formatKip(min) : `${formatKip(min)} - ${formatKip(max)}`;
 }
 
+function productCardPrice(product, key = "salePrice") {
+  const prices = productSizeOptions(product).map((option) => option[key]).filter((value) => value > 0);
+  if (!prices.length) return formatKip(productPrice(product, key));
+  return formatKip(Math.min(...prices));
+}
+
 function productSavingLabel(product) {
   const options = productSizeOptions(product);
   const savings = options.map((option) => option.regularPrice - option.salePrice).filter((value) => value > 0);
@@ -493,9 +499,9 @@ function productCard(product) {
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
         <div class="sizes">${productSizes(product).map((size) => `<span>${size}</span>`).join("")}</div>
         <div class="prices" aria-label="ລາຄາສິນຄ້າ">
-          <span class="price-label">ລາຄາພິເສດ</span>
-          <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
-          <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
+          <span class="price-label">ລາຄາເລີ່ມຕົ້ນ</span>
+          <strong class="sale-price">${productCardPrice(product)}</strong>
+          <span class="regular-price">${productCardPrice(product, "regularPrice")}</span>
           ${savingLabel ? `<span class="save-chip">${savingLabel}</span>` : ""}
         </div>
         <div class="card-actions">
@@ -812,6 +818,7 @@ function openProductDetail(id) {
 }
 
 function openDrawer(drawer) {
+  window.kinglikeRevealHeader?.();
   drawer.classList.add("is-open");
 }
 
@@ -912,10 +919,46 @@ els.sort.addEventListener("change", (event) => {
   renderProducts();
 });
 
-window.addEventListener("scroll", () => {
-  els.header.classList.toggle("is-scrolled", window.scrollY > 24);
-});
+function initHeaderReveal() {
+  if (!els.header) return;
+  const idleDelay = 2000;
+  let lastY = window.scrollY;
+  let hideTimer = 0;
+  const canHide = () => !els.mobileMenu?.classList.contains("is-open") && !els.header.matches(":focus-within");
+  const showHeader = () => {
+    els.header.classList.remove("is-header-hidden");
+    window.clearTimeout(hideTimer);
+    if (canHide()) hideTimer = window.setTimeout(() => {
+      if (canHide()) els.header.classList.add("is-header-hidden");
+    }, idleDelay);
+  };
+  const hideHeader = () => {
+    window.clearTimeout(hideTimer);
+    if (canHide()) els.header.classList.add("is-header-hidden");
+  };
+  window.addEventListener("scroll", () => {
+    const currentY = window.scrollY;
+    const delta = currentY - lastY;
+    els.header.classList.toggle("is-scrolled", currentY > 24);
+    if (Math.abs(delta) >= 4) {
+      if (delta < 0) showHeader();
+      else if (currentY > 12) hideHeader();
+      lastY = Math.max(0, currentY);
+    }
+  }, { passive: true });
+  window.addEventListener("mousemove", (event) => {
+    if (event.clientY <= 22) showHeader();
+  }, { passive: true });
+  window.addEventListener("touchstart", (event) => {
+    if (event.touches?.[0]?.clientY <= 36) showHeader();
+  }, { passive: true });
+  els.header.addEventListener("focusin", showHeader);
+  els.header.addEventListener("mouseenter", showHeader);
+  window.kinglikeRevealHeader = showHeader;
+  showHeader();
+}
 
+initHeaderReveal();
 renderCollectionMeta();
 renderProducts();
 renderCart();
