@@ -190,6 +190,7 @@ function relatedTitle(product) {
 function relatedProductCard(product) {
   const image = primaryImage(product);
   const imageClass = image ? "has-admin-image" : "";
+  const savingLabel = productSavingLabel(product);
   return `
     <article class="product-card related-product-card clickable-card" data-related-detail="${product.id}">
       <div class="product-art ${imageClass}">
@@ -200,9 +201,11 @@ function relatedProductCard(product) {
       <div class="product-body">
         <h3>${product.name}</h3>
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness}</div>
-        <div class="prices">
+        <div class="prices" aria-label="ລາຄາສິນຄ້າ">
+          <span class="price-label">ລາຄາພິເສດ</span>
           <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
           <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
+          ${savingLabel ? `<span class="save-chip">${savingLabel}</span>` : ""}
         </div>
         <div class="card-actions">
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
@@ -381,6 +384,15 @@ function productDisplayPrice(product, key = "salePrice") {
   return min === max ? formatKip(min) : `${formatKip(min)} - ${formatKip(max)}`;
 }
 
+function productSavingLabel(product) {
+  const options = productSizeOptions(product);
+  const savings = options.map((option) => option.regularPrice - option.salePrice).filter((value) => value > 0);
+  if (!savings.length) return "";
+  const maxSaving = Math.max(...savings);
+  const discount = productDiscountPercent(product);
+  return `ປະຢັດສູງສຸດ ${formatKip(maxSaving)}${discount ? ` • ${discount}%` : ""}`;
+}
+
 function cartKey(id, size = "") {
   return `${id}__${size || ""}`;
 }
@@ -470,7 +482,8 @@ function renderProduct() {
         <h2>${currentProduct.name}</h2>
         <div class="detail-code">SKU: ${currentProduct.sku} • ${currentProduct.stock}</div>
         <div class="meta">${currentProduct.category} • ${currentProduct.thickness} • ${currentProduct.firmness} • ★ ${currentProduct.rating}</div>
-        <div class="detail-price">
+        <div class="detail-price" aria-label="ລາຄາສິນຄ້າ">
+          <span class="price-label">ລາຄາພິເສດ</span>
           <strong data-detail-sale-price>${formatKip(selectedOption.salePrice)}</strong>
           <span class="regular-price" data-detail-regular-price>${formatKip(selectedOption.regularPrice)}</span>
         </div>
@@ -500,6 +513,26 @@ function renderProduct() {
       ${detailBenefitCard("support", "ມີທີມງານແນະນຳ", "ຊ່ວຍເລືອກຮຸ່ນ ຂະໜາດ ແລະຄວາມນຸ່ມ.")}
       ${productFreebies(currentProduct).length ? detailBenefitCard("gift", "ຂອງແຖມ", productFreebies(currentProduct).join(", "), "detail-gift-benefit") : ""}
     </div>
+    <section class="detail-layer-story" aria-label="Mattress structure">
+      <div class="layer-story-copy">
+        <span>Inside this model</span>
+        <h3>ຂ້າງໃນແຕ່ລະຊັ້ນ ຕັ້ງໃຈເລືອກມາເພື່ອການນອນທີ່ດີຂຶ້ນ</h3>
+        <p>ລາຍລະອຽດວັດສະດຸຊ່ວຍໃຫ້ລູກຄ້າເຂົ້າໃຈວ່າຮຸ່ນນີ້ເໝາະກັບໃຜ ໂດຍບໍ່ຕ້ອງຕັດສິນໃຈຈາກລາຄາຢ່າງດຽວ.</p>
+      </div>
+      <div class="layer-stack">
+        ${currentProduct.materials.map((item, index) => `
+          <article>
+            <strong>${String(index + 1).padStart(2, "0")}</strong>
+            <span>${item}</span>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+    <section class="detail-hotel-proof" aria-label="Kinglike hotel comfort">
+      <span>Hotel Comfort</span>
+      <h3>ຟີລທີ່ນອນໂຮງແຮມໃນຫ້ອງນອນຂອງທ່ານ</h3>
+      <p>ເລືອກຂະໜາດໃຫ້ກົງກັບຕຽງ, ກົດສັ່ງຊື້ ແລ້ວໃຫ້ແອດມິນຢືນຢັນຮອບຈັດສົ່ງ ແລະເງື່ອນໄຂຮັບປະກັນກ່ອນຊຳລະເງິນ.</p>
+    </section>
     <div class="detail-info">
       <section>
         <h3>ລາຍລະອຽດສິນຄ້າ</h3>

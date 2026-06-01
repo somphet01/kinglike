@@ -16,6 +16,10 @@ if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
 }
 
+if (window.location.hash === "#home") {
+  window.scrollTo(0, 0);
+}
+
 const defaultProducts = [
   {
     id: "royal-cloud",
@@ -467,6 +471,15 @@ function productDisplayPrice(product, key = "salePrice") {
   return min === max ? formatKip(min) : `${formatKip(min)} - ${formatKip(max)}`;
 }
 
+function productSavingLabel(product) {
+  const options = productSizeOptions(product);
+  const savings = options.map((option) => option.regularPrice - option.salePrice).filter((value) => value > 0);
+  if (!savings.length) return "";
+  const maxSaving = Math.max(...savings);
+  const discount = productDiscountPercent(product);
+  return `ປະຢັດສູງສຸດ ${formatKip(maxSaving)}${discount ? ` • ${discount}%` : ""}`;
+}
+
 function cartKey(id, size = "") {
   return `${id}__${size || ""}`;
 }
@@ -692,6 +705,15 @@ function renderHeroCarousel(promotion, activeEvents = []) {
         <p>${slide.eyebrow}</p>
         <h1><span>${slide.titleLight}</span><strong>${slide.titleStrong}</strong></h1>
         <span>${slide.text}</span>
+        <div class="hero-cover-actions">
+          <a class="hero-primary-link" href="#products">ເລືອກທີ່ນອນ</a>
+          <a class="hero-secondary-link" href="#sleep-guide">ຊ່ວຍເລືອກຮຸ່ນ</a>
+        </div>
+        <div class="hero-proof-row" aria-label="Kinglike service highlights">
+          <span>ຈັດສົ່ງຟຣີ</span>
+          <span>ຮັບປະກັນ 6-12 ປີ</span>
+          <span>ສັ່ງຜ່ານແຊັດ</span>
+        </div>
       </div>
     </article>
   `).join("");
@@ -905,6 +927,7 @@ function productCard(product) {
   const isWishlisted = state.wishlist.has(product.id);
   const image = primaryImage(product);
   const imageClass = image ? "has-admin-image" : "";
+  const savingLabel = productSavingLabel(product);
   return `
     <article class="product-card clickable-card" data-open-detail="${product.id}">
       <div class="product-art ${imageClass}">
@@ -917,9 +940,11 @@ function productCard(product) {
         <h3>${product.name}</h3>
         <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating}</div>
         <div class="sizes">${productSizes(product).map((size) => `<span>${size}</span>`).join("")}</div>
-        <div class="prices">
+        <div class="prices" aria-label="ລາຄາສິນຄ້າ">
+          <span class="price-label">ລາຄາພິເສດ</span>
           <strong class="sale-price">${productDisplayPrice(product, "salePrice")}</strong>
           <span class="regular-price">${productDisplayPrice(product, "regularPrice")}</span>
+          ${savingLabel ? `<span class="save-chip">${savingLabel}</span>` : ""}
         </div>
         <div class="card-actions">
           <button class="add-cart" type="button" data-add-cart="${product.id}">ເພີ່ມລົດເຂັນ</button>
