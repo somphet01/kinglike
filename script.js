@@ -1444,17 +1444,17 @@ els.searchInput.closest(".header-search")?.addEventListener("click", () => {
   els.searchInput.focus();
 });
 
-els.sizeFilter.addEventListener("change", (event) => {
+els.sizeFilter?.addEventListener("change", (event) => {
   state.size = event.target.value;
   state.page = 1;
   renderProducts();
 });
-els.firmnessFilter.addEventListener("change", (event) => {
+els.firmnessFilter?.addEventListener("change", (event) => {
   state.firmness = event.target.value;
   state.page = 1;
   renderProducts();
 });
-els.sort.addEventListener("change", (event) => {
+els.sort?.addEventListener("change", (event) => {
   state.sort = event.target.value;
   state.page = 1;
   renderProducts();

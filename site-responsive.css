@@ -1,0 +1,204 @@
+/* Final responsive consistency layer shared by every storefront page. */
+body > .site-header:not(.liquid-header) {
+  left: clamp(14px, 3vw, 42px) !important;
+  max-width: none !important;
+  right: clamp(14px, 3vw, 42px) !important;
+  transform: none !important;
+  width: auto !important;
+}
+
+.drawer:not(.is-open) {
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.chat-order-modal {
+  align-items: center !important;
+  background: rgba(15, 15, 17, 0.48) !important;
+  display: none !important;
+  inset: 0 !important;
+  justify-content: center !important;
+  padding: clamp(14px, 4vw, 28px) !important;
+  position: fixed !important;
+  z-index: 1300 !important;
+}
+
+.chat-order-modal.is-open {
+  display: flex !important;
+}
+
+.chat-order-panel {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.66) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.24) !important;
+  color: #111113 !important;
+  display: grid !important;
+  gap: 16px !important;
+  max-height: min(82dvh, 620px) !important;
+  max-width: 460px !important;
+  overflow: auto !important;
+  padding: clamp(24px, 4vw, 32px) !important;
+  position: relative !important;
+  width: min(100%, 460px) !important;
+}
+
+.chat-order-panel > .close-btn {
+  align-items: center !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(17, 17, 19, 0.08) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08) !important;
+  color: #111113 !important;
+  display: inline-flex !important;
+  font-size: 26px !important;
+  height: 44px !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  position: absolute !important;
+  right: 16px !important;
+  top: 16px !important;
+  width: 44px !important;
+}
+
+.chat-order-panel h2 {
+  color: #050607 !important;
+  font-size: clamp(28px, 5.5vw, 38px) !important;
+  font-weight: 950 !important;
+  line-height: 1.12 !important;
+  margin: 0 !important;
+  padding-right: 48px !important;
+}
+
+.chat-order-panel .meta,
+.chat-order-panel p.meta {
+  color: #6a7179 !important;
+  font-size: clamp(12px, 2.5vw, 14px) !important;
+  font-weight: 700 !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+
+.chat-order-summary {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.chat-order-summary div {
+  background: rgba(255, 255, 255, 0.46) !important;
+  border: 1px solid rgba(17, 17, 19, 0.12) !important;
+  border-radius: 8px !important;
+  display: grid !important;
+  gap: 6px !important;
+  padding: 14px !important;
+}
+
+.chat-order-summary strong {
+  color: #111113 !important;
+  font-size: clamp(15px, 3.2vw, 17px) !important;
+  font-weight: 950 !important;
+  line-height: 1.25 !important;
+}
+
+.chat-order-summary span {
+  color: #7a828a !important;
+  font-size: clamp(12px, 2.6vw, 14px) !important;
+  font-weight: 700 !important;
+}
+
+.chat-channel-actions {
+  display: grid !important;
+  gap: 10px !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.chat-channel-actions button {
+  align-items: center !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  font-size: clamp(14px, 3vw, 16px) !important;
+  font-weight: 950 !important;
+  gap: 8px !important;
+  justify-content: center !important;
+  min-height: 48px !important;
+  padding: 0 14px !important;
+  white-space: nowrap !important;
+}
+
+.chat-channel-actions [data-chat-channel="whatsapp"] {
+  background: #111113 !important;
+  color: #ffffff !important;
+}
+
+.chat-channel-actions [data-chat-channel="messenger"] {
+  background: #f2f1ef !important;
+  color: #111113 !important;
+}
+
+@media (max-width: 420px) {
+  .chat-order-panel {
+    border-radius: 24px !important;
+    padding: 24px !important;
+    width: min(100%, 430px) !important;
+  }
+
+  .chat-channel-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body > .site-header:not(.liquid-header) {
+    border-radius: 24px !important;
+    display: flex !important;
+    gap: 10px !important;
+    height: auto !important;
+    left: max(12px, env(safe-area-inset-left)) !important;
+    max-width: none !important;
+    min-height: 58px !important;
+    padding: 8px 12px !important;
+    right: max(12px, env(safe-area-inset-right)) !important;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    transform: none !important;
+    width: auto !important;
+  }
+
+  body > .site-header:not(.liquid-header) .brand {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+  }
+
+  body > .site-header:not(.liquid-header) .brand img {
+    height: 30px !important;
+    max-width: 112px !important;
+    object-fit: contain !important;
+  }
+
+  body > .site-header:not(.liquid-header) .main-nav {
+    align-items: center !important;
+    background: transparent !important;
+    border: 0 !important;
+    display: flex !important;
+    flex: 1 1 auto !important;
+    gap: 6px !important;
+    justify-content: flex-end !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > .site-header:not(.liquid-header) .main-nav a {
+    border-radius: 999px !important;
+    flex: 0 1 auto !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    max-width: 130px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    padding: 8px 9px !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}

@@ -3,6 +3,9 @@
     {
       "id": "sample-mattresses-1779941755802",
       "name": "Kinglike Royal Mattress",
+      "image": "",
+      "images": [],
+      "sku": "SAMPLE-MATTRESSES-1779941755802",
       "category": "Mattress",
       "firmness": "ນຸ່ມແນ່ນ",
       "thickness": "12 ນິ້ວ",
@@ -22,194 +25,18 @@
       "badge": "Sample",
       "rating": 4.8,
       "popular": 1779941755802,
-      "sku": "SAMPLE-MATTRESSES-1779941755802",
+      "stock": "ມີສິນຄ້າ",
+      "warranty": "10 ປີ",
+      "freebies": [
+        "2 pillows",
+        "Premium bedsheet"
+      ],
       "materials": [
         "Premium fabric",
         "Comfort support",
         "Hotel grade"
       ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
-      "stock": "ມີສິນຄ້າ",
       "description": "Kinglike Royal Mattress ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
-    },
-    {
-      "id": "sample-mattresses-1779941751499",
-      "name": "Kinglike Royal Mattress",
-      "category": "Mattress",
-      "firmness": "ນຸ່ມແນ່ນ",
-      "thickness": "12 ນິ້ວ",
-      "sizes": [
-        "3.5 ຟຸດ",
-        "5 ຟຸດ",
-        "6 ຟຸດ"
-      ],
-      "sizePrices": {
-        "3.5 ຟຸດ": 4990000,
-        "5 ຟຸດ": 5588800,
-        "6 ຟຸດ": 6187600
-      },
-      "price": 7500000,
-      "salePrice": 4990000,
-      "discountPercent": 33,
-      "badge": "Sample",
-      "rating": 4.8,
-      "popular": 1779941751499,
-      "sku": "SAMPLE-MATTRESSES-1779941751499",
-      "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
-      ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
-      "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Royal Mattress ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
-    },
-    {
-      "id": "sample-mattresses-1779941748251",
-      "name": "Kinglike Royal Mattress",
-      "category": "Mattress",
-      "firmness": "ນຸ່ມແນ່ນ",
-      "thickness": "12 ນິ້ວ",
-      "sizes": [
-        "3.5 ຟຸດ",
-        "5 ຟຸດ",
-        "6 ຟຸດ"
-      ],
-      "sizePrices": {
-        "3.5 ຟຸດ": 4990000,
-        "5 ຟຸດ": 5588800,
-        "6 ຟຸດ": 6187600
-      },
-      "price": 7500000,
-      "salePrice": 4990000,
-      "discountPercent": 33,
-      "badge": "Sample",
-      "rating": 4.8,
-      "popular": 1779941748251,
-      "sku": "SAMPLE-MATTRESSES-1779941748251",
-      "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
-      ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
-      "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Royal Mattress ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
-    },
-    {
-      "id": "sample-mattresses-1779941721867",
-      "name": "Kinglike Royal Mattress",
-      "category": "Mattress",
-      "firmness": "ນຸ່ມແນ່ນ",
-      "thickness": "12 ນິ້ວ",
-      "sizes": [
-        "3.5 ຟຸດ",
-        "5 ຟຸດ",
-        "6 ຟຸດ"
-      ],
-      "sizePrices": {
-        "3.5 ຟຸດ": 4990000,
-        "5 ຟຸດ": 5588800,
-        "6 ຟຸດ": 6187600
-      },
-      "price": 7500000,
-      "salePrice": 4990000,
-      "discountPercent": 33,
-      "badge": "Sample",
-      "rating": 4.8,
-      "popular": 1779941721867,
-      "sku": "SAMPLE-MATTRESSES-1779941721867",
-      "materials": [
-        "Premium fabric",
-        "Comfort support",
-        "Hotel grade"
-      ],
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "warranty": "10 ປີ",
-      "stock": "ມີສິນຄ້າ",
-      "description": "Kinglike Royal Mattress ສິນຄ້າພຣີມຽມສຳລັບຫ້ອງນອນ Kinglike."
-    },
-    {
-      "id": "gold-support",
-      "name": "Kinglike Gold Support",
-      "image": "",
-      "images": [],
-      "sku": "KL-GS-1205",
-      "category": "Hybrid",
-      "firmness": "ນຸ່ມແນ່ນ",
-      "thickness": "12 ນິ້ວ",
-      "sizes": [
-        "3.5 ຟຸດ",
-        "5 ຟຸດ",
-        "6 ຟຸດ"
-      ],
-      "sizePrices": {
-        "3.5 ຟຸດ": 6190000,
-        "5 ຟຸດ": 6932800,
-        "6 ຟຸດ": 7675600
-      },
-      "price": 8600000,
-      "salePrice": 6190000,
-      "discountPercent": 28,
-      "badge": "Hotel Grade",
-      "rating": 4.9,
-      "popular": 92,
-      "stock": "ມີສິນຄ້າ",
-      "warranty": "12 ປີ",
-      "freebies": [
-        "2 pillows",
-        "Premium bedsheet"
-      ],
-      "materials": [
-        "Hybrid support",
-        "Natural latex",
-        "Pocket spring",
-        "Luxury quilted fabric"
-      ],
-      "description": "Gold Support ເປັນຮຸ່ນພຣີມຽມທີ່ຮອງຮັບແນ່ນ ແຕ່ຍັງນຸ່ມສະບາຍ ໃຫ້ຄວາມຮູ້ສຶກແບບໂຮງແຮມ."
-    },
-    {
-      "id": "classic-rest",
-      "name": "Kinglike Classic Rest",
-      "category": "Pocket Spring",
-      "firmness": "ແນ່ນ",
-      "thickness": "9 ນິ້ວ",
-      "sizes": [
-        "3.5 ຟຸດ",
-        "5 ຟຸດ",
-        "6 ຟຸດ"
-      ],
-      "price": 3900000,
-      "salePrice": 2790000,
-      "discountPercent": 28,
-      "badge": "Value",
-      "rating": 4.5,
-      "popular": 58,
-      "sku": "KL-CR-0906",
-      "materials": [
-        "Pocket spring",
-        "Comfort foam",
-        "Knitted fabric",
-        "Edge support"
-      ],
-      "warranty": "6 ປີ",
-      "stock": "ມີສິນຄ້າ",
-      "description": "Classic Rest ເປັນຮຸ່ນເລີ່ມຕົ້ນທີ່ໃຊ້ງານງ່າຍ ລາຄາດີ ແລະຮອງຮັບການນອນປະຈຳວັນ."
     }
   ],
   "promotion": {
@@ -243,5 +70,5 @@
     ],
     "coverImage": ""
   },
-  "updatedAt": "2026-05-28T07:59:51.178Z"
+  "updatedAt": "2026-06-01T07:43:42.971Z"
 }
