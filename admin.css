@@ -1706,6 +1706,15 @@
   box-shadow: 0 14px 34px rgba(164, 195, 45, 0.24) !important;
 }
 
+.admin-category-strip button.is-active {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.72), transparent 32%),
+    linear-gradient(135deg, #dfff5f, #f7ffcf 54%, #ffffff) !important;
+  border-color: rgba(164, 195, 45, 0.46) !important;
+  color: #050607 !important;
+  box-shadow: 0 18px 42px rgba(164, 195, 45, 0.22) !important;
+}
+
 .admin-card input,
 .admin-card textarea,
 .admin-card select,
@@ -1749,4 +1758,278 @@
     radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.92), transparent 32%),
     linear-gradient(180deg, #ffffff, #e7ebed) !important;
   border-color: rgba(7, 8, 9, 0.1) !important;
+}
+
+/* Focused admin workflow polish, products first. */
+.admin-shell {
+  padding-top: clamp(18px, 2.6vw, 34px) !important;
+}
+
+.admin-dashboard-hero {
+  align-items: center !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(247, 248, 248, 0.86)),
+    radial-gradient(circle at 92% 12%, rgba(223, 255, 95, 0.22), transparent 32%) !important;
+  border: 1px solid rgba(7, 8, 9, 0.08) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 14px 38px rgba(8, 10, 12, 0.06) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  margin-bottom: 16px !important;
+  min-height: 0 !important;
+  padding: clamp(18px, 2.5vw, 28px) !important;
+}
+
+.admin-dashboard-hero h1 {
+  font-size: clamp(28px, 3.2vw, 44px) !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.08 !important;
+  margin-bottom: 8px !important;
+}
+
+.admin-dashboard-hero p:not(.eyebrow) {
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+  max-width: 620px !important;
+}
+
+.admin-stats {
+  gap: 8px !important;
+}
+
+.admin-stats article {
+  border-radius: 14px !important;
+  min-width: 92px !important;
+  padding: 12px 14px !important;
+}
+
+.admin-stats span {
+  font-size: 24px !important;
+}
+
+.admin-tabs {
+  margin-bottom: 16px !important;
+}
+
+.admin-tabs button {
+  min-width: 108px !important;
+}
+
+.danger-soft-btn {
+  color: #b42318 !important;
+}
+
+.danger-soft-btn:hover {
+  background: #fff1f0 !important;
+  border-color: rgba(180, 35, 24, 0.24) !important;
+}
+
+.admin-workspace {
+  grid-template-columns: minmax(240px, 0.72fr) minmax(420px, 1.05fr) minmax(280px, 0.78fr) !important;
+}
+
+.admin-card {
+  border-radius: 18px !important;
+  box-shadow: 0 14px 36px rgba(8, 10, 12, 0.06) !important;
+}
+
+.admin-cover-editor,
+.admin-catalog,
+.admin-preview-card {
+  position: sticky !important;
+  top: 96px !important;
+}
+
+.admin-cover-preview,
+.admin-upload-preview,
+.admin-status-grid article,
+.admin-view-product,
+.map-grid article,
+.backup-summary article {
+  border-radius: 14px !important;
+}
+
+.admin-cover-preview.has-image {
+  align-items: stretch !important;
+  padding: 0 !important;
+}
+
+.admin-cover-slide-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  padding: 8px;
+  width: 100%;
+}
+
+.admin-cover-slide-grid span {
+  aspect-ratio: 16 / 6;
+  border: 1px solid rgba(7, 8, 9, 0.1);
+  border-radius: 12px;
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+.admin-cover-slide-grid img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.admin-cover-slide-grid b,
+.admin-cover-slide-grid button {
+  position: absolute;
+  top: 8px;
+}
+
+.admin-cover-slide-grid b {
+  background: #dfff5f;
+  border-radius: 999px;
+  color: #050607;
+  font-size: 10px;
+  font-weight: 900;
+  left: 8px;
+  padding: 3px 7px;
+}
+
+.admin-cover-slide-grid button {
+  align-items: center;
+  background: rgba(5, 5, 6, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-size: 18px;
+  font-weight: 900;
+  height: 28px;
+  justify-content: center;
+  right: 8px;
+  width: 28px;
+}
+
+.admin-upload-preview:not(.has-image) {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(245, 247, 248, 0.92)),
+    radial-gradient(circle at 12% 0%, rgba(223, 255, 95, 0.2), transparent 34%) !important;
+  color: #6a6b72 !important;
+  min-height: 140px !important;
+}
+
+.product-form {
+  gap: 16px !important;
+  padding-bottom: 12px !important;
+}
+
+.product-form > label,
+.product-form > .form-row,
+.product-form > .admin-hint,
+.product-form > .admin-status-grid {
+  border-bottom: 1px solid rgba(7, 8, 9, 0.07) !important;
+  padding-bottom: 14px !important;
+}
+
+.admin-card label {
+  color: #37383f !important;
+}
+
+.admin-card small {
+  color: #6b6c73 !important;
+}
+
+.admin-submit {
+  bottom: 14px !important;
+  min-height: 52px !important;
+  position: sticky !important;
+  z-index: 5 !important;
+}
+
+.admin-backup,
+.admin-map {
+  margin: 0 auto !important;
+  max-width: 980px !important;
+}
+
+.admin-backup h2,
+.admin-map h2 {
+  font-size: clamp(28px, 4vw, 48px) !important;
+  line-height: 1.08 !important;
+  margin-bottom: 10px !important;
+}
+
+.backup-actions {
+  align-items: center !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+.backup-summary,
+.map-grid {
+  display: grid !important;
+  gap: 12px !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+}
+
+@media (max-width: 1180px) {
+  .admin-workspace {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-cover-editor,
+  .admin-catalog,
+  .admin-preview-card {
+    position: static !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-header {
+    align-items: center !important;
+    display: flex !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+  }
+
+  .brand img {
+    height: 30px !important;
+    width: 122px !important;
+  }
+
+  .admin-nav {
+    gap: 6px !important;
+    justify-content: flex-end !important;
+    min-width: 0 !important;
+  }
+
+  .admin-nav a,
+  .admin-nav button {
+    font-size: 12px !important;
+    min-height: 38px !important;
+    padding: 8px 10px !important;
+  }
+
+  .admin-dashboard-hero {
+    grid-template-columns: 1fr !important;
+    padding: 18px !important;
+  }
+
+  .admin-dashboard-hero h1 {
+    font-size: 30px !important;
+  }
+
+  .admin-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .admin-tabs button {
+    min-height: 48px !important;
+    min-width: 0 !important;
+  }
+
+  .admin-submit {
+    bottom: 10px !important;
+  }
 }

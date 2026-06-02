@@ -9,7 +9,7 @@ const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
 const DEFAULT_CATEGORY_COVERS = {
-  pillows: "assets/category-cover-pillows-test.png"
+  pillows: ["assets/category-cover-pillows-test.png"]
 };
 
 function openLocalDb() {
@@ -216,10 +216,16 @@ async function loadPromotionAsync() {
   }
 }
 
-function collectionCoverImage(key) {
+function coverImagesFromData(cover = {}) {
+  if (Array.isArray(cover.images) && cover.images.length) return cover.images.filter(Boolean);
+  return cover.image ? [cover.image] : [];
+}
+
+function collectionCoverImages(key) {
   const covers = loadPromotion().categoryCovers;
-  const adminCover = covers && typeof covers === "object" ? covers[key]?.image || "" : "";
-  return DEFAULT_CATEGORY_COVERS[key] || adminCover || "";
+  const adminCover = covers && typeof covers === "object" ? coverImagesFromData(covers[key]) : [];
+  const defaultCover = DEFAULT_CATEGORY_COVERS[key] || [];
+  return adminCover.length ? adminCover : defaultCover;
 }
 
 function getCollectionProducts(category, type) {
@@ -465,11 +471,26 @@ function renderCollectionMeta() {
   els.copy.textContent = typeKey ? `ລວມສິນຄ້າປະເພດ ${title} ເພື່ອໃຫ້ເລືອກຮຸ່ນທີ່ເໝາະກັບການນອນຂອງທ່ານ.` : collection.copy;
   els.listTitle.textContent = title;
   els.art.className = `collection-art ${collection.art}-cover-art`;
-  const coverImage = collectionCoverImage(collectionKey);
+  const coverImages = collectionCoverImages(collectionKey);
   const cover = document.querySelector("[data-collection-cover]");
-  if (coverImage && cover) {
+  if (!cover) return;
+  cover.querySelector(".collection-cover-slides")?.remove();
+  cover.classList.remove("has-admin-cover", "has-cover-slider");
+  cover.style.removeProperty("background-image");
+  els.art.style.display = "";
+  if (coverImages.length) {
     cover.classList.add("has-admin-cover");
-    cover.style.setProperty("background-image", `linear-gradient(90deg, rgba(5, 5, 5, 0.72), rgba(5, 5, 5, 0.18)), url("${coverImage}")`, "important");
+    if (coverImages.length > 1) {
+      cover.classList.add("has-cover-slider");
+      const slides = document.createElement("div");
+      slides.className = "collection-cover-slides";
+      slides.setAttribute("aria-hidden", "true");
+      slides.innerHTML = coverImages.map((image, index) => `<span style="background-image: url('${image.replace(/'/g, "%27")}'); animation-delay: ${index * 4.5}s"></span>`).join("");
+      slides.style.setProperty("--slide-count", coverImages.length);
+      cover.prepend(slides);
+    } else {
+      cover.style.setProperty("background-image", `linear-gradient(90deg, rgba(5, 5, 5, 0.72), rgba(5, 5, 5, 0.18)), url("${coverImages[0]}")`, "important");
+    }
     els.art.style.display = "none";
   }
 }
@@ -556,8 +577,24 @@ function flyToHeaderIcon(source, target) {
   dot.addEventListener("animationend", () => dot.remove(), { once: true });
 }
 
+function revealHeaderConfirmation() {
+  const header = els.header || document.querySelector("[data-header]");
+  if (!header) return;
+  window.clearTimeout(header._confirmTimer);
+  header.classList.remove("is-header-hidden", "is-action-confirming");
+  void header.offsetWidth;
+  header.classList.add("is-action-confirming");
+  header._confirmTimer = window.setTimeout(() => {
+    header.classList.remove("is-action-confirming");
+    if (window.scrollY > 12 && !header.matches(":focus-within") && !els.mobileMenu?.classList.contains("is-open")) {
+      header.classList.add("is-header-hidden");
+    }
+  }, 1450);
+}
+
 function pulseHeaderAction(type, source) {
   const target = document.querySelector(type === "wishlist" ? "[data-open-wishlist]" : "[data-open-cart]");
+  revealHeaderConfirmation();
   target?.classList.remove("is-count-bump");
   void target?.offsetWidth;
   target?.classList.add("is-count-bump");

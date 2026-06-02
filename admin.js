@@ -567,6 +567,22 @@ function activeCategoryCover() {
   return collectionCoverData()[activeCollectionKey] || {};
 }
 
+function categoryCoverImages(cover = {}) {
+  if (Array.isArray(cover.images) && cover.images.length) return cover.images.filter(Boolean);
+  return cover.image ? [cover.image] : [];
+}
+
+function parseCategoryCoverValue(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch (error) {
+    // Fall back to the legacy single-image value below.
+  }
+  return value ? [value] : [];
+}
+
 function placementLabel(product) {
   if (!product?.name) return "Home / Category / Detail";
   const labels = {
@@ -591,11 +607,11 @@ function updateImagePreview(src) {
   els.productImagePreview.classList.toggle("has-image", Boolean(images.length));
   els.productImagePreview.innerHTML = images.length
     ? `<div class="admin-upload-grid">${images.map((image, index) => `<span><img src="${image}" alt="Product preview ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-image="${index}" aria-label="Remove image">×</button></span>`).join("")}</div>`
-    : "Product image preview";
+    : "ຍັງບໍ່ມີຮູບສິນຄ້າ";
 }
 
 function updateAdminStatus(product) {
-  if (els.adminMode) els.adminMode.textContent = activeProductId && !product?._draft ? "Editing product" : "New product";
+  if (els.adminMode) els.adminMode.textContent = activeProductId && !product?._draft ? "ກຳລັງແກ້ໄຂ" : "ສິນຄ້າໃໝ່";
   if (els.adminPlacement) els.adminPlacement.textContent = placementLabel(product);
   if (els.viewProduct) {
     const canView = Boolean(product?.name && activeProductId && !product?._draft);
@@ -616,13 +632,15 @@ function renderCategoryCoverEditor() {
   if (!els.categoryCoverForm) return;
   const collection = activeCollection();
   const cover = activeCategoryCover();
+  const coverImages = categoryCoverImages(cover);
   els.categoryCoverKey.value = collection.key;
-  els.categoryCoverValue.value = cover.image || "";
+  els.categoryCoverValue.value = JSON.stringify(coverImages);
   els.categoryCoverTitle.textContent = `ແກ້ໄຂໜ້າປົກ: ${collection.label}`;
-  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າ collection ຂອງ ${collection.label}. ຂະໜາດແນະນຳ 1920 × 520 px, ຫຼື 2400 × 650 px ສຳລັບຈໍໃຫຍ່.`;
-  els.categoryCoverPreview.classList.toggle("has-image", Boolean(cover.image));
-  els.categoryCoverPreview.innerHTML = cover.image
-    ? `<img src="${cover.image}" alt="${collection.label} cover" />`
+  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າ collection ຂອງ ${collection.label}. ອັບໄດ້ຫຼາຍຮູບ, ຖ້າມີຫຼາຍຮູບຈະເລື່ອນອັດຕະໂນມັດ. ຂະໜາດແນະນຳ 1920 × 520 px, ຫຼື 2400 × 650 px ສຳລັບຈໍໃຫຍ່.`;
+  els.categoryCoverPreview.classList.toggle("has-image", Boolean(coverImages.length));
+  els.categoryCoverPreview.classList.toggle("has-multiple", coverImages.length > 1);
+  els.categoryCoverPreview.innerHTML = coverImages.length
+    ? `<div class="admin-cover-slide-grid">${coverImages.map((image, index) => `<span><img src="${image}" alt="${collection.label} cover ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="Remove cover image">×</button></span>`).join("")}</div>`
     : `<span>${collection.label} cover preview</span>`;
 }
 
@@ -891,6 +909,19 @@ async function compactPromotionForStorage(promotion) {
   const compacted = { ...promotion, events: Array.isArray(promotion.events) ? [...promotion.events] : [] };
   compacted.coverImage = await compactExistingImage(compacted.coverImage, 760, 0.58, 130000);
   compacted.heroSlides = await Promise.all((Array.isArray(compacted.heroSlides) ? compacted.heroSlides : []).filter(Boolean).map((image) => compactExistingImage(image, 1100, 0.66, 240000)));
+  if (compacted.categoryCovers && typeof compacted.categoryCovers === "object") {
+    const categoryCovers = {};
+    for (const [key, cover] of Object.entries(compacted.categoryCovers)) {
+      const images = categoryCoverImages(cover);
+      const compactedImages = await Promise.all(images.map((image) => compactExistingImage(image, 1920, 0.76, 420000)));
+      categoryCovers[key] = {
+        ...cover,
+        image: compactedImages[0] || "",
+        images: compactedImages.filter(Boolean)
+      };
+    }
+    compacted.categoryCovers = categoryCovers;
+  }
   compacted.events = await Promise.all(compacted.events.map(async (item) => ({
     ...item,
     image: await compactExistingImage(item.image, 560, 0.54, 80000)
@@ -1146,7 +1177,7 @@ function renderBackupSummary() {
   if (els.backupProductCount) els.backupProductCount.textContent = products.length;
   if (els.backupPromoStatus) {
     const promo = loadPromotionData();
-    els.backupPromoStatus.textContent = promo.title || promo.text || promo.coverImage || promo.events.length ? "Saved" : "Not saved";
+    els.backupPromoStatus.textContent = promo.title || promo.text || promo.coverImage || promo.events.length ? "ບັນທຶກແລ້ວ" : "ຍັງບໍ່ມີ";
   }
 }
 
@@ -1466,22 +1497,50 @@ els.videoList?.addEventListener("click", (event) => {
   renderVideoList();
 });
 
-els.categoryCoverUpload?.addEventListener("change", (event) => {
-  readFileAsDataUrl(event.target.files[0], (dataUrl) => {
-    els.categoryCoverValue.value = dataUrl;
+els.categoryCoverUpload?.addEventListener("change", async (event) => {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  try {
+    const existing = parseCategoryCoverValue(els.categoryCoverValue.value);
+    const dataUrls = await Promise.all(files.map((file) => readImageAsCompressedDataUrl(file, 2400, 0.78, 520000)));
+    const images = [...existing, ...dataUrls].filter(Boolean);
+    els.categoryCoverValue.value = JSON.stringify(images);
     els.categoryCoverPreview.classList.add("has-image");
-    els.categoryCoverPreview.innerHTML = `<img src="${dataUrl}" alt="${activeCollection().label} cover" />`;
+    els.categoryCoverPreview.classList.toggle("has-multiple", images.length > 1);
+    els.categoryCoverPreview.innerHTML = `<div class="admin-cover-slide-grid">${images.map((image, index) => `<span><img src="${image}" alt="${activeCollection().label} cover ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="Remove cover image">×</button></span>`).join("")}</div>`;
+  } catch (error) {
+    showResult({
+      type: "error",
+      title: "ອັບຮູບບໍ່ສຳເລັດ",
+      message: "ຮູບປົກໃຫຍ່ເກີນໄປ ຫຼື browser ບີບອັດບໍ່ໄດ້."
+    });
+  } finally {
     event.target.value = "";
-  }, { maxSize: 2400, quality: 0.78, maxBytes: 520000 });
+  }
+});
+
+els.categoryCoverPreview?.addEventListener("click", (event) => {
+  const removeIndex = event.target.closest("[data-remove-category-cover]")?.dataset.removeCategoryCover;
+  if (removeIndex === undefined) return;
+  const images = parseCategoryCoverValue(els.categoryCoverValue.value).filter((_, index) => index !== Number(removeIndex));
+  els.categoryCoverValue.value = JSON.stringify(images);
+  els.categoryCoverPreview.classList.toggle("has-image", Boolean(images.length));
+  els.categoryCoverPreview.classList.toggle("has-multiple", images.length > 1);
+  els.categoryCoverPreview.innerHTML = images.length
+    ? `<div class="admin-cover-slide-grid">${images.map((image, index) => `<span><img src="${image}" alt="${activeCollection().label} cover ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="Remove cover image">×</button></span>`).join("")}</div>`
+    : `<span>${activeCollection().label} cover preview</span>`;
 });
 
 els.categoryCoverForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const promo = loadPromotionData();
   const categoryCovers = promo.categoryCovers && typeof promo.categoryCovers === "object" ? { ...promo.categoryCovers } : {};
+  const images = parseCategoryCoverValue(els.categoryCoverValue.value);
+  const compactedImages = await Promise.all(images.map((image) => compactExistingImage(image, 1920, 0.76, 420000)));
   categoryCovers[activeCollectionKey] = {
     label: activeCollection().label,
-    image: await compactExistingImage(els.categoryCoverValue.value, 1920, 0.76, 420000)
+    image: compactedImages[0] || "",
+    images: compactedImages.filter(Boolean)
   };
   if (savePromotionData({ ...promo, categoryCovers })) {
     renderCategoryCoverEditor();

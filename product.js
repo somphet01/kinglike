@@ -707,8 +707,24 @@ function flyToHeaderIcon(source, target) {
   dot.addEventListener("animationend", () => dot.remove(), { once: true });
 }
 
+function revealHeaderConfirmation() {
+  const header = els.header || document.querySelector("[data-header]");
+  if (!header) return;
+  window.clearTimeout(header._confirmTimer);
+  header.classList.remove("is-header-hidden", "is-action-confirming");
+  void header.offsetWidth;
+  header.classList.add("is-action-confirming");
+  header._confirmTimer = window.setTimeout(() => {
+    header.classList.remove("is-action-confirming");
+    if (window.scrollY > 12 && !header.matches(":focus-within") && !els.mobileMenu?.classList.contains("is-open")) {
+      header.classList.add("is-header-hidden");
+    }
+  }, 1450);
+}
+
 function pulseHeaderAction(type, source) {
   const target = document.querySelector(type === "wishlist" ? "[data-open-wishlist]" : "[data-open-cart]");
+  revealHeaderConfirmation();
   target?.classList.remove("is-count-bump");
   void target?.offsetWidth;
   target?.classList.add("is-count-bump");

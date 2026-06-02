@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css?v=20260601-collection-box-dark1" />
-    <link rel="stylesheet" href="site-responsive.css?v=20260601-responsive-audit12" />
-    <link rel="stylesheet" href="admin.css?v=20260529-12" />
+    <link rel="stylesheet" href="site-responsive.css?v=20260601-responsive-audit14" />
+    <link rel="stylesheet" href="admin.css?v=20260602-category-cover-slider1" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -18,8 +18,7 @@
       </a>
       <nav class="admin-nav">
         <a href="index.html#products">ເບິ່ງໜ້າຮ້ານ</a>
-        <a href="admin-orders.html">Orders</a>
-        <button class="secondary-btn" type="button" data-reset-demo>Reset demo</button>
+        <button class="secondary-btn danger-soft-btn" type="button" data-reset-demo>ລ້າງ Demo</button>
       </nav>
     </header>
 
@@ -48,7 +47,8 @@
 
       <section class="admin-tabs" aria-label="Admin sections">
         <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
-        <button type="button" data-admin-tab="promotion">Cover / Promotion</button>
+        <button type="button" data-admin-tab="backup">ສຳຮອງ</button>
+        <button type="button" data-admin-tab="help">ຄູ່ມື</button>
       </section>
 
       <section class="admin-panel is-active" data-admin-panel="products">
@@ -65,7 +65,7 @@
             <div class="admin-head-actions">
               <label class="secondary-btn mini-btn admin-file-btn">
                 ອັບຮູບປົກ
-                <input name="coverUpload" type="file" accept="image/*" data-category-cover-upload />
+                <input name="coverUpload" type="file" accept="image/*" multiple data-category-cover-upload />
               </label>
               <button class="primary-btn mini-btn" type="submit">ບັນທຶກປົກ</button>
             </div>
@@ -103,14 +103,14 @@
 
             <div class="admin-status-grid">
               <article>
-                <span>Mode</span>
-                <strong data-admin-mode>New product</strong>
+                <span>ສະຖານະ</span>
+                <strong data-admin-mode>ສິນຄ້າໃໝ່</strong>
               </article>
               <article>
-                <span>Shows on</span>
+                <span>ສະແດງຢູ່</span>
                 <strong data-admin-placement>Home / Category / Detail</strong>
               </article>
-              <a class="admin-view-product" data-view-product href="index.html#products" target="_blank" rel="noreferrer">View shop page</a>
+              <a class="admin-view-product" data-view-product href="index.html#products" target="_blank" rel="noreferrer">ເບິ່ງໜ້າສິນຄ້າ</a>
             </div>
 
             <div class="admin-hint">
@@ -452,6 +452,6 @@
     </div>
     <div class="admin-toast" data-toast></div>
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="admin.js?v=20260601-category-cover1"></script>
+    <script src="admin.js?v=20260602-category-cover-slider1"></script>
   </body>
 </html>
