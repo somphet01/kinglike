@@ -619,7 +619,7 @@ function renderCategoryCoverEditor() {
   els.categoryCoverKey.value = collection.key;
   els.categoryCoverValue.value = cover.image || "";
   els.categoryCoverTitle.textContent = `ແກ້ໄຂໜ້າປົກ: ${collection.label}`;
-  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າ collection ຂອງ ${collection.label}.`;
+  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າ collection ຂອງ ${collection.label}. ຂະໜາດແນະນຳ 1920 × 520 px, ຫຼື 2400 × 650 px ສຳລັບຈໍໃຫຍ່.`;
   els.categoryCoverPreview.classList.toggle("has-image", Boolean(cover.image));
   els.categoryCoverPreview.innerHTML = cover.image
     ? `<img src="${cover.image}" alt="${collection.label} cover" />`
@@ -1472,7 +1472,7 @@ els.categoryCoverUpload?.addEventListener("change", (event) => {
     els.categoryCoverPreview.classList.add("has-image");
     els.categoryCoverPreview.innerHTML = `<img src="${dataUrl}" alt="${activeCollection().label} cover" />`;
     event.target.value = "";
-  }, { maxSize: 1200, quality: 0.72, maxBytes: 280000 });
+  }, { maxSize: 2400, quality: 0.78, maxBytes: 520000 });
 });
 
 els.categoryCoverForm?.addEventListener("submit", async (event) => {
@@ -1481,7 +1481,7 @@ els.categoryCoverForm?.addEventListener("submit", async (event) => {
   const categoryCovers = promo.categoryCovers && typeof promo.categoryCovers === "object" ? { ...promo.categoryCovers } : {};
   categoryCovers[activeCollectionKey] = {
     label: activeCollection().label,
-    image: await compactExistingImage(els.categoryCoverValue.value, 900, 0.62, 160000)
+    image: await compactExistingImage(els.categoryCoverValue.value, 1920, 0.76, 420000)
   };
   if (savePromotionData({ ...promo, categoryCovers })) {
     renderCategoryCoverEditor();

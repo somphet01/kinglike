@@ -8,6 +8,9 @@ const MESSENGER_ID = "Kinglikesikai";
 const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
+const DEFAULT_CATEGORY_COVERS = {
+  pillows: "assets/category-cover-pillows-test.png"
+};
 
 function openLocalDb() {
   return new Promise((resolve, reject) => {
@@ -215,7 +218,8 @@ async function loadPromotionAsync() {
 
 function collectionCoverImage(key) {
   const covers = loadPromotion().categoryCovers;
-  return covers && typeof covers === "object" ? covers[key]?.image || "" : "";
+  const adminCover = covers && typeof covers === "object" ? covers[key]?.image || "" : "";
+  return DEFAULT_CATEGORY_COVERS[key] || adminCover || "";
 }
 
 function getCollectionProducts(category, type) {
@@ -465,7 +469,7 @@ function renderCollectionMeta() {
   const cover = document.querySelector("[data-collection-cover]");
   if (coverImage && cover) {
     cover.classList.add("has-admin-cover");
-    cover.style.backgroundImage = `linear-gradient(90deg, rgba(5, 5, 5, 0.72), rgba(5, 5, 5, 0.18)), url("${coverImage}")`;
+    cover.style.setProperty("background-image", `linear-gradient(90deg, rgba(5, 5, 5, 0.72), rgba(5, 5, 5, 0.18)), url("${coverImage}")`, "important");
     els.art.style.display = "none";
   }
 }
