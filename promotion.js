@@ -7,9 +7,9 @@ const MESSENGER_URL = "https://www.messenger.com/t/Kinglikesikai";
 
 const defaultPromotion = {
   badge: "HOT PROMOTION",
-  title: "à»‚àº›àº£à»‚àº¡àºŠàº±àº™àºžàº´à»€àºªàº” Kinglike",
-  text: "à»€àº¥àº·àº­àºàºŠàº¸àº”àº—àºµà»ˆàº™àº­àº™àºžàº£àºµàº¡àº½àº¡ àºžà»‰àº­àº¡àº‚àº­àº‡à»àº–àº¡ à»àº¥àº°àº¥àº²àº„àº²àºžàº´à»€àºªàº”àºà»ˆàº­àº™à»àº»àº”à»€àº§àº¥àº².",
-  button: "à»€àº¥àº·àº­àºàºŠàº·à»‰àºªàº´àº™àº„à»‰àº²",
+  title: "ໂປຣໂມຊັນພິເສດ Kinglike",
+  text: "ເລືອກຊຸດທີ່ນອນພຣີມຽມ ພ້ອມຂອງແຖມ ແລະລາຄາພິເສດກ່ອນໝົດເວລາ.",
+  button: "ເລືອກຊື້ສິນຄ້າ",
   link: "index.html#products",
   events: []
 };
@@ -82,6 +82,34 @@ function escapeHtml(value) {
   })[char]);
 }
 
+const CP1252_BYTES = { "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8A, "‹": 0x8B, "Œ": 0x8C, "Ž": 0x8E, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9A, "›": 0x9B, "œ": 0x9C, "ž": 0x9E, "Ÿ": 0x9F };
+const MOJIBAKE_RUN = /[\u0080-\u009F\u00A0-\u00FF\u0192\u20AC\u201A-\u201E\u2020-\u2026\u02C6\u2030\u0160\u2039\u0152\u017D\u2018-\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]+/g;
+
+function repairText(value) {
+  if (typeof value !== "string" || !/[àâÃðÂ\u0080-\u009F\u0192]/.test(value)) return value;
+  return value.replace(MOJIBAKE_RUN, (part) => {
+    if (!/[àâÃðÂ\u0080-\u009F\u0192]/.test(part)) return part;
+    const bytes = [];
+    for (const char of part) {
+      const code = char.charCodeAt(0);
+      if (CP1252_BYTES[char] !== undefined) bytes.push(CP1252_BYTES[char]);
+      else if (code <= 255) bytes.push(code);
+      else return part;
+    }
+    try {
+      return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+    } catch {
+      return part;
+    }
+  });
+}
+
+function repairStoredData(value) {
+  if (Array.isArray(value)) return value.map(repairStoredData);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, repairStoredData(item)]));
+  return repairText(value);
+}
+
 function openDb() {
   return new Promise((resolve, reject) => {
     if (!("indexedDB" in window)) {
@@ -129,9 +157,10 @@ async function loadPromotion() {
   const fileStore = await fetchJson("data/store.json");
   sources.push(fileStore?.promotion || null);
 
-  const promo = sources.find((item) => item && typeof item === "object") || {};
+  const promo = repairStoredData(sources.find((item) => item && typeof item === "object") || {});
+  const defaults = repairStoredData(defaultPromotion);
   return {
-    ...defaultPromotion,
+    ...defaults,
     ...promo,
     events: Array.isArray(promo.events) ? promo.events : []
   };
@@ -166,10 +195,10 @@ function countdownMarkup(item, large = false) {
   const end = getPromoEnd(item);
   return `
     <div class="promo-countdown ${large ? "promo-countdown-large" : ""}" data-promo-countdown="${end}">
-      <b data-count-days>0</b><small>àº¡àº·à»‰</small>
-      <b data-count-hours>00</b><small>àºŠàº»à»ˆàº§à»‚àº¡àº‡</small>
-      <b data-count-minutes>00</b><small>àº™àº²àº—àºµ</small>
-      <b data-count-seconds>00</b><small>àº§àº´</small>
+      <b data-count-days>0</b><small>ມື້</small>
+      <b data-count-hours>00</b><small>ຊົ່ວໂມງ</small>
+      <b data-count-minutes>00</b><small>ນາທີ</small>
+      <b data-count-seconds>00</b><small>ວິ</small>
     </div>
   `;
 }
@@ -187,7 +216,7 @@ function updateCountdowns() {
 
 function endLabel(item) {
   const date = new Date(getPromoEnd(item));
-  return `à»àº»àº”à»€àº§àº¥àº²: ${date.toLocaleDateString("lo-LA", { day: "2-digit", month: "long", year: "numeric" })} ${date.toLocaleTimeString("lo-LA", { hour: "2-digit", minute: "2-digit" })}`;
+  return `ໝົດເວລາ: ${date.toLocaleDateString("lo-LA", { day: "2-digit", month: "long", year: "numeric" })} ${date.toLocaleTimeString("lo-LA", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 function renderHero(promotion, lead) {
@@ -225,7 +254,7 @@ function renderEvents(events) {
         ${item.text ? `<p>${escapeHtml(item.text)}</p>` : ""}
         ${countdownMarkup(item)}
         <small>${escapeHtml(item.date || endLabel(item))}</small>
-        <a class="primary-btn" href="${escapeHtml(item.link || "index.html#products")}">${escapeHtml(item.button || "à»€àº¥àº·àº­àºàºŠàº·à»‰àºªàº´àº™àº„à»‰àº²")}</a>
+        <a class="primary-btn" href="${escapeHtml(item.link || "index.html#products")}">${escapeHtml(item.button || "ເລືອກຊື້ສິນຄ້າ")}</a>
       </div>
     </article>
   `).join("");
@@ -240,7 +269,7 @@ function showPopup(item) {
       </div>
       <div class="promo-popup-bottom">
         ${countdownMarkup(item)}
-        <a class="primary-btn" href="promotion.html" data-close-promo-popup>à»€àºšàº´à»ˆàº‡à»‚àº›àº£à»‚àº¡àºŠàº±àº™</a>
+        <a class="primary-btn" href="promotion.html" data-close-promo-popup>ເບິ່ງໂປຣໂມຊັນ</a>
       </div>
     </div>
   `;
@@ -272,7 +301,7 @@ function bindUi() {
     const lineTarget = event.target.closest("[data-line-contact]");
     if (lineTarget) {
       const channel = lineTarget.dataset.lineChannel;
-      const message = "àºªàº°àºšàº²àºàº”àºµ àºªàº»àº™à»ƒàºˆà»‚àº›àº£à»‚àº¡àºŠàº±àº™ Kinglike";
+      const message = "ສະບາຍດີ ສົນໃຈໂປຣໂມຊັນ Kinglike";
       const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank", "noopener");
     }

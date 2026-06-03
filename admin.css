@@ -101,7 +101,7 @@
 
 .admin-tabs button.is-active {
   background: var(--gold);
-  color: #090909;
+  color: #fff;
 }
 
 .admin-tabs button small {
@@ -389,7 +389,7 @@
 .admin-upload-grid b {
   background: var(--gold);
   border-radius: 999px;
-  color: #090909;
+  color: #fff;
   font-size: 10px;
   font-weight: 900;
   left: 8px;
@@ -1290,7 +1290,7 @@
   border-radius: 999px;
   bottom: 24px;
   box-shadow: var(--shadow);
-  color: #090909;
+  color: #fff;
   font-weight: 900;
   opacity: 0;
   padding: 12px 18px;
@@ -1702,7 +1702,7 @@
 .status-actions button.is-active {
   background: var(--gold) !important;
   border-color: var(--gold) !important;
-  color: #050607 !important;
+  color: #ffffff !important;
   box-shadow: 0 14px 34px rgba(164, 195, 45, 0.24) !important;
 }
 
@@ -1973,6 +1973,83 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
 }
 
+.admin-size-guide {
+  background: linear-gradient(180deg, #f7f8f8, #ffffff) !important;
+  border: 1px solid rgba(7, 8, 9, 0.1) !important;
+  border-radius: 14px !important;
+  color: var(--text) !important;
+  display: grid !important;
+  gap: 6px !important;
+  margin-bottom: 14px !important;
+  padding: 14px !important;
+}
+
+.admin-size-guide strong {
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+
+.admin-size-guide span {
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+.hero-slide-admin-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+}
+
+.hero-slide-admin-pair {
+  aspect-ratio: 16 / 10 !important;
+  background: #050607 !important;
+}
+
+.hero-slide-admin-pair img {
+  height: 100% !important;
+  object-fit: cover !important;
+  width: 100% !important;
+}
+
+.hero-slide-admin-pair img + img {
+  border-left: 1px solid rgba(255, 255, 255, 0.22) !important;
+  bottom: 0 !important;
+  height: 58% !important;
+  position: absolute !important;
+  right: 0 !important;
+  top: auto !important;
+  width: 34% !important;
+}
+
+.hero-slide-admin-pair em {
+  background: rgba(5, 6, 7, 0.78) !important;
+  border-radius: 999px !important;
+  bottom: 8px !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  left: 8px !important;
+  padding: 3px 7px !important;
+  position: absolute !important;
+}
+
+.admin-tabs button.is-active,
+.primary-btn,
+.admin-submit,
+.mini-btn.is-primary,
+.status-actions button.is-active,
+.admin-upload-grid b,
+.admin-toast,
+.admin-mini-actions button {
+  color: #ffffff !important;
+}
+
+.order-filters input,
+.order-filters select,
+.chat-draft-box pre {
+  color: #f4f5f6 !important;
+}
+
 @media (max-width: 1180px) {
   .admin-workspace {
     grid-template-columns: 1fr !important;
@@ -2021,7 +2098,9 @@
   }
 
   .admin-tabs {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
   }
 
   .admin-tabs button {

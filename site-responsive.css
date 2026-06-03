@@ -441,3 +441,66 @@ body > .site-header.liquid-header.is-action-confirming {
     animation: none !important;
   }
 }
+
+.whatsapp-contact,
+.line-contact.whatsapp-contact,
+.chat-channel-actions [data-chat-channel="whatsapp"] {
+  background: #25d366 !important;
+  border-color: #25d366 !important;
+  color: #ffffff !important;
+}
+
+.messenger-contact,
+.line-contact.messenger-contact,
+.chat-channel-actions [data-chat-channel="messenger"] {
+  background: #0084ff !important;
+  border-color: #0084ff !important;
+  color: #ffffff !important;
+}
+
+.whatsapp-contact .contact-icon,
+.messenger-contact .contact-icon,
+.chat-channel-actions .contact-icon {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 720px) {
+  .floating-contact-group .floating-line,
+  .floating-line,
+  .contact-channel-group .line-contact,
+  .contact-channel-group .whatsapp-contact,
+  .contact-channel-group .messenger-contact,
+  .line-contact,
+  .chat-channel-actions button {
+    font-size: 13px !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    line-height: 1 !important;
+    padding: 6px 12px !important;
+  }
+
+  .floating-contact-group .floating-line .contact-icon,
+  .floating-line .contact-icon,
+  .contact-channel-group .line-contact .contact-icon,
+  .contact-channel-group .whatsapp-contact .contact-icon,
+  .contact-channel-group .messenger-contact .contact-icon,
+  .line-contact .contact-icon,
+  .chat-channel-actions .contact-icon {
+    height: 28px !important;
+    width: 28px !important;
+  }
+
+  .floating-contact-group .floating-line .contact-icon svg,
+  .floating-line .contact-icon svg,
+  .contact-channel-group .line-contact .contact-icon svg,
+  .contact-channel-group .whatsapp-contact .contact-icon svg,
+  .contact-channel-group .messenger-contact .contact-icon svg,
+  .line-contact .contact-icon svg,
+  .chat-channel-actions .contact-icon svg {
+    height: 14px !important;
+    width: 14px !important;
+  }
+}

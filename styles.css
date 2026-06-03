@@ -9994,12 +9994,16 @@ body:not(.home-intro) .cover-carousel-hero {
   z-index: 1;
 }
 
+.hero-carousel-slide picture,
 .hero-carousel-slide img {
   display: block;
   height: 100%;
+  width: 100%;
+}
+
+.hero-carousel-slide img {
   object-fit: cover;
   object-position: var(--cover-position, center center);
-  width: 100%;
 }
 
 .hero-carousel-slide::before {
@@ -11622,6 +11626,57 @@ body > .site-header.liquid-header .icon-btn[data-open-cart] span::after,
   .product-card .add-cart::before {
     height: 19px !important;
     width: 23px !important;
+  }
+}
+
+/* Final chat brand colors and mobile sizing. */
+.whatsapp-contact,
+.line-contact.whatsapp-contact,
+.chat-channel-actions [data-chat-channel="whatsapp"] {
+  background: #25d366 !important;
+  border-color: #25d366 !important;
+  color: #ffffff !important;
+}
+
+.messenger-contact,
+.line-contact.messenger-contact,
+.chat-channel-actions [data-chat-channel="messenger"] {
+  background: #0084ff !important;
+  border-color: #0084ff !important;
+  color: #ffffff !important;
+}
+
+.whatsapp-contact .contact-icon,
+.messenger-contact .contact-icon,
+.chat-channel-actions .contact-icon {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 720px) {
+  .line-contact,
+  .chat-channel-actions button {
+    border-radius: 999px !important;
+    font-size: 13px !important;
+    gap: 6px !important;
+    min-height: 42px !important;
+    padding: 8px 13px !important;
+  }
+
+  .line-contact .contact-icon,
+  .chat-channel-actions .contact-icon {
+    height: 28px !important;
+    width: 28px !important;
+  }
+
+  .line-contact .contact-icon svg,
+  .chat-channel-actions .contact-icon svg {
+    height: 14px !important;
+    width: 14px !important;
+  }
+
+  .contact-channel-group {
+    gap: 8px !important;
   }
 }
 

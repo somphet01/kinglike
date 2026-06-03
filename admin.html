@@ -47,6 +47,7 @@
 
       <section class="admin-tabs" aria-label="Admin sections">
         <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
+        <button type="button" data-admin-tab="promotion">ໜ້າຫຼັກ</button>
         <button type="button" data-admin-tab="backup">ສຳຮອງ</button>
         <button type="button" data-admin-tab="help">ຄູ່ມື</button>
       </section>
@@ -80,7 +81,6 @@
                 <h2>ລາຍການສິນຄ້າ</h2>
               </div>
               <div class="admin-head-actions">
-                <button class="secondary-btn mini-btn" type="button" data-add-sample>+ ສິນຄ້າຕົວຢ່າງ</button>
                 <button class="primary-btn mini-btn" type="button" data-new-product>+ ເພີ່ມ</button>
               </div>
             </div>
@@ -284,14 +284,26 @@
             <div class="admin-card-head">
               <div>
                 <p class="eyebrow">HOME SLIDER</p>
-                <h2>ອັບຮູບສະໄລດ໌ໜ້າປົກ</h2>
+                <h2>ຮູບໜ້າປົກ Home</h2>
               </div>
             </div>
-            <label>
-              ຮູບໜ້າປົກຫຼາຍຮູບ
-              <input name="heroSlideUpload" type="file" accept="image/*" multiple data-hero-slide-upload />
-              <small>ອັບໄດ້ຫຼາຍຮູບ. ໜ້າຫຼັກຈະເລື່ອນອັດຕະໂນມັດ ແລະມີຈຸດໃຫ້ກົດເລື່ອນ.</small>
-            </label>
+            <div class="admin-size-guide">
+              <strong>ຈຸດທີ່ແກ້: ຮູບ cover ເທິງສຸດຂອງໜ້າ Home</strong>
+              <span>PC: 1920 × 1080 px ຫຼື 2400 × 1350 px</span>
+              <span>Mobile: 1080 × 1600 px ຫຼື 1170 × 2532 px, ແນວຕັ້ງ</span>
+            </div>
+            <div class="form-row">
+              <label>
+                ຮູບ PC / Desktop
+                <input name="heroDesktopUpload" type="file" accept="image/*" multiple data-hero-desktop-upload />
+                <small>ອັບຮູບແນວນອນ. ຖ້າອັບຫຼາຍຮູບຈະເປັນ slide 1, 2, 3...</small>
+              </label>
+              <label>
+                ຮູບ Mobile
+                <input name="heroMobileUpload" type="file" accept="image/*" multiple data-hero-mobile-upload />
+                <small>ອັບຮູບແນວຕັ້ງ. ລຳດັບຈະຈັບຄູ່ກັບຮູບ PC.</small>
+              </label>
+            </div>
             <div class="admin-upload-preview" data-hero-slide-list>Hero slides preview</div>
           </form>
 

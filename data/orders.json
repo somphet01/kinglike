@@ -1,6 +1,36 @@
 {
   "orders": [
     {
+      "id": "6ed5c1fc-1229-4f77-adbc-79a7f5ec8e98",
+      "orderCode": "KL260603QGSS",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "customerAddress": "",
+      "note": "",
+      "contactChannel": "whatsapp",
+      "productLink": "http://127.0.0.1:4173/product.html?id=gold-support&category=mattresses",
+      "chatMessage": "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike\nຊື່ສິນຄ້າ\nຈຳນວນ\nລາຄາ\nKinglike Gold Support\nຈຳນວນ: 1\nລາຄາ: 6,190,000 ກີບ\n__________________________________\nຍອດລວມ: 6,190,000 ກີບ",
+      "totalAmount": 6190000,
+      "status": "draft",
+      "paymentMethod": "chat",
+      "slip": null,
+      "adminNote": "",
+      "items": [
+        {
+          "id": "50776759-57be-49ff-a4e9-9a390c1e13e6",
+          "productId": "gold-support",
+          "productName": "Kinglike Gold Support",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 6190000,
+          "subtotal": 6190000
+        }
+      ],
+      "createdAt": "2026-06-03T01:07:15.324Z",
+      "updatedAt": "2026-06-03T01:07:15.324Z"
+    },
+    {
       "id": "42fddcc2-02c9-4bd6-b613-16238927fcf5",
       "orderCode": "KL2605276K6I",
       "customerName": "Website chat customer",
@@ -862,6 +892,15 @@
     }
   ],
   "logs": [
+    {
+      "id": "8496c068-0351-4d9c-854b-f6f39e020d5e",
+      "orderId": "6ed5c1fc-1229-4f77-adbc-79a7f5ec8e98",
+      "oldStatus": "",
+      "newStatus": "draft",
+      "changedBy": "customer",
+      "note": "Chat draft via whatsapp",
+      "createdAt": "2026-06-03T01:07:15.324Z"
+    },
     {
       "id": "393026bd-0a08-487b-8abe-fcc65c491808",
       "orderId": "42fddcc2-02c9-4bd6-b613-16238927fcf5",

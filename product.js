@@ -814,37 +814,24 @@ function buildOrderMessage(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
   const focusedOption = focusedProduct ? selectedDetailSize(focusedProduct) : null;
   const items = focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
-  const itemLines = items.map((item, index) => {
+  const orderPrice = (value) => formatKip(value).replace("₭", "ກີບ");
+  const itemLines = items.map((item) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
-    return [
-      `${index + 1}. ${item.product.name}`,
-      `   ລະຫັດສິນຄ້າ: ${item.product.sku || item.product.id || "-"}`,
-      `   ຂະໜາດ: ${item.size || productSizeOption(item.product).size}`,
-      `   ຈຳນວນ: ${item.qty}`,
-      `   ລາຄາ/ໜ່ວຍ: ${formatKip(unitPrice)}`,
-      `   ລວມ: ${formatKip(subtotal)}`
-    ].join("\n");
+    return `${item.product.name}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
-  const productLink = focusedProduct
-    ? new URL(productUrl(focusedProduct), window.location.href).toString()
-    : window.location.href;
   return [
-    "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
+    "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike",
     "",
-    "ໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ",
-    "ຮ້ານ: Kinglike Product",
+    "ຊື່ສິນຄ້າ",
+    "ຈຳນວນ",
+    "ລາຄາ",
     "",
-    "ລາຍການສິນຄ້າ:",
     itemLines.join("\n\n"),
     "",
-    `ຍອດລວມທີ່ຕ້ອງຊຳລະ: ${formatKip(total)}`,
-    "",
-    "ລິ້ງສິນຄ້າ:",
-    productLink,
-    "",
-    "ກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ."
+    "__________________________________",
+    `ຍອດລວມ: ${orderPrice(total)}`
   ].filter(Boolean).join("\n");
 }
 
@@ -973,7 +960,7 @@ function showMessengerCopyNotice(copied) {
 
 async function sendChatDraft(channel, productId = "") {
   const items = chatItems(productId);
-  const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີ ຂ້ອຍສົນໃຈສອບຖາມສິນຄ້າ Kinglike";
+  const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike";
   const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
   const chatWindow = window.open(url, "_blank");
   if (!chatWindow) window.location.href = url;

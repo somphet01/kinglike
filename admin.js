@@ -178,7 +178,6 @@ const els = {
   clearForm: document.querySelector("[data-clear-form]"),
   resetDemo: document.querySelector("[data-reset-demo]"),
   newProduct: document.querySelector("[data-new-product]"),
-  addSample: document.querySelector("[data-add-sample]"),
   search: document.querySelector("[data-admin-search]"),
   preview: document.querySelector("[data-product-preview]"),
   productImageUpload: document.querySelector("[data-product-image-upload]"),
@@ -195,7 +194,8 @@ const els = {
   promoEventImageUpload: document.querySelector("[data-promo-event-image-upload]"),
   promoEventImageValue: document.querySelector("[data-promo-event-image-value]"),
   heroSlideForm: document.querySelector("[data-hero-slide-form]"),
-  heroSlideUpload: document.querySelector("[data-hero-slide-upload]"),
+  heroDesktopUpload: document.querySelector("[data-hero-desktop-upload]"),
+  heroMobileUpload: document.querySelector("[data-hero-mobile-upload]"),
   heroSlideList: document.querySelector("[data-hero-slide-list]"),
   videoForm: document.querySelector("[data-video-form]"),
   videoUpload: document.querySelector("[data-video-upload]"),
@@ -572,6 +572,38 @@ function categoryCoverImages(cover = {}) {
   return cover.image ? [cover.image] : [];
 }
 
+function normalizeHeroSlide(slide, index = 0) {
+  if (typeof slide === "string") {
+    return {
+      id: `hero-${index + 1}`,
+      src: slide,
+      mobileSrc: "",
+      active: true
+    };
+  }
+  if (!slide || typeof slide !== "object") {
+    return {
+      id: `hero-${index + 1}`,
+      src: "",
+      mobileSrc: "",
+      active: true
+    };
+  }
+  return {
+    ...slide,
+    id: slide.id || `hero-${index + 1}`,
+    src: slide.src || slide.desktopSrc || slide.image || "",
+    mobileSrc: slide.mobileSrc || slide.mobileImage || slide.mobile || "",
+    active: slide.active !== false
+  };
+}
+
+function heroSlidesFromPromotion(promotion = loadPromotionData()) {
+  return (Array.isArray(promotion.heroSlides) ? promotion.heroSlides : [])
+    .map(normalizeHeroSlide)
+    .filter((slide) => slide.src || slide.mobileSrc);
+}
+
 function parseCategoryCoverValue(value) {
   if (!value) return [];
   try {
@@ -908,7 +940,14 @@ function compactExistingImage(dataUrl, maxSize = 620, quality = 0.58, maxBytes =
 async function compactPromotionForStorage(promotion) {
   const compacted = { ...promotion, events: Array.isArray(promotion.events) ? [...promotion.events] : [] };
   compacted.coverImage = await compactExistingImage(compacted.coverImage, 760, 0.58, 130000);
-  compacted.heroSlides = await Promise.all((Array.isArray(compacted.heroSlides) ? compacted.heroSlides : []).filter(Boolean).map((image) => compactExistingImage(image, 1100, 0.66, 240000)));
+  compacted.heroSlides = (await Promise.all((Array.isArray(compacted.heroSlides) ? compacted.heroSlides : [])
+    .map(normalizeHeroSlide)
+    .filter((slide) => slide.src || slide.mobileSrc)
+    .map(async (slide) => ({
+      ...slide,
+      src: await compactExistingImage(slide.src, 1920, 0.74, 420000),
+      mobileSrc: await compactExistingImage(slide.mobileSrc, 1600, 0.74, 360000)
+    })))).filter((slide) => slide.src || slide.mobileSrc);
   if (compacted.categoryCovers && typeof compacted.categoryCovers === "object") {
     const categoryCovers = {};
     for (const [key, cover] of Object.entries(compacted.categoryCovers)) {
@@ -1005,13 +1044,15 @@ function renderPromoPreview() {
 
 function renderHeroSlideList() {
   if (!els.heroSlideList) return;
-  const slides = Array.isArray(loadPromotionData().heroSlides) ? loadPromotionData().heroSlides.filter(Boolean) : [];
+  const slides = heroSlidesFromPromotion();
   els.heroSlideList.innerHTML = slides.length ? `
     <div class="admin-upload-grid hero-slide-admin-grid">
-      ${slides.map((image, index) => `
-        <span>
-          <img src="${image}" alt="Hero slide ${index + 1}" />
+      ${slides.map((slide, index) => `
+        <span class="hero-slide-admin-pair">
+          <img src="${slide.src || slide.mobileSrc}" alt="Hero desktop slide ${index + 1}" />
+          ${slide.mobileSrc ? `<img src="${slide.mobileSrc}" alt="Hero mobile slide ${index + 1}" />` : ""}
           <b>Slide ${index + 1}</b>
+          <em>${slide.src ? "PC ready" : "PC missing"} / ${slide.mobileSrc ? "Mobile ready" : "Mobile missing"}</em>
           <button type="button" data-remove-hero-slide="${index}" aria-label="Remove slide">×</button>
         </span>
       `).join("")}
@@ -1252,6 +1293,42 @@ function scrollToProductForm() {
   });
 }
 
+async function addHeroSlideImages(files, target) {
+  const list = [...(files || [])].filter((file) => file.type.startsWith("image/"));
+  if (!list.length) return;
+  try {
+    const options = target === "mobile"
+      ? { maxSize: 1600, quality: 0.74, maxBytes: 360000 }
+      : { maxSize: 1920, quality: 0.74, maxBytes: 420000 };
+    const dataUrls = (await Promise.all(list.map((file) => readImageAsCompressedDataUrl(file, options.maxSize, options.quality, options.maxBytes)))).filter(Boolean);
+    const promo = loadPromotionData();
+    const slides = heroSlidesFromPromotion(promo);
+
+    if (target === "mobile") {
+      dataUrls.forEach((dataUrl) => {
+        const openIndex = slides.findIndex((slide) => !slide.mobileSrc);
+        if (openIndex >= 0) slides[openIndex] = { ...slides[openIndex], mobileSrc: dataUrl };
+        else slides.push({ id: `hero-${Date.now()}-${slides.length}`, src: "", mobileSrc: dataUrl, active: true });
+      });
+    } else {
+      dataUrls.forEach((dataUrl) => {
+        slides.push({ id: `hero-${Date.now()}-${slides.length}`, src: dataUrl, mobileSrc: "", active: true });
+      });
+    }
+
+    const compactedPromo = await compactPromotionForStorage({ ...promo, heroSlides: slides });
+    savePromotionData(compactedPromo);
+    renderHeroSlideList();
+    showToast(target === "mobile" ? "ອັບຮູບ Mobile cover ແລ້ວ" : "ອັບຮູບ PC cover ແລ້ວ");
+  } catch (error) {
+    showResult({
+      type: "error",
+      title: "ອັບຮູບບໍ່ສຳເລັດ",
+      message: "ຮູບໃຫຍ່ເກີນໄປ ຫຼື browser ບີບອັດບໍ່ໄດ້."
+    });
+  }
+}
+
 els.tabs.forEach((tab) => tab.addEventListener("click", () => setTab(tab.dataset.adminTab)));
 els.categoryTabs?.addEventListener("click", (event) => {
   const key = event.target.closest("[data-admin-category]")?.dataset.adminCategory;
@@ -1267,16 +1344,6 @@ els.categoryTabs?.addEventListener("click", (event) => {
 els.search.addEventListener("input", renderProducts);
 els.clearForm.addEventListener("click", clearForm);
 els.newProduct.addEventListener("click", addBlankProductDraft);
-els.addSample.addEventListener("click", () => {
-  const collection = activeCollection();
-  const sample = productSeed(`sample-${collection.key}-${Date.now()}`, collection.sample, collection.category, "ນຸ່ມແນ່ນ", "12 ນິ້ວ", 7500000, 4990000, "Sample");
-  products.unshift(sample);
-  activeProductId = sample.id;
-  saveProducts();
-  renderProducts();
-  fillForm(sample);
-  showToast("ເພີ່ມສິນຄ້າຕົວຢ່າງແລ້ວ");
-});
 
 els.form.addEventListener("input", renderPreview);
 
@@ -1308,22 +1375,21 @@ els.promoEventImageUpload?.addEventListener("change", (event) => {
   }, { maxSize: 820, quality: 0.7, maxBytes: 180000 });
 });
 
-els.heroSlideUpload?.addEventListener("change", (event) => {
-  readFilesAsDataUrls(event.target.files, async (dataUrls) => {
-    const promo = loadPromotionData();
-    const slides = Array.isArray(promo.heroSlides) ? promo.heroSlides.filter(Boolean) : [];
-    const compactedPromo = await compactPromotionForStorage({ ...promo, heroSlides: [...slides, ...dataUrls] });
-    savePromotionData(compactedPromo);
-    renderHeroSlideList();
-    event.target.value = "";
-  });
+els.heroDesktopUpload?.addEventListener("change", async (event) => {
+  await addHeroSlideImages(event.target.files, "desktop");
+  event.target.value = "";
+});
+
+els.heroMobileUpload?.addEventListener("change", async (event) => {
+  await addHeroSlideImages(event.target.files, "mobile");
+  event.target.value = "";
 });
 
 els.heroSlideList?.addEventListener("click", (event) => {
   const removeIndex = event.target.closest("[data-remove-hero-slide]")?.dataset.removeHeroSlide;
   if (removeIndex === undefined) return;
   const promo = loadPromotionData();
-  const slides = Array.isArray(promo.heroSlides) ? [...promo.heroSlides] : [];
+  const slides = heroSlidesFromPromotion(promo);
   slides.splice(Number(removeIndex), 1);
   savePromotionData({ ...promo, heroSlides: slides });
   renderHeroSlideList();

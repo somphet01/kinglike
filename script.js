@@ -655,8 +655,31 @@ function renderPromotionData(promotion) {
   updatePromoCountdowns();
 }
 
+function normalizeHeroSlideData(slide, index = 0) {
+  const fallback = HERO_COVER_SLIDES[index % HERO_COVER_SLIDES.length] || HERO_COVER_SLIDES[0];
+  if (typeof slide === "string") {
+    return {
+      ...fallback,
+      src: slide,
+      mobileSrc: "",
+      active: true
+    };
+  }
+  if (!slide || typeof slide !== "object") return fallback;
+  return {
+    ...fallback,
+    ...slide,
+    src: slide.src || slide.desktopSrc || slide.image || slide.mobileSrc || fallback.src,
+    mobileSrc: slide.mobileSrc || slide.mobileImage || slide.mobile || "",
+    active: slide.active !== false
+  };
+}
+
 function heroSlideSources(promotion, activeEvents = []) {
-  return HERO_COVER_SLIDES;
+  const adminSlides = (Array.isArray(promotion?.heroSlides) ? promotion.heroSlides : [])
+    .map(normalizeHeroSlideData)
+    .filter((slide) => slide.active !== false && (slide.src || slide.mobileSrc));
+  return adminSlides.length ? adminSlides : HERO_COVER_SLIDES;
 }
 
 function setHeroSlide(index) {
@@ -705,8 +728,11 @@ function renderHeroCarousel(promotion, activeEvents = []) {
   if (!els.heroTrack || !els.heroDots) return;
   const slides = heroSlideSources(promotion, activeEvents);
   els.heroTrack.innerHTML = slides.map((slide, index) => `
-    <article class="hero-carousel-slide ${index === 0 ? "is-active" : ""}" style="--cover-image: url('${slide.src}'); --cover-position: ${slide.desktopPosition || "center center"}; --cover-mobile-position: ${slide.mobilePosition || slide.desktopPosition || "center center"};">
-      <img src="${slide.src}" alt="Kinglike cover ${index + 1}" />
+    <article class="hero-carousel-slide ${index === 0 ? "is-active" : ""}" style="--cover-image: url('${slide.src || slide.mobileSrc}'); --cover-position: ${slide.desktopPosition || "center center"}; --cover-mobile-position: ${slide.mobilePosition || slide.desktopPosition || "center center"};">
+      <picture>
+        <source media="(max-width: 720px)" srcset="${slide.mobileSrc || slide.src}" />
+        <img src="${slide.src || slide.mobileSrc}" alt="Kinglike cover ${index + 1}" />
+      </picture>
       <div class="hero-cover-copy">
         <p>${slide.eyebrow}</p>
         <h1><span>${slide.titleLight}</span><strong>${slide.titleStrong}</strong></h1>
@@ -1119,37 +1145,24 @@ function buildOrderMessage(productId = "") {
   const focusedProduct = products.find((product) => product.id === productId);
   const focusedOption = focusedProduct ? selectedDetailSize(focusedProduct) : null;
   const items = focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.productDetail) }] : cartItemsWithProducts();
-  const itemLines = items.map((item, index) => {
+  const orderPrice = (value) => formatKip(value).replace("₭", "ກີບ");
+  const itemLines = items.map((item) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
-    return [
-      `${index + 1}. ${item.product.name}`,
-      `   ລະຫັດສິນຄ້າ: ${item.product.sku || item.product.id || "-"}`,
-      `   ຂະໜາດ: ${item.size || productSizeOption(item.product).size}`,
-      `   ຈຳນວນ: ${item.qty}`,
-      `   ລາຄາ/ໜ່ວຍ: ${formatKip(unitPrice)}`,
-      `   ລວມ: ${formatKip(subtotal)}`
-    ].join("\n");
+    return `${item.product.name}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
-  const productLink = focusedProduct
-    ? new URL(`product.html?id=${encodeURIComponent(focusedProduct.id)}&category=${encodeURIComponent(productCollectionKey(focusedProduct))}`, window.location.href).toString()
-    : window.location.href;
   return [
-    "ສະບາຍດີ ຂ້ອຍສົນໃຈສັ່ງຊື້ສິນຄ້າ Kinglike",
+    "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike",
     "",
-    "ໃບແຈ້ງລາຄາ / ໃບຈອງສິນຄ້າ",
-    "ຮ້ານ: Kinglike Product",
+    "ຊື່ສິນຄ້າ",
+    "ຈຳນວນ",
+    "ລາຄາ",
     "",
-    "ລາຍການສິນຄ້າ:",
     itemLines.join("\n\n"),
     "",
-    `ຍອດລວມທີ່ຕ້ອງຊຳລະ: ${formatKip(total)}`,
-    "",
-    "ລິ້ງສິນຄ້າ:",
-    productLink,
-    "",
-    "ກະລຸນາຢືນຢັນສິນຄ້າ, ຂະໜາດ, ຈຳນວນ ແລະ ທີ່ຢູ່ຈັດສົ່ງ. ແອດມິນຈະແຈ້ງຄ່າຈັດສົ່ງ ແລະ ຂັ້ນຕອນຊຳລະເງິນອີກຄັ້ງ."
+    "__________________________________",
+    `ຍອດລວມ: ${orderPrice(total)}`
   ].filter(Boolean).join("\n");
 }
 
@@ -1258,7 +1271,7 @@ function showMessengerCopyNotice(copied) {
 
 async function sendChatDraft(channel, productId = "") {
   const items = chatItems(productId);
-  const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີ ຂ້ອຍສົນໃຈສອບຖາມສິນຄ້າ Kinglike";
+  const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike";
   const url = channel === "messenger"
     ? MESSENGER_URL
     : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
