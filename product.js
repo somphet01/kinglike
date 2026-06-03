@@ -7,6 +7,24 @@ const MESSENGER_ID = "Kinglikesikai";
 const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
+const BED_COLOR_PALETTE = [
+  ["fabric-01", "01 Cream", "#f4ead2"], ["fabric-02", "02 Ivory", "#fff3cf"],
+  ["fabric-03", "03 Sand", "#d9c89a"], ["fabric-04", "04 Wheat", "#c7ae72"],
+  ["fabric-05", "05 Honey", "#d6a85a"], ["fabric-06", "06 Camel", "#b98a55"],
+  ["fabric-07", "07 Taupe", "#a98d70"], ["fabric-08", "08 Mocha", "#7a5d45"],
+  ["fabric-09", "09 Walnut", "#5b4134"], ["fabric-10", "10 Chocolate", "#3f2b24"],
+  ["fabric-11", "11 Charcoal", "#252b2d"], ["fabric-12", "12 Navy", "#182837"],
+  ["fabric-13", "13 Slate", "#3f4a4a"], ["fabric-14", "14 Smoke", "#686f67"],
+  ["fabric-15", "15 Olive", "#7f8a62"], ["fabric-16", "16 Lime", "#9ac13f"],
+  ["fabric-17", "17 Sage", "#b6bd93"], ["fabric-18", "18 Khaki", "#b2a77c"],
+  ["fabric-19", "19 Beige", "#d4c19a"], ["fabric-20", "20 Champagne", "#e4d6b3"],
+  ["fabric-21", "21 Gold", "#d4ad55"], ["fabric-22", "22 Mustard", "#c99738"],
+  ["fabric-23", "23 Orange", "#d77b35"], ["fabric-24", "24 Terracotta", "#a95b3e"],
+  ["fabric-25", "25 Brick", "#8f4638"], ["fabric-26", "26 Coral", "#d95e5f"],
+  ["fabric-27", "27 Rose", "#c9495b"], ["fabric-28", "28 Wine", "#7d3446"],
+  ["fabric-29", "29 Plum", "#5a4159"], ["fabric-30", "30 Mauve", "#8b6678"],
+  ["fabric-31", "31 Gray Beige", "#a5a093"], ["fabric-32", "32 Linen Gray", "#c8c7b8"]
+].map(([id, name, hex]) => ({ id, name, hex, available: true }));
 
 function openLocalDb() {
   return new Promise((resolve, reject) => {
@@ -240,6 +258,36 @@ function collectionFromAdminProduct(product) {
   return "mattresses";
 }
 
+function isBedProduct(product) {
+  return collectionFromAdminProduct(product) === "beds";
+}
+
+function bedColorOptions(product) {
+  const saved = new Map((Array.isArray(product?.bedColors) ? product.bedColors : []).map((item) => [item?.id, item]));
+  return BED_COLOR_PALETTE.map((color) => {
+    const current = saved.get(color.id) || {};
+    return {
+      ...color,
+      name: current.name || color.name,
+      hex: current.hex || color.hex,
+      available: current.available !== false
+    };
+  });
+}
+
+function selectedDetailColor(product) {
+  if (!isBedProduct(product)) return null;
+  const options = bedColorOptions(product);
+  const selectedId = els.page?.querySelector("[data-bed-color].is-active")?.dataset.bedColor || "";
+  return options.find((color) => color.id === selectedId && color.available) || options.find((color) => color.available) || null;
+}
+
+function colorNameForCartItem(item, product) {
+  if (item?.colorName) return item.colorName;
+  const color = bedColorOptions(product).find((option) => option.id === item?.color);
+  return color?.name || "";
+}
+
 function getProductList(category) {
   const base = collectionProducts[category] || collectionProducts.pillows;
   const adminProducts = loadAdminProducts().filter((item) => collectionFromAdminProduct(item) === category);
@@ -399,8 +447,8 @@ function productSavingLabel(product) {
   return `ປະຢັດສູງສຸດ ${formatKip(maxSaving)}${discount ? ` • ${discount}%` : ""}`;
 }
 
-function cartKey(id, size = "") {
-  return `${id}__${size || ""}`;
+function cartKey(id, size = "", color = "") {
+  return `${id}__${size || ""}__${color || ""}`;
 }
 
 function detailBenefitIcon(type) {
@@ -456,6 +504,8 @@ function renderProduct() {
   const gallery = galleryItems(currentProduct);
   const heroImage = gallery[0]?.image || "";
   const imageClass = heroImage ? "has-admin-image" : "";
+  const bedColors = isBedProduct(currentProduct) ? bedColorOptions(currentProduct) : [];
+  const firstBedColor = bedColors.find((color) => color.available);
   els.page.innerHTML = `
     <div class="detail-layout">
       <div class="detail-gallery">
@@ -498,6 +548,15 @@ function renderProduct() {
           <label>ເລືອກຂະໜາດ</label>
           <div class="size-options">${productSizeOptions(currentProduct).map((option, index) => `<button class="${index === 0 ? "is-active" : ""}" type="button" data-size-option="${option.size}" data-size-sale="${option.salePrice}" data-size-regular="${option.regularPrice}">${option.size}</button>`).join("")}</div>
         </div>
+        ${bedColors.length ? `
+          <div class="option-group bed-color-group">
+            <label>ເລືອກສີຜ້າ</label>
+            <div class="bed-color-options">
+              ${bedColors.map((color) => `<button class="bed-color-swatch ${firstBedColor?.id === color.id ? "is-active" : ""}" type="button" data-bed-color="${color.id}" data-bed-color-name="${color.name}" style="--swatch:${color.hex}" ${color.available ? "" : "disabled"} aria-label="${color.name}${color.available ? "" : " sold out"}"><span></span></button>`).join("")}
+            </div>
+            <small class="bed-color-selected" data-selected-bed-color>${firstBedColor ? firstBedColor.name : "ສີທີ່ເລືອກໝົດຊົ່ວຄາວ"}</small>
+          </div>
+        ` : ""}
         <div class="option-group">
           <label>ຈຳນວນ</label>
           <div class="qty-control">
@@ -731,14 +790,16 @@ function pulseHeaderAction(type, source) {
   flyToHeaderIcon(source, target);
 }
 
-function addToCart(idToAdd, size = "", qty = 1, source) {
+function addToCart(idToAdd, size = "", qty = 1, source, colorId = "") {
   const product = allProducts.find((candidate) => candidate.id === idToAdd);
   if (!product) return;
   const option = productSizeOption(product, size);
-  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === cartKey(idToAdd, option.size));
+  const color = isBedProduct(product) ? (bedColorOptions(product).find((item) => item.id === colorId && item.available) || bedColorOptions(product).find((item) => item.available)) : null;
+  if (isBedProduct(product) && !color) return;
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size, cartItem.color) === cartKey(idToAdd, option.size, color?.id || ""));
   const quantity = Math.max(1, Number(qty || 1));
   if (item) item.qty += quantity;
-  else state.cart.push({ id: idToAdd, size: option.size, unitPrice: option.salePrice, qty: quantity });
+  else state.cart.push({ id: idToAdd, size: option.size, color: color?.id || "", colorName: color?.name || "", unitPrice: option.salePrice, qty: quantity });
   saveCart();
   renderCart();
   pulseHeaderAction("cart", source);
@@ -754,16 +815,16 @@ function renderCart() {
       <div class="drawer-item cart-line">
         <div class="cart-line-info">
           <strong>${item.product.name}</strong>
-          <div class="meta">${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)}</div>
+          <div class="meta">${[item.size || productSizeOption(item.product).size, colorNameForCartItem(item, item.product), formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)].filter(Boolean).join(" • ")}</div>
           <div class="cart-qty">
-            <button type="button" data-cart-decrease="${cartKey(item.product.id, item.size)}">−</button>
+            <button type="button" data-cart-decrease="${cartKey(item.product.id, item.size, item.color)}">−</button>
             <span>${item.qty}</span>
-            <button type="button" data-cart-increase="${cartKey(item.product.id, item.size)}">＋</button>
+            <button type="button" data-cart-increase="${cartKey(item.product.id, item.size, item.color)}">＋</button>
           </div>
         </div>
         <div class="cart-line-side">
           <strong>${formatKip((item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty)}</strong>
-          <button type="button" data-remove-cart="${cartKey(item.product.id, item.size)}">×</button>
+          <button type="button" data-remove-cart="${cartKey(item.product.id, item.size, item.color)}">×</button>
         </div>
       </div>
     `).join("")
@@ -774,13 +835,13 @@ function renderCart() {
 }
 
 function removeFromCart(key) {
-  state.cart = state.cart.filter((item) => cartKey(item.id, item.size) !== key);
+  state.cart = state.cart.filter((item) => cartKey(item.id, item.size, item.color) !== key);
   saveCart();
   renderCart();
 }
 
 function updateCartQty(key, delta) {
-  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === key);
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size, cartItem.color) === key);
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) {
@@ -805,7 +866,7 @@ function cartItemsWithProducts() {
       const product = allProducts.find((candidate) => candidate.id === item.id);
       if (!product) return null;
       const option = productSizeOption(product, item.size);
-      return { ...item, size: item.size || option.size, unitPrice: item.unitPrice || option.salePrice, product };
+      return { ...item, size: item.size || option.size, colorName: colorNameForCartItem(item, product), unitPrice: item.unitPrice || option.salePrice, product };
     })
     .filter(Boolean);
 }
@@ -813,12 +874,13 @@ function cartItemsWithProducts() {
 function buildOrderMessage(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
   const focusedOption = focusedProduct ? selectedDetailSize(focusedProduct) : null;
-  const items = focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
+  const focusedColor = focusedProduct ? selectedDetailColor(focusedProduct) : null;
+  const items = focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, color: focusedColor?.id || "", colorName: focusedColor?.name || "", unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
   const orderPrice = (value) => formatKip(value).replace("₭", "ກີບ");
   const itemLines = items.map((item) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
-    return `${item.product.name}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
+    return `${item.product.name}${item.colorName ? `\nສີ: ${item.colorName}` : ""}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   return [
@@ -838,7 +900,8 @@ function buildOrderMessage(productId = "") {
 function chatItems(productId = "") {
   const focusedProduct = allProducts.find((product) => product.id === productId);
   const option = focusedProduct ? selectedDetailSize(focusedProduct) : null;
-  return focusedProduct ? [{ product: focusedProduct, size: option.size, unitPrice: option.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
+  const color = focusedProduct ? selectedDetailColor(focusedProduct) : null;
+  return focusedProduct ? [{ product: focusedProduct, size: option.size, color: color?.id || "", colorName: color?.name || "", unitPrice: option.salePrice, qty: selectedDetailQty(els.page) }] : cartItemsWithProducts();
 }
 
 function selectedDetailSize(product) {
@@ -924,7 +987,7 @@ function openChatOrder(productId = "") {
   const modal = ensureChatModal();
   modal.dataset.productId = productId;
   modal.querySelector("[data-chat-summary]").innerHTML = items.map((item) => `
-    <div><strong>${item.product.name}</strong><span>${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)} x ${item.qty}</span></div>
+    <div><strong>${item.product.name}</strong><span>${[item.size || productSizeOption(item.product).size, item.colorName, formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)].filter(Boolean).join(" • ")} x ${item.qty}</span></div>
   `).join("");
   modal.classList.add("is-open");
 }
@@ -983,6 +1046,7 @@ async function sendChatDraft(channel, productId = "") {
           productId: item.product.id,
           productName: item.product.name,
           size: item.size || productSizeOption(item.product).size,
+          color: item.colorName || "",
           quantity: item.qty,
           unitPrice: item.unitPrice || productSizeOption(item.product, item.size).salePrice
         }))
@@ -1052,8 +1116,13 @@ document.addEventListener("click", (event) => {
   if (addId) {
     const product = allProducts.find((candidate) => candidate.id === addId);
     const isDetailAdd = Boolean(addButton.closest(".detail-buybox"));
+    if (product && isBedProduct(product) && !isDetailAdd) {
+      navigateToProductPage(product);
+      return;
+    }
     const selected = product && isDetailAdd ? selectedDetailSize(product).size : "";
-    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.page) : 1, addButton);
+    const selectedColor = product && isDetailAdd ? selectedDetailColor(product) : null;
+    addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.page) : 1, addButton, selectedColor?.id || "");
     return;
   }
   if (relatedDetailId) {
@@ -1105,6 +1174,13 @@ document.addEventListener("click", (event) => {
     const regularTarget = panel?.querySelector("[data-detail-regular-price]");
     if (saleTarget) saleTarget.textContent = formatKip(sizeButton.dataset.sizeSale);
     if (regularTarget) regularTarget.textContent = formatKip(sizeButton.dataset.sizeRegular);
+  }
+  const colorButton = event.target.closest("[data-bed-color]");
+  if (colorButton && !colorButton.disabled) {
+    const group = colorButton.closest(".bed-color-options");
+    group?.querySelectorAll("[data-bed-color]").forEach((button) => button.classList.toggle("is-active", button === colorButton));
+    const label = colorButton.closest(".bed-color-group")?.querySelector("[data-selected-bed-color]");
+    if (label) label.textContent = colorButton.dataset.bedColorName || "";
   }
 });
 

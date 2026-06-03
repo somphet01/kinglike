@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css?v=20260601-collection-box-dark1" />
     <link rel="stylesheet" href="site-responsive.css?v=20260601-responsive-audit14" />
-    <link rel="stylesheet" href="admin.css?v=20260602-category-cover-slider1" />
+    <link rel="stylesheet" href="admin.css?v=20260603-bed-colors1" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -100,6 +100,7 @@
             <input type="hidden" name="id" />
             <input type="hidden" name="image" data-product-image-value />
             <input type="hidden" name="images" data-product-images-value />
+            <input type="hidden" name="bedColors" data-bed-color-value />
 
             <div class="admin-status-grid">
               <article>
@@ -162,10 +163,15 @@
               <label>
                 ຄວາມນຸ່ມ
                 <select name="firmness">
-                  <option>ນຸ່ມ</option>
-                  <option>ນຸ່ມແນ່ນ</option>
-                  <option>ແນ່ນ</option>
+                  <option>ນຸ້ມສະບາຍ</option>
+                  <option>ນຸ້ມພໍດີ</option>
+                  <option>ນຸ້ມແຫນ້ນ</option>
+                  <option>ສົມດຸ່ນລົງໂຕ</option>
+                  <option>ແຫນ້ນ ສະບາຍ</option>
+                  <option>ແຫນ້ນ</option>
+                  <option>ແຫນ້ນພິເສດ</option>
                 </select>
+                <small>ໃຊ້ສຳລັບສິນຄ້າກຸ່ມທີ່ນອນເທົ່ານັ້ນ.</small>
               </label>
             </div>
 
@@ -213,6 +219,17 @@
                 <input name="stock" placeholder="ມີສິນຄ້າ" />
               </label>
             </div>
+
+            <section class="admin-bed-colors" data-bed-color-admin>
+              <div class="admin-bed-color-head">
+                <div>
+                  <strong>Bed fabric colors</strong>
+                  <small>For Bed products only. Tap a color to mark available or sold out.</small>
+                </div>
+                <span data-bed-color-count>32 colors</span>
+              </div>
+              <div class="admin-bed-color-grid" data-bed-color-grid></div>
+            </section>
 
             <label>
               Warranty
@@ -464,6 +481,6 @@
     </div>
     <div class="admin-toast" data-toast></div>
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="admin.js?v=20260602-category-cover-slider1"></script>
+    <script src="admin.js?v=20260603-bed-colors1"></script>
   </body>
 </html>

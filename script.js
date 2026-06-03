@@ -486,8 +486,12 @@ function productSavingLabel(product) {
   return `ປະຢັດສູງສຸດ ${formatKip(maxSaving)}${discount ? ` • ${discount}%` : ""}`;
 }
 
-function cartKey(id, size = "") {
-  return `${id}__${size || ""}`;
+function cartKey(id, size = "", color = "") {
+  return `${id}__${size || ""}__${color || ""}`;
+}
+
+function cartMetaLabel(item, product) {
+  return [item.size || productSizeOption(product).size, item.colorName || "", formatKip(item.unitPrice || productSizeOption(product, item.size).salePrice)].filter(Boolean).join(" • ");
 }
 
 function productMaterials(product) {
@@ -1029,7 +1033,7 @@ function addToCart(id, size = "", qty = 1, source) {
   const product = products.find((candidate) => candidate.id === id);
   if (!product) return;
   const option = productSizeOption(product, size);
-  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === cartKey(id, option.size));
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size, cartItem.color) === cartKey(id, option.size, ""));
   const quantity = Math.max(1, Number(qty || 1));
   if (item) item.qty += quantity;
   else state.cart.push({ id, size: option.size, unitPrice: option.salePrice, qty: quantity });
@@ -1057,6 +1061,10 @@ function productCollectionKey(product) {
   return "mattresses";
 }
 
+function isBedProduct(product) {
+  return productCollectionKey(product) === "beds";
+}
+
 function openProductDetail(id) {
   const product = products.find((candidate) => candidate.id === id);
   if (!product) return;
@@ -1064,13 +1072,13 @@ function openProductDetail(id) {
 }
 
 function removeFromCart(key) {
-  state.cart = state.cart.filter((item) => cartKey(item.id, item.size) !== key);
+  state.cart = state.cart.filter((item) => cartKey(item.id, item.size, item.color) !== key);
   saveCart();
   renderCart();
 }
 
 function updateCartQty(key, delta) {
-  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size) === key);
+  const item = state.cart.find((cartItem) => cartKey(cartItem.id, cartItem.size, cartItem.color) === key);
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) {
@@ -1093,16 +1101,16 @@ function renderCart() {
           <div class="drawer-item cart-line">
             <div class="cart-line-info">
               <strong>${product.name}</strong>
-              <div class="meta">${item.size || productSizeOption(product).size} • ${formatKip(item.unitPrice || productSizeOption(product, item.size).salePrice)}</div>
+              <div class="meta">${cartMetaLabel(item, product)}</div>
               <div class="cart-qty">
-                <button type="button" data-cart-decrease="${cartKey(product.id, item.size)}">−</button>
+                <button type="button" data-cart-decrease="${cartKey(product.id, item.size, item.color)}">−</button>
                 <span>${item.qty}</span>
-                <button type="button" data-cart-increase="${cartKey(product.id, item.size)}">＋</button>
+                <button type="button" data-cart-increase="${cartKey(product.id, item.size, item.color)}">＋</button>
               </div>
             </div>
             <div class="cart-line-side">
               <strong>${formatKip((item.unitPrice || productSizeOption(product, item.size).salePrice) * item.qty)}</strong>
-              <button type="button" data-remove-cart="${cartKey(product.id, item.size)}">×</button>
+              <button type="button" data-remove-cart="${cartKey(product.id, item.size, item.color)}">×</button>
             </div>
           </div>
         `;
@@ -1136,7 +1144,7 @@ function cartItemsWithProducts() {
       const product = products.find((candidate) => candidate.id === item.id);
       if (!product) return null;
       const option = productSizeOption(product, item.size);
-      return { ...item, size: item.size || option.size, unitPrice: item.unitPrice || option.salePrice, product };
+      return { ...item, size: item.size || option.size, colorName: item.colorName || "", unitPrice: item.unitPrice || option.salePrice, product };
     })
     .filter(Boolean);
 }
@@ -1149,7 +1157,7 @@ function buildOrderMessage(productId = "") {
   const itemLines = items.map((item) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
-    return `${item.product.name}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
+    return `${item.product.name}${item.colorName ? `\nສີ: ${item.colorName}` : ""}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   return [
@@ -1235,7 +1243,7 @@ function openChatOrder(productId = "") {
   const modal = ensureChatModal();
   modal.dataset.productId = productId;
   modal.querySelector("[data-chat-summary]").innerHTML = items.map((item) => `
-    <div><strong>${item.product.name}</strong><span>${item.size || productSizeOption(item.product).size} • ${formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)} x ${item.qty}</span></div>
+    <div><strong>${item.product.name}</strong><span>${[item.size || productSizeOption(item.product).size, item.colorName, formatKip(item.unitPrice || productSizeOption(item.product, item.size).salePrice)].filter(Boolean).join(" • ")} x ${item.qty}</span></div>
   `).join("");
   modal.classList.add("is-open");
 }
@@ -1292,6 +1300,7 @@ async function sendChatDraft(channel, productId = "") {
       productId: item.product.id,
       productName: item.product.name,
       size: item.size || productSizeOption(item.product).size,
+      color: item.colorName || "",
       quantity: item.qty,
       unitPrice: item.unitPrice || productSizeOption(item.product, item.size).salePrice
     }))
@@ -1378,6 +1387,10 @@ document.addEventListener("click", (event) => {
   if (addId) {
     const product = products.find((candidate) => candidate.id === addId);
     const isDetailAdd = Boolean(addButton.closest(".detail-buybox"));
+    if (product && isBedProduct(product)) {
+      openProductDetail(addId);
+      return;
+    }
     const selected = product && isDetailAdd ? selectedDetailSize(product).size : "";
     addToCart(addId, selected, isDetailAdd ? selectedDetailQty(els.productDetail) : 1, addButton);
     return;

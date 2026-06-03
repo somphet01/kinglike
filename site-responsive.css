@@ -504,3 +504,67 @@ body > .site-header.liquid-header.is-action-confirming {
     width: 14px !important;
   }
 }
+
+/* Liquid glass chat pills: keep brand identity without flat solid buttons. */
+.floating-contact-group .floating-line {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.38)),
+    radial-gradient(circle at 22% 12%, rgba(255, 255, 255, 0.96), transparent 34%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.68) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -16px 28px rgba(255, 255, 255, 0.14),
+    0 12px 28px rgba(8, 12, 28, 0.2) !important;
+  color: #08090b !important;
+  position: relative !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7) !important;
+  backdrop-filter: blur(22px) saturate(1.7) !important;
+}
+
+.floating-contact-group .floating-line::before {
+  border-radius: inherit;
+  content: "" !important;
+  inset: 1px !important;
+  opacity: 0.24 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  z-index: 0 !important;
+}
+
+.floating-contact-group .floating-line > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.floating-contact-group .whatsapp-contact::before {
+  background: linear-gradient(90deg, rgba(37, 211, 102, 0.62), transparent 58%) !important;
+}
+
+.floating-contact-group .messenger-contact::before {
+  background: linear-gradient(90deg, rgba(0, 132, 255, 0.58), transparent 58%) !important;
+}
+
+.floating-contact-group .floating-line .contact-icon {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.38)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 6px 14px rgba(8, 12, 28, 0.12) !important;
+}
+
+.floating-contact-group .whatsapp-contact .contact-icon {
+  color: #0a8f4d !important;
+}
+
+.floating-contact-group .messenger-contact .contact-icon {
+  color: #1f6fff !important;
+}
+
+.floating-contact-group .floating-line:hover {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5)),
+    radial-gradient(circle at 22% 12%, rgba(255, 255, 255, 1), transparent 34%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 16px 34px rgba(8, 12, 28, 0.24) !important;
+}

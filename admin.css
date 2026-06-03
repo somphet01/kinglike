@@ -1939,6 +1939,133 @@
   color: #6b6c73 !important;
 }
 
+.admin-bed-colors {
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(7, 8, 9, 0.1);
+  border-radius: 18px;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.admin-bed-colors.is-disabled {
+  opacity: 0.58;
+}
+
+.admin-bed-color-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.admin-bed-color-head strong {
+  color: #060708;
+  display: block;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.admin-bed-color-head small {
+  color: #5f666d;
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-bed-color-head span {
+  background: #101214;
+  border-radius: 999px;
+  color: #dfff5f;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 8px 11px;
+  white-space: nowrap;
+}
+
+.admin-bed-color-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+}
+
+.admin-bed-color-toggle {
+  align-items: center;
+  background: #fff !important;
+  border: 1px solid rgba(7, 8, 9, 0.12) !important;
+  border-radius: 13px;
+  color: #111;
+  cursor: pointer;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 30px 1fr;
+  min-height: 58px;
+  padding: 9px;
+  text-align: left;
+}
+
+.admin-bed-color-toggle .admin-bed-swatch {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.16)), var(--swatch);
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  grid-row: span 2;
+  height: 30px;
+  width: 30px;
+}
+
+.admin-bed-color-toggle strong {
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.admin-bed-color-toggle small {
+  color: #667069;
+  font-size: 11px;
+}
+
+.admin-bed-color-toggle.is-sold-out {
+  background: #f1f2f2 !important;
+  color: #777;
+}
+
+.admin-bed-color-toggle.is-sold-out .admin-bed-swatch {
+  filter: grayscale(0.92);
+  opacity: 0.42;
+}
+
+.admin-bed-color-toggle.is-sold-out small {
+  color: #b32626;
+}
+
+.admin-bed-color-toggle:focus-visible {
+  outline: 3px solid rgba(223, 255, 95, 0.9);
+  outline-offset: 2px;
+}
+
+.bed-color-mini-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 2px;
+}
+
+.bed-color-mini-row span {
+  background: var(--swatch);
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 999px;
+  height: 16px;
+  width: 16px;
+}
+
+.admin-card label.is-disabled {
+  opacity: 0.58 !important;
+}
+
+.admin-card label.is-disabled select {
+  cursor: not-allowed !important;
+}
+
 .admin-submit {
   bottom: 14px !important;
   min-height: 52px !important;

@@ -13,6 +13,40 @@ const ADMIN_COLLECTIONS = [
   { key: "beds", label: "ຕຽງນອນ", category: "Bed", sample: "Kinglike Luxury Bed" },
   { key: "toppers", label: "ທັອບເປີ", category: "Topper", sample: "Kinglike Comfort Topper" }
 ];
+const BED_COLOR_PALETTE = [
+  ["fabric-01", "01 Cream", "#f4ead2"],
+  ["fabric-02", "02 Ivory", "#fff3cf"],
+  ["fabric-03", "03 Sand", "#d9c89a"],
+  ["fabric-04", "04 Wheat", "#c7ae72"],
+  ["fabric-05", "05 Honey", "#d6a85a"],
+  ["fabric-06", "06 Camel", "#b98a55"],
+  ["fabric-07", "07 Taupe", "#a98d70"],
+  ["fabric-08", "08 Mocha", "#7a5d45"],
+  ["fabric-09", "09 Walnut", "#5b4134"],
+  ["fabric-10", "10 Chocolate", "#3f2b24"],
+  ["fabric-11", "11 Charcoal", "#252b2d"],
+  ["fabric-12", "12 Navy", "#182837"],
+  ["fabric-13", "13 Slate", "#3f4a4a"],
+  ["fabric-14", "14 Smoke", "#686f67"],
+  ["fabric-15", "15 Olive", "#7f8a62"],
+  ["fabric-16", "16 Lime", "#9ac13f"],
+  ["fabric-17", "17 Sage", "#b6bd93"],
+  ["fabric-18", "18 Khaki", "#b2a77c"],
+  ["fabric-19", "19 Beige", "#d4c19a"],
+  ["fabric-20", "20 Champagne", "#e4d6b3"],
+  ["fabric-21", "21 Gold", "#d4ad55"],
+  ["fabric-22", "22 Mustard", "#c99738"],
+  ["fabric-23", "23 Orange", "#d77b35"],
+  ["fabric-24", "24 Terracotta", "#a95b3e"],
+  ["fabric-25", "25 Brick", "#8f4638"],
+  ["fabric-26", "26 Coral", "#d95e5f"],
+  ["fabric-27", "27 Rose", "#c9495b"],
+  ["fabric-28", "28 Wine", "#7d3446"],
+  ["fabric-29", "29 Plum", "#5a4159"],
+  ["fabric-30", "30 Mauve", "#8b6678"],
+  ["fabric-31", "31 Gray Beige", "#a5a093"],
+  ["fabric-32", "32 Linen Gray", "#c8c7b8"]
+].map(([id, name, hex]) => ({ id, name, hex, available: true }));
 
 const defaultProducts = [
   {
@@ -184,6 +218,10 @@ const els = {
   productImageValue: document.querySelector("[data-product-image-value]"),
   productImagesValue: document.querySelector("[data-product-images-value]"),
   productImagePreview: document.querySelector("[data-product-image-preview]"),
+  bedColorAdmin: document.querySelector("[data-bed-color-admin]"),
+  bedColorValue: document.querySelector("[data-bed-color-value]"),
+  bedColorGrid: document.querySelector("[data-bed-color-grid]"),
+  bedColorCount: document.querySelector("[data-bed-color-count]"),
   adminMode: document.querySelector("[data-admin-mode]"),
   adminPlacement: document.querySelector("[data-admin-placement]"),
   viewProduct: document.querySelector("[data-view-product]"),
@@ -554,6 +592,83 @@ function productCollectionLabel(product) {
   return ADMIN_COLLECTIONS.find((item) => item.key === collectionKeyForProduct(product))?.label || "ທີ່ນອນ";
 }
 
+function isMattressCategory(category = "") {
+  const value = category.toLowerCase();
+  return ["mattress", "hybrid", "latex", "memory foam", "pocket spring"].some((item) => value.includes(item));
+}
+
+function isBedCategory(category = "") {
+  const value = category.toLowerCase();
+  return value === "bed" || value.includes("bed frame") || value.includes("bedframe");
+}
+
+function normalizeFirmness(value = "") {
+  const map = {
+    "ນຸ່ມ": "ນຸ້ມສະບາຍ",
+    "ນຸ່ມແນ່ນ": "ນຸ້ມແຫນ້ນ",
+    "ແນ່ນ": "ແຫນ້ນ"
+  };
+  return map[value] || value;
+}
+
+function parseBedColorsValue(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function normalizeBedColors(colors = []) {
+  const saved = new Map((Array.isArray(colors) ? colors : []).map((item) => [item?.id, item]));
+  return BED_COLOR_PALETTE.map((color) => {
+    const current = saved.get(color.id) || {};
+    return {
+      ...color,
+      name: current.name || color.name,
+      hex: current.hex || color.hex,
+      available: current.available !== false
+    };
+  });
+}
+
+function currentBedColors() {
+  return normalizeBedColors(parseBedColorsValue(els.bedColorValue?.value || ""));
+}
+
+function setBedColors(colors) {
+  if (els.bedColorValue) els.bedColorValue.value = JSON.stringify(normalizeBedColors(colors));
+  renderBedColorAdmin();
+  renderPreview();
+}
+
+function renderBedColorAdmin() {
+  if (!els.bedColorAdmin || !els.bedColorGrid) return;
+  const category = field("category")?.value || "";
+  const enabled = isBedCategory(category);
+  const colors = currentBedColors();
+  const availableCount = colors.filter((color) => color.available).length;
+  els.bedColorAdmin.classList.toggle("is-disabled", !enabled);
+  if (els.bedColorCount) els.bedColorCount.textContent = enabled ? `${availableCount}/${colors.length} available` : "Bed only";
+  els.bedColorGrid.innerHTML = colors.map((color) => `
+    <button class="admin-bed-color-toggle ${color.available ? "is-available" : "is-sold-out"}" type="button" data-admin-bed-color="${color.id}" style="--swatch:${color.hex}" ${enabled ? "" : "disabled"}>
+      <span class="admin-bed-swatch"></span>
+      <strong>${color.name}</strong>
+      <small>${color.available ? "Available" : "Sold out"}</small>
+    </button>
+  `).join("");
+}
+
+function updateBedColorField() {
+  if (!els.bedColorValue) return;
+  const enabled = isBedCategory(field("category")?.value || "");
+  if (!els.bedColorValue.value) els.bedColorValue.value = JSON.stringify(normalizeBedColors());
+  els.bedColorAdmin?.classList.toggle("is-disabled", !enabled);
+  renderBedColorAdmin();
+}
+
 function collectionProducts(key = activeCollectionKey) {
   return products.filter((product) => collectionKeyForProduct(product) === key);
 }
@@ -721,6 +836,7 @@ function createBlankProductDraft() {
     rating: "",
     popular: Date.now(),
     stock: "",
+    bedColors: [],
     warranty: "",
     freebies: [],
     materials: [],
@@ -772,7 +888,7 @@ function formToProduct() {
     images: images.length ? images : image ? [image] : [],
     sku: data.get("sku").trim() || id.toUpperCase(),
     category: data.get("category"),
-    firmness: data.get("firmness"),
+    firmness: isMattressCategory(data.get("category")) ? normalizeFirmness(data.get("firmness")) : "",
     thickness: data.get("thickness").trim(),
     sizes: toList(data.get("sizes") || "3.5 ຟຸດ, 5 ຟຸດ, 6 ຟຸດ"),
     sizePrices,
@@ -783,6 +899,7 @@ function formToProduct() {
     rating: Number(data.get("rating") || 4.8),
     popular: previous?.popular || Date.now(),
     stock: data.get("stock").trim() || "ມີສິນຄ້າ",
+    bedColors: isBedCategory(data.get("category")) ? normalizeBedColors(parseBedColorsValue(data.get("bedColors"))) : [],
     warranty: data.get("warranty").trim() || "10 ປີ",
     freebies: toList(data.get("freebies") || "2 pillows, Premium bedsheet"),
     materials: toList(data.get("materials") || "Premium fabric, Pocket spring"),
@@ -799,7 +916,7 @@ function fillForm(product) {
   setField("sku", product.sku || "");
   setField("badge", product.badge || "");
   setField("category", product.category || "Hybrid");
-  setField("firmness", product.firmness || "ນຸ່ມ");
+  setField("firmness", normalizeFirmness(product.firmness) || "ນຸ້ມສະບາຍ");
   setField("thickness", product.thickness || "");
   setField("sizes", product.sizes?.join(", ") || "");
   setField("sizePrices", product._draft ? "" : formatSizePrices(product));
@@ -808,12 +925,15 @@ function fillForm(product) {
   setField("discountPercent", product.discountPercent || "");
   setField("rating", product.rating || "");
   setField("stock", product.stock || "");
+  setField("bedColors", JSON.stringify(normalizeBedColors(product.bedColors)));
   setField("warranty", product.warranty || "");
   setField("freebies", product.freebies?.join(", ") || "");
   setField("materials", product.materials?.join(", ") || "");
   setField("description", product.description || "");
   els.formTitle.textContent = product._draft ? "ເພີ່ມສິນຄ້າໃໝ່" : "ແກ້ໄຂສິນຄ້າ";
   activeProductId = product.id;
+  updateFirmnessField();
+  updateBedColorField();
   updateImagePreview(images);
   updateAdminStatus(product);
   renderProducts();
@@ -829,12 +949,26 @@ function setField(name, value) {
   if (input) input.value = value;
 }
 
+function updateFirmnessField() {
+  const categoryInput = field("category");
+  const firmnessInput = field("firmness");
+  if (!categoryInput || !firmnessInput) return;
+  const enabled = isMattressCategory(categoryInput.value);
+  firmnessInput.disabled = !enabled;
+  firmnessInput.closest("label")?.classList.toggle("is-disabled", !enabled);
+  if (!enabled) firmnessInput.value = "";
+  else if (!firmnessInput.value) firmnessInput.value = "ນຸ້ມສະບາຍ";
+}
+
 function clearForm() {
   els.form.reset();
   setField("id", "");
   setField("image", "");
   setField("images", "");
+  setField("bedColors", JSON.stringify(normalizeBedColors()));
   setField("category", activeCollection().category);
+  updateFirmnessField();
+  updateBedColorField();
   els.formTitle.textContent = "ເພີ່ມສິນຄ້າໃໝ່";
   activeProductId = "";
   updateImagePreview("");
@@ -863,6 +997,10 @@ function renderPreview() {
   updateAdminStatus(product);
   const previewImage = primaryImage(product);
   const imageClass = previewImage ? "has-admin-image" : "";
+  const previewMeta = [product.category, product.thickness, product.firmness, `★ ${product.rating || 4.8}`].filter(Boolean).join(" • ");
+  const previewColors = isBedCategory(product.category)
+    ? normalizeBedColors(product.bedColors).filter((color) => color.available).slice(0, 8)
+    : [];
   els.preview.innerHTML = `
     <article class="product-card">
       <div class="product-art ${imageClass}">
@@ -872,7 +1010,8 @@ function renderPreview() {
       </div>
       <div class="product-body">
         <h3>${product.name}</h3>
-        <div class="meta">${product.category} • ${product.thickness} • ${product.firmness} • ★ ${product.rating || 4.8}</div>
+        <div class="meta">${previewMeta}</div>
+        ${previewColors.length ? `<div class="bed-color-mini-row">${previewColors.map((color) => `<span style="--swatch:${color.hex}" title="${color.name}"></span>`).join("")}</div>` : ""}
         <div class="sizes">${(product.sizes || []).map((size) => `<span>${size}</span>`).join("")}</div>
         <div class="prices">
           <strong class="sale-price">${productPriceLabel(product)}</strong>
@@ -1345,7 +1484,22 @@ els.search.addEventListener("input", renderProducts);
 els.clearForm.addEventListener("click", clearForm);
 els.newProduct.addEventListener("click", addBlankProductDraft);
 
-els.form.addEventListener("input", renderPreview);
+els.form.addEventListener("input", (event) => {
+  if (event.target?.name === "category") {
+    updateFirmnessField();
+    updateBedColorField();
+  }
+  renderPreview();
+});
+
+els.bedColorGrid?.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-admin-bed-color]");
+  if (!target || target.disabled) return;
+  const colors = currentBedColors().map((color) => (
+    color.id === target.dataset.adminBedColor ? { ...color, available: !color.available } : color
+  ));
+  setBedColors(colors);
+});
 
 els.productImageUpload.addEventListener("change", (event) => {
   readFilesAsDataUrls(event.target.files, (dataUrls) => {
