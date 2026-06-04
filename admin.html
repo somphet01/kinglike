@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css?v=20260604-cart-icon-clean1" />
     <link rel="stylesheet" href="site-responsive.css?v=20260604-order-form1" />
-    <link rel="stylesheet" href="admin.css?v=20260604-admin-primary-buttons1" />
+    <link rel="stylesheet" href="admin.css?v=20260604-detail-story-contrast2" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -18,6 +18,7 @@
       </a>
       <nav class="admin-nav">
         <a href="index.html#products">ເບິ່ງໜ້າຮ້ານ</a>
+        <button class="secondary-btn" type="button" data-admin-logout>ອອກຈາກລະບົບ</button>
         <button class="secondary-btn danger-soft-btn" type="button" data-reset-demo>ລ້າງຂໍ້ມູນທົດລອງ</button>
       </nav>
     </header>
@@ -298,34 +299,6 @@
 
       <section class="admin-panel" data-admin-panel="promotion">
         <div class="admin-workspace promo-workspace">
-          <form class="admin-card promo-admin" data-promo-form>
-            <div class="admin-card-head">
-              <div>
-                <p class="eyebrow">ຮູບປົກ / ໂປຣໂມຊັນ</p>
-                <h2>ແກ້ໄຂແຖບໂປຣໂມຊັນ</h2>
-              </div>
-            </div>
-            <input type="hidden" name="coverImage" data-cover-image-value />
-            <label>
-              ຮູບປົກ
-              <input name="coverUpload" type="file" accept="image/*" data-cover-image-upload />
-              <small>ຮູບນີ້ຈະໄປສະແດງໃນແຖບໂປຣໂມຊັນ / ຮູບປົກ.</small>
-            </label>
-            <label>
-              ຫົວຂໍ້
-              <input name="title" placeholder="ຊຸດນອນຫຼູ ປະຢັດກວ່າ" />
-            </label>
-            <label>
-              ຂໍ້ຄວາມ
-              <input name="text" placeholder="ຊື້ທີ່ນອນພ້ອມໝອນ ຮັບສ່ວນຫຼຸດພິເສດ" />
-            </label>
-            <label>
-              ຂໍ້ຄວາມປຸ່ມ
-              <input name="button" placeholder="ເລືອກຊຸດສິນຄ້າ" />
-            </label>
-            <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
-          </form>
-
           <form class="admin-card promo-admin" data-hero-slide-form>
             <div class="admin-card-head">
               <div>
@@ -372,72 +345,6 @@
             <button class="primary-btn admin-submit" type="submit">ເພີ່ມຄລິບ</button>
             <div class="admin-upload-preview vertical-video-admin-list" data-video-list>ຕົວຢ່າງວິດີໂອ</div>
           </form>
-
-          <form class="admin-card promo-admin" data-promo-event-form>
-            <div class="admin-card-head">
-              <div>
-                <p class="eyebrow">ກາດໂປຣໂມຊັນ</p>
-                <h2>ເພີ່ມ / ແກ້ໄຂໂປຣໂມຊັນ</h2>
-              </div>
-              <button class="secondary-btn" type="button" data-new-promo-event>+ ໃໝ່</button>
-            </div>
-            <input type="hidden" name="id" />
-            <input type="hidden" name="image" data-promo-event-image-value />
-            <label>
-              ຮູບໂປຣໂມຊັນ / ອີເວັນ
-              <input name="eventImageUpload" type="file" accept="image/*" data-promo-event-image-upload />
-              <small>ຮູບນີ້ຈະສະແດງເປັນກາດໃນໜ້າຫຼັກ.</small>
-            </label>
-            <div class="form-row">
-              <label>
-                Badge / ປ້າຍ
-                <input name="badge" placeholder="MID MONTH / EVENT / SALE" />
-              </label>
-              <label>
-                ວັນທີ ຫຼື ໄລຍະເວລາ
-                <input name="date" placeholder="20 - 31 May" />
-              </label>
-            </div>
-            <label>
-              ໝົດໂປຣໂມຊັນ
-              <input name="endsAt" type="datetime-local" />
-              <small>ຖ້າໃສ່ວັນເວລານີ້ ໜ້າລູກຄ້າຈະສະແດງໂຕນັບຖອຍຫຼັງອັດຕະໂນມັດ.</small>
-            </label>
-            <label>
-              ຫົວຂໍ້
-              <input name="title" required placeholder="Mid Month Super Surprise" />
-            </label>
-            <label>
-              ຂໍ້ຄວາມ
-              <textarea name="text" rows="3" placeholder="ລາຍລະອຽດໂປຣໂມຊັນ ຫຼື ອີເວັນ"></textarea>
-            </label>
-            <div class="form-row">
-              <label>
-                ຂໍ້ຄວາມປຸ່ມ
-                <input name="button" placeholder="ເບິ່ງສິນຄ້າ" />
-              </label>
-              <label>
-                Link / ລິ້ງ
-                <input name="link" placeholder="#products" />
-              </label>
-            </div>
-            <label class="admin-check">
-              <input name="active" type="checkbox" checked />
-              <span>ສະແດງໃນໜ້າຫຼັກ</span>
-            </label>
-            <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
-          </form>
-
-          <aside class="admin-card">
-            <div class="admin-card-head">
-              <div>
-                <p class="eyebrow">ຕົວຢ່າງ</p>
-                <h2>ຕົວຢ່າງຮູບປົກ</h2>
-              </div>
-            </div>
-            <div class="promo-preview" data-promo-preview></div>
-            <div class="promo-event-admin-list" data-promo-event-list></div>
-          </aside>
         </div>
       </section>
 
@@ -510,6 +417,6 @@
     </div>
     <div class="admin-toast" data-toast></div>
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="admin.js?v=20260604-price-sync1"></script>
+    <script src="admin.js?v=20260604-sqlite-admin1"></script>
   </body>
 </html>

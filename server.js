@@ -2,12 +2,14 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const database = require("./database");
 
 const root = __dirname;
 const dataDir = path.join(root, "data");
-const storePath = path.join(dataDir, "store.json");
-const ordersPath = path.join(dataDir, "orders.json");
 const port = Number(process.env.PORT || 4173);
+const adminPassword = process.env.ADMIN_PASSWORD || "kinglike2026";
+const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
+const sessionCookie = "kinglike_admin";
 
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -32,6 +34,47 @@ function send(res, status, body, type = "text/plain; charset=utf-8") {
   res.end(body);
 }
 
+function redirect(res, location) {
+  res.writeHead(302, {
+    Location: location,
+    "Cache-Control": "no-store"
+  });
+  res.end();
+}
+
+function parseCookies(header = "") {
+  return Object.fromEntries(header.split(";").map((part) => {
+    const [key, ...value] = part.trim().split("=");
+    return [key, decodeURIComponent(value.join("=") || "")];
+  }).filter(([key]) => key));
+}
+
+function adminToken() {
+  return crypto.createHmac("sha256", sessionSecret).update(adminPassword).digest("hex");
+}
+
+function isAdmin(req) {
+  return parseCookies(req.headers.cookie)[sessionCookie] === adminToken();
+}
+
+function requireAdmin(req, res, { api = false } = {}) {
+  if (isAdmin(req)) return true;
+  if (api) {
+    send(res, 401, JSON.stringify({ error: "Admin login required" }), "application/json; charset=utf-8");
+    return false;
+  }
+  redirect(res, "/admin-login.html");
+  return false;
+}
+
+function setAdminCookie(res) {
+  res.setHeader("Set-Cookie", `${sessionCookie}=${encodeURIComponent(adminToken())}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`);
+}
+
+function clearAdminCookie(res) {
+  res.setHeader("Set-Cookie", `${sessionCookie}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`);
+}
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -51,33 +94,15 @@ function readBody(req) {
 }
 
 function readStore() {
-  try {
-    return JSON.parse(fs.readFileSync(storePath, "utf8"));
-  } catch (error) {
-    return { products: [], promotion: {}, updatedAt: null };
-  }
+  return database.readStore();
 }
 
 function readOrders() {
-  try {
-    const data = JSON.parse(fs.readFileSync(ordersPath, "utf8"));
-    return {
-      orders: Array.isArray(data.orders) ? data.orders : [],
-      logs: Array.isArray(data.logs) ? data.logs : []
-    };
-  } catch (error) {
-    return { orders: [], logs: [] };
-  }
+  return database.readOrders();
 }
 
 function writeOrders(data) {
-  fs.mkdirSync(dataDir, { recursive: true });
-  const clean = {
-    orders: Array.isArray(data.orders) ? data.orders : [],
-    logs: Array.isArray(data.logs) ? data.logs : []
-  };
-  fs.writeFileSync(ordersPath, JSON.stringify(clean, null, 2));
-  return clean;
+  return database.writeOrders(data);
 }
 
 function orderCode() {
@@ -181,14 +206,7 @@ function updateOrderStatus(id, payload) {
 }
 
 function writeStore(data) {
-  fs.mkdirSync(dataDir, { recursive: true });
-  const clean = {
-    products: Array.isArray(data.products) ? data.products : [],
-    promotion: data.promotion && typeof data.promotion === "object" ? data.promotion : {},
-    updatedAt: new Date().toISOString()
-  };
-  fs.writeFileSync(storePath, JSON.stringify(clean, null, 2));
-  return clean;
+  return database.writeStore(data);
 }
 
 function safeStaticPath(urlPath) {
@@ -201,12 +219,40 @@ function safeStaticPath(urlPath) {
 const server = http.createServer(async (req, res) => {
   try {
     const reqUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+
+    if (reqUrl.pathname === "/api/admin/session") {
+      send(res, 200, JSON.stringify({ authenticated: isAdmin(req) }), "application/json; charset=utf-8");
+      return;
+    }
+
+    if (reqUrl.pathname === "/api/admin/login") {
+      if (req.method !== "POST") {
+        send(res, 405, "Method not allowed");
+        return;
+      }
+      const body = JSON.parse(await readBody(req) || "{}");
+      if (String(body.password || "") !== adminPassword) {
+        send(res, 401, JSON.stringify({ error: "Invalid password" }), "application/json; charset=utf-8");
+        return;
+      }
+      setAdminCookie(res);
+      send(res, 200, JSON.stringify({ ok: true }), "application/json; charset=utf-8");
+      return;
+    }
+
+    if (reqUrl.pathname === "/api/admin/logout") {
+      clearAdminCookie(res);
+      send(res, 200, JSON.stringify({ ok: true }), "application/json; charset=utf-8");
+      return;
+    }
+
     if (req.url.startsWith("/api/store")) {
       if (req.method === "GET") {
         send(res, 200, JSON.stringify(readStore()), "application/json; charset=utf-8");
         return;
       }
       if (req.method === "POST") {
+        if (!requireAdmin(req, res, { api: true })) return;
         const body = await readBody(req);
         const saved = writeStore(JSON.parse(body || "{}"));
         send(res, 200, JSON.stringify(saved), "application/json; charset=utf-8");
@@ -218,6 +264,7 @@ const server = http.createServer(async (req, res) => {
 
     if (reqUrl.pathname === "/api/orders") {
       if (req.method === "GET") {
+        if (!requireAdmin(req, res, { api: true })) return;
         const data = readOrders();
         send(res, 200, JSON.stringify(data), "application/json; charset=utf-8");
         return;
@@ -246,6 +293,7 @@ const server = http.createServer(async (req, res) => {
 
     const statusMatch = reqUrl.pathname.match(/^\/api\/orders\/([^/]+)\/status$/);
     if (statusMatch && req.method === "PATCH") {
+      if (!requireAdmin(req, res, { api: true })) return;
       const body = await readBody(req);
       const result = updateOrderStatus(statusMatch[1], JSON.parse(body || "{}"));
       send(res, 200, JSON.stringify(result), "application/json; charset=utf-8");
@@ -257,6 +305,8 @@ const server = http.createServer(async (req, res) => {
       send(res, 404, "Not found");
       return;
     }
+
+    if (["/admin.html", "/admin-orders.html"].includes(reqUrl.pathname) && !requireAdmin(req, res)) return;
 
     const ext = path.extname(filePath).toLowerCase();
     res.writeHead(200, {
@@ -271,4 +321,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, "0.0.0.0", () => {
   console.log(`Kinglike server running at http://localhost:${port}/`);
+  console.log(`Database backend: ${database.backend}${database.dbPath ? ` (${database.dbPath})` : ""}`);
 });

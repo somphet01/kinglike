@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinglike Admin Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        align-items: center;
+        background: linear-gradient(180deg, #f7f8f8, #e8ecee);
+        color: #070809;
+        display: flex;
+        font-family: "Noto Sans Lao", system-ui, sans-serif;
+        justify-content: center;
+        margin: 0;
+        min-height: 100svh;
+        padding: 24px;
+      }
+      .login-card {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(7, 8, 9, 0.1);
+        border-radius: 14px;
+        box-shadow: 0 24px 70px rgba(8, 10, 12, 0.12);
+        display: grid;
+        gap: 18px;
+        max-width: 420px;
+        padding: 28px;
+        width: 100%;
+      }
+      img {
+        filter: grayscale(1) brightness(0) contrast(1.18);
+        height: 28px;
+        object-fit: contain;
+        width: 118px;
+      }
+      h1 {
+        font-size: clamp(28px, 8vw, 42px);
+        line-height: 1.08;
+        margin: 10px 0 0;
+      }
+      p {
+        color: #555a61;
+        line-height: 1.6;
+        margin: 0;
+      }
+      label {
+        display: grid;
+        font-weight: 800;
+        gap: 8px;
+      }
+      input {
+        border: 1px solid rgba(7, 8, 9, 0.14);
+        border-radius: 12px;
+        font: inherit;
+        font-weight: 800;
+        min-height: 52px;
+        padding: 0 14px;
+        width: 100%;
+      }
+      button {
+        background: #08090a;
+        border: 0;
+        border-radius: 999px;
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+        min-height: 52px;
+      }
+      .error {
+        color: #b00020;
+        font-weight: 800;
+        min-height: 1.4em;
+      }
+    </style>
+  </head>
+  <body>
+    <form class="login-card" data-admin-login-form>
+      <img src="assets/kinglike-logo-tight.png" alt="Kinglike" />
+      <div>
+        <h1>ເຂົ້າຫຼັງບ້ານ</h1>
+        <p>ກະລຸນາໃສ່ລະຫັດແອດມິນ ເພື່ອແກ້ໄຂຂໍ້ມູນຮ້ານ.</p>
+      </div>
+      <label>
+        ລະຫັດຜ່ານ
+        <input name="password" type="password" autocomplete="current-password" required autofocus />
+      </label>
+      <p class="error" data-login-error></p>
+      <button type="submit">ເຂົ້າສູ່ລະບົບ</button>
+    </form>
+    <script>
+      document.querySelector("[data-admin-login-form]").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const error = document.querySelector("[data-login-error]");
+        error.textContent = "";
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: form.elements.password.value })
+        });
+        if (!response.ok) {
+          error.textContent = "ລະຫັດບໍ່ຖືກຕ້ອງ.";
+          return;
+        }
+        window.location.href = "admin.html";
+      });
+    </script>
+  </body>
+</html>

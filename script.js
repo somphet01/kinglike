@@ -638,29 +638,15 @@ function renderPromotionData(promotion) {
     promoSection.style.backgroundImage = `linear-gradient(90deg, rgba(5, 5, 5, 0.9), rgba(5, 5, 5, 0.42)), url("${promotion.coverImage}")`;
   }
 
-  const activeEvents = (promotion.events || []).filter((item) => item.active !== false && item.title);
+  const activeEvents = [];
   renderHeroCarousel(promotion, activeEvents);
   renderHomeVideos(promotion);
   if (eventSection && eventGrid) {
-    eventSection.hidden = !activeEvents.length;
-    eventGrid.innerHTML = activeEvents.map((item) => `
-      <article class="promo-event-card ${item.image ? "has-image" : ""}">
-        ${item.image ? `<img src="${item.image}" alt="${item.title}" />` : ""}
-        <div class="promo-event-copy">
-          <span>${item.badge || "PROMOTION"}</span>
-          <h3>${item.title}</h3>
-          ${item.text ? `<p>${item.text}</p>` : ""}
-          ${promoCountdownMarkup(item)}
-          <div class="promo-event-foot">
-            ${item.date ? `<small>${item.date}</small>` : "<small>Kinglike</small>"}
-            <a href="${item.link || "#products"}">${item.button || "ເບິ່ງສິນຄ້າ"}</a>
-          </div>
-        </div>
-      </article>
-    `).join("");
+    eventSection.hidden = true;
+    eventGrid.innerHTML = "";
   }
 
-  renderPromoPopup(promotion, activeEvents);
+  renderPromoPopup(null, activeEvents);
   updatePromoCountdowns();
 }
 
@@ -983,6 +969,11 @@ function renderPromoPopup(promotion, activeEvents) {
   const content = document.querySelector("[data-promo-popup-content]");
   if (promoPopupDismissed) return;
   if (!popup || !content) return;
+  if (!promotion) {
+    popup.classList.remove("is-visible");
+    content.innerHTML = "";
+    return;
+  }
   const popupItem = activeEvents[0] || (promotion.title ? {
     badge: "HOT DEAL",
     title: promotion.title,

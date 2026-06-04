@@ -1091,8 +1091,8 @@
 }
 
 .admin-detail-story {
-  background: #111113;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #08090a;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 18px;
   color: #fff;
   display: grid;
@@ -1101,21 +1101,22 @@
 }
 
 .admin-detail-story .eyebrow {
-  color: #c9ff2f;
+  color: #dfff5f !important;
+  opacity: 1 !important;
 }
 
 .admin-detail-story h3 {
-  color: #fff;
+  color: #ffffff !important;
   margin: 4px 0;
 }
 
 .admin-detail-story small {
-  color: rgba(255, 255, 255, 0.78) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
   line-height: 1.6;
 }
 
 .admin-detail-story label {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: #ffffff !important;
   font-weight: 800;
 }
 
@@ -1129,7 +1130,7 @@
 
 .admin-detail-story input::placeholder,
 .admin-detail-story textarea::placeholder {
-  color: rgba(255, 255, 255, 0.48);
+  color: #6a6d73;
 }
 
 .admin-layer-preview {
@@ -2418,4 +2419,47 @@
   .admin-submit {
     bottom: 10px !important;
   }
+}
+
+/* Keep admin logo visually consistent with the storefront header. */
+.admin-header .brand img {
+  display: block !important;
+  filter: grayscale(1) brightness(0) contrast(1.18) !important;
+  height: 23px !important;
+  max-width: 100px !important;
+  object-fit: contain !important;
+  width: 100px !important;
+}
+
+@media (max-width: 680px) {
+  .admin-header .brand img {
+    height: 23px !important;
+    max-width: 100px !important;
+    width: 100px !important;
+  }
+}
+
+/* Final contrast lock for the black detail-story editor. */
+.admin-card .admin-detail-story {
+  background: #08090a !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.admin-card .admin-detail-story h3,
+.admin-card .admin-detail-story label {
+  color: #ffffff !important;
+}
+
+.admin-card .admin-detail-story small {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+.admin-card .admin-detail-story .eyebrow {
+  color: #dfff5f !important;
+  opacity: 1 !important;
+}
+
+.admin-card .admin-detail-story input::placeholder,
+.admin-card .admin-detail-story textarea::placeholder {
+  color: #6a6d73 !important;
 }

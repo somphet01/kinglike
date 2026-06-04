@@ -265,6 +265,7 @@ const els = {
   resultTitle: document.querySelector("[data-result-title]"),
   resultMessage: document.querySelector("[data-result-message]"),
   resultOk: document.querySelector("[data-result-ok]"),
+  adminLogout: document.querySelector("[data-admin-logout]"),
   toast: document.querySelector("[data-toast]")
 };
 
@@ -276,6 +277,7 @@ let activeProductId = products.find((product) => collectionKeyForProduct(product
 let recentlyAddedProductId = "";
 let activePromoEventId = "";
 let confirmAction = null;
+let lastExportActionAt = 0;
 
 function openLocalDb() {
   return new Promise((resolve, reject) => {
@@ -1276,14 +1278,16 @@ function readVideoAsDataUrl(file, callback) {
 }
 
 function loadPromoForm() {
-  try {
-    const promo = loadPromotionData();
-    els.promoForm.elements.title.value = promo.title || "";
-    els.promoForm.elements.text.value = promo.text || "";
-    els.promoForm.elements.button.value = promo.button || "";
-    els.promoForm.elements.coverImage.value = promo.coverImage || "";
-  } catch (error) {
-    els.promoForm.reset();
+  if (els.promoForm) {
+    try {
+      const promo = loadPromotionData();
+      els.promoForm.elements.title.value = promo.title || "";
+      els.promoForm.elements.text.value = promo.text || "";
+      els.promoForm.elements.button.value = promo.button || "";
+      els.promoForm.elements.coverImage.value = promo.coverImage || "";
+    } catch (error) {
+      els.promoForm.reset();
+    }
   }
   renderPromoPreview();
   renderHeroSlideList();
@@ -1292,6 +1296,7 @@ function loadPromoForm() {
 }
 
 function renderPromoPreview() {
+  if (!els.promoForm || !els.promoPreview) return;
   const data = new FormData(els.promoForm);
   const title = data.get("title") || "ຊຸດນອນຫຼູ ປະຢັດກວ່າ";
   const text = data.get("text") || "ຊື້ທີ່ນອນພ້ອມໝອນ ຮັບສ່ວນຫຼຸດພິເສດ";
@@ -1400,6 +1405,7 @@ function promoEventFromForm() {
 }
 
 function fillPromoEventForm(eventItem) {
+  if (!els.promoEventForm) return;
   activePromoEventId = eventItem.id;
   els.promoEventForm.elements.id.value = eventItem.id;
   els.promoEventForm.elements.badge.value = eventItem.badge || "";
@@ -1494,11 +1500,14 @@ function exportBackup() {
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = `kinglike-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  showResult({
+    title: "ດາວໂຫຼດແລ້ວ",
+    message: "ໄຟລ໌ສຳຮອງຖືກສ້າງແລ້ວ. ຖ້າບໍ່ເຫັນໄຟລ໌ ໃຫ້ເບິ່ງໃນ Downloads ຂອງ browser."
+  });
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(link.href);
-  showToast("ດາວໂຫຼດໄຟລ໌ສຳຮອງແລ້ວ");
+  window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
 function exportPublishStore() {
@@ -1511,11 +1520,14 @@ function exportPublishStore() {
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = "store.json";
+  showResult({
+    title: "ດາວໂຫຼດ store.json ແລ້ວ",
+    message: "ໄຟລ໌ store.json ສຳລັບ GitHub Pages ຖືກສ້າງແລ້ວ. ຖ້າບໍ່ເຫັນໄຟລ໌ ໃຫ້ເບິ່ງໃນ Downloads ຂອງ browser."
+  });
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(link.href);
-  showToast("ດາວໂຫຼດ store.json ສຳລັບ GitHub Pages ແລ້ວ");
+  window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
 function importBackup(file) {
@@ -1659,9 +1671,9 @@ els.productImagePreview.addEventListener("click", (event) => {
   setProductImages(images);
 });
 
-els.coverUpload.addEventListener("change", (event) => {
+els.coverUpload?.addEventListener("change", (event) => {
   readFileAsDataUrl(event.target.files[0], (dataUrl) => {
-    els.coverValue.value = dataUrl;
+    if (els.coverValue) els.coverValue.value = dataUrl;
     renderPromoPreview();
   }, { maxSize: 1100, quality: 0.72, maxBytes: 260000 });
 });
@@ -1698,11 +1710,29 @@ els.videoUpload?.addEventListener("change", (event) => {
   });
 });
 
-els.exportData.addEventListener("click", exportBackup);
-els.exportPublish?.addEventListener("click", exportPublishStore);
+function handleExportAction(event) {
+  if (event.target.closest("[data-export-data]")) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (Date.now() - lastExportActionAt < 800) return;
+    lastExportActionAt = Date.now();
+    exportBackup();
+    return;
+  }
+  if (event.target.closest("[data-export-publish]")) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (Date.now() - lastExportActionAt < 800) return;
+    lastExportActionAt = Date.now();
+    exportPublishStore();
+  }
+}
+
+document.addEventListener("pointerdown", handleExportAction, true);
+document.addEventListener("click", handleExportAction, true);
 els.importData.addEventListener("change", (event) => importBackup(event.target.files[0]));
 
-els.promoForm.addEventListener("input", renderPromoPreview);
+els.promoForm?.addEventListener("input", renderPromoPreview);
 els.newPromoEvent?.addEventListener("click", clearPromoEventForm);
 els.confirmCancel?.addEventListener("click", closeConfirm);
 els.confirmModal?.addEventListener("click", (event) => {
@@ -1714,6 +1744,10 @@ els.confirmOk?.addEventListener("click", () => {
   if (typeof action === "function") action();
 });
 els.resultOk?.addEventListener("click", closeResult);
+els.adminLogout?.addEventListener("click", async () => {
+  await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+  window.location.href = "admin-login.html";
+});
 els.resultModal?.addEventListener("click", (event) => {
   if (event.target === els.resultModal) closeResult();
 });
@@ -1788,7 +1822,7 @@ els.resetDemo.addEventListener("click", () => {
   showToast("ລ້າງຂໍ້ມູນທົດລອງແລ້ວ");
 });
 
-els.promoForm.addEventListener("submit", async (event) => {
+els.promoForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(els.promoForm);
   const draft = await compactPromotionForStorage({

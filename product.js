@@ -7,6 +7,16 @@ const MESSENGER_ID = "Kinglikesikai";
 const MESSENGER_URL = `https://www.messenger.com/t/${MESSENGER_ID}`;
 const IDB_NAME = "kinglikeAdminStore";
 const IDB_STORE = "records";
+if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+
+const SHOULD_START_PRODUCT_AT_TOP = !window.location.hash;
+
+function resetInitialProductScroll() {
+  if (!SHOULD_START_PRODUCT_AT_TOP) return;
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+}
+
+resetInitialProductScroll();
 const BED_COLOR_PALETTE = [
   ["fabric-01", "01 Cream", "#f4ead2"], ["fabric-02", "02 Ivory", "#fff3cf"],
   ["fabric-03", "03 Sand", "#d9c89a"], ["fabric-04", "04 Wheat", "#c7ae72"],
@@ -317,7 +327,6 @@ function getProductList(category) {
 const params = new URLSearchParams(window.location.search);
 const categoryKey = params.get("category") || "pillows";
 const id = params.get("id");
-if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
 let products = getProductList(categoryKey);
 let allProducts = mergedAllProducts();
 let currentProduct = products.find((item) => item.id === id) || products[0];
@@ -1361,6 +1370,13 @@ window.addEventListener("popstate", () => {
 
 initHeaderReveal();
 renderProduct();
+resetInitialProductScroll();
+window.requestAnimationFrame(resetInitialProductScroll);
+window.addEventListener("load", resetInitialProductScroll, { once: true });
+window.addEventListener("pageshow", resetInitialProductScroll);
 renderCart();
 renderWishlist();
-hydrateSyncedStore();
+hydrateSyncedStore().then(() => {
+  resetInitialProductScroll();
+  window.requestAnimationFrame(resetInitialProductScroll);
+});
