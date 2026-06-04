@@ -243,7 +243,9 @@
       "sizes": [
         "120cm"
       ],
-      "sizePrices": {},
+      "sizePrices": {
+        "120cm": 13898000
+      },
       "price": 27795999,
       "salePrice": 13898000,
       "discountPercent": 28,
@@ -251,6 +253,7 @@
       "rating": 4.9,
       "popular": 92,
       "stock": "ມີສິນຄ້າ",
+      "bedColors": [],
       "warranty": "12 ປີ",
       "freebies": [
         "ຫມອນສັ້ນສອງຫນ່ວຍ"
@@ -259,8 +262,15 @@
         "Hybrid support",
         "Natural latex",
         "Pocket spring",
-        "Luxury quilted fabric"
+        "Luxury quilted fabric",
+        "htdssss",
+        "iuuuu"
       ],
+      "layerStory": {
+        "eyebrow": "Inside this model",
+        "title": "ຂ້າງໃນແຕ່ລະຊັ້ນ ຕັ້ງໃຈເລືອກມາເພື່ອການນອນທີ່ດີຂຶ້ນ",
+        "description": "ລາຍລະອຽດວັດສະດຸຊ່ວຍໃຫ້ລູກຄ້າເຂົ້າໃຈວ່າຮຸ່ນນີ້ເໝາະກັບໃຜ ໂດຍບໍ່ຕ້ອງຕັດສິນໃຈຈາກລາຄາຢ່າງດຽວ."
+      },
       "description": "Gold Support ເປັນຮຸ່ນພຣີມຽມທີ່ຮອງຮັບແນ່ນ ແຕ່ຍັງນຸ່ມສະບາຍ ໃຫ້ຄວາມຮູ້ສຶກແບບໂຮງແຮມ."
     },
     {
@@ -313,5 +323,5 @@
     "coverImage": "",
     "events": []
   },
-  "updatedAt": "2026-06-03T09:43:44.915Z"
+  "updatedAt": "2026-06-04T04:27:55.671Z"
 }

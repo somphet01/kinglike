@@ -9,6 +9,7 @@ const IDB_STORE = "records";
 const ADMIN_COLLECTIONS = [
   { key: "pillows", label: "ໝອນ", category: "Pillow", sample: "Kinglike Cloud Pillow" },
   { key: "mattresses", label: "ທີ່ນອນ", category: "Mattress", sample: "Kinglike Royal Mattress" },
+  { key: "mattress-beds", label: "ເສື່ອນອນ+ຕຽງນອນ", category: "Mattress + Bed", sample: "Kinglike Mattress + Bed Set" },
   { key: "blankets", label: "ຜ້າຫົ່ມ", category: "Blanket", sample: "Kinglike Soft Blanket" },
   { key: "beds", label: "ຕຽງນອນ", category: "Bed", sample: "Kinglike Luxury Bed" },
   { key: "toppers", label: "ທັອບເປີ", category: "Topper", sample: "Kinglike Comfort Topper" }
@@ -47,6 +48,11 @@ const BED_COLOR_PALETTE = [
   ["fabric-31", "31 Gray Beige", "#a5a093"],
   ["fabric-32", "32 Linen Gray", "#c8c7b8"]
 ].map(([id, name, hex]) => ({ id, name, hex, available: true }));
+const DEFAULT_LAYER_STORY = {
+  eyebrow: "Inside this model",
+  title: "ຂ້າງໃນແຕ່ລະຊັ້ນ ຕັ້ງໃຈເລືອກມາເພື່ອການນອນທີ່ດີຂຶ້ນ",
+  description: "ລາຍລະອຽດວັດສະດຸຊ່ວຍໃຫ້ລູກຄ້າເຂົ້າໃຈວ່າຮຸ່ນນີ້ເໝາະກັບໃຜ ໂດຍບໍ່ຕ້ອງຕັດສິນໃຈຈາກລາຄາຢ່າງດຽວ."
+};
 
 const defaultProducts = [
   {
@@ -218,6 +224,8 @@ const els = {
   productImageValue: document.querySelector("[data-product-image-value]"),
   productImagesValue: document.querySelector("[data-product-images-value]"),
   productImagePreview: document.querySelector("[data-product-image-preview]"),
+  materialList: document.querySelector("[data-material-list]"),
+  addMaterial: document.querySelector("[data-add-material]"),
   bedColorAdmin: document.querySelector("[data-bed-color-admin]"),
   bedColorValue: document.querySelector("[data-bed-color-value]"),
   bedColorGrid: document.querySelector("[data-bed-color-grid]"),
@@ -323,7 +331,7 @@ async function publishSyncedStore(promotionOverride = null) {
     });
     if (!response.ok) throw new Error("Sync server unavailable");
   } catch (error) {
-    showToast("Saved locally. Export for GitHub Pages to update phone.");
+    showToast("ບັນທຶກໃນເຄື່ອງແລ້ວ. ດາວໂຫຼດໄຟລ໌ GitHub Pages ເພື່ອອັບເດດໜ້າຮ້ານ.");
   }
 }
 
@@ -404,6 +412,44 @@ function toList(value) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function currentMaterials() {
+  return toList(field("materials")?.value || "");
+}
+
+function setMaterials(items) {
+  const clean = (Array.isArray(items) ? items : []).map((item) => String(item || "").trim()).filter(Boolean);
+  setField("materials", clean.join(", "));
+  renderMaterialEditor(clean);
+}
+
+function updateMaterialsFromEditor() {
+  const items = [...(els.materialList?.querySelectorAll("[data-material-input]") || [])]
+    .map((input) => input.value.trim())
+    .filter(Boolean);
+  setField("materials", items.join(", "));
+  return items;
+}
+
+function renderMaterialEditor(items = currentMaterials()) {
+  if (!els.materialList) return;
+  const rows = (Array.isArray(items) && items.length ? items : [""]).map((item, index) => `
+    <article class="admin-material-row">
+      <strong>${String(index + 1).padStart(2, "0")}</strong>
+      <input data-material-input type="text" value="${escapeHtml(item)}" placeholder="ຜ້າຖັກພຣີມຽມ" aria-label="ຊັ້ນວັດສະດຸ ${index + 1}" />
+      <button type="button" data-remove-material="${index}" aria-label="ລຶບຊັ້ນວັດສະດຸ ${index + 1}">×</button>
+    </article>
+  `).join("");
+  els.materialList.innerHTML = rows;
+}
+
 function parseSizePrices(value) {
   return toList(value || "").reduce((prices, item) => {
     const [size, price] = item.split("=").map((part) => part.trim());
@@ -468,7 +514,44 @@ function discountPercent(price, salePrice) {
   const regular = Number(price || 0);
   const sale = Number(salePrice || 0);
   if (!regular || sale >= regular) return 0;
-  return Math.round(((regular - sale) / regular) * 100);
+  return Math.min(99, Math.round(((regular - sale) / regular) * 100));
+}
+
+function clampDiscount(value) {
+  if (value === "") return "";
+  const percent = Math.round(Number(value || 0));
+  return Math.min(99, Math.max(0, percent));
+}
+
+function syncPriceFields(sourceName) {
+  if (!["price", "salePrice", "discountPercent"].includes(sourceName)) return;
+  const priceInput = field("price");
+  const saleInput = field("salePrice");
+  const discountInput = field("discountPercent");
+  if (!priceInput || !saleInput || !discountInput) return;
+
+  const price = Number(priceInput.value || 0);
+  const salePrice = Number(saleInput.value || 0);
+  const discountValue = discountInput.value === "" ? "" : clampDiscount(discountInput.value);
+  const discount = Number(discountValue || 0);
+
+  if (sourceName === "discountPercent") {
+    if (discountInput.value !== "" && String(discountInput.value) !== String(discountValue)) {
+      discountInput.value = discountValue;
+    }
+    if (salePrice > 0 && discount > 0) {
+      priceInput.value = Math.round(salePrice / (1 - (discount / 100)));
+      return;
+    }
+    if (price > 0 && discount > 0) {
+      saleInput.value = Math.round(price * (1 - (discount / 100)));
+      return;
+    }
+  }
+
+  if (price > 0 && salePrice > 0) {
+    discountInput.value = discountPercent(price, salePrice);
+  }
 }
 
 function productDiscountPercent(product) {
@@ -477,7 +560,7 @@ function productDiscountPercent(product) {
 
 function productBadgeText(product) {
   const discount = productDiscountPercent(product);
-  return discount > 0 ? `ຫຼຸດ ${discount}%` : product.badge || "New";
+  return discount > 0 ? `ຫຼຸດ ${discount}%` : product.badge || "ໃໝ່";
 }
 
 function productBadgeClass(product) {
@@ -508,7 +591,7 @@ function closeConfirm() {
 function showResult({ type = "success", title, message }) {
   const isError = type === "error";
   if (els.resultIcon) els.resultIcon.textContent = isError ? "!" : "✓";
-  if (els.resultKicker) els.resultKicker.textContent = isError ? "NOT SAVED" : "SUCCESS";
+  if (els.resultKicker) els.resultKicker.textContent = isError ? "ບັນທຶກບໍ່ໄດ້" : "ສຳເລັດ";
   if (els.resultTitle) els.resultTitle.textContent = title || (isError ? "ບັນທຶກບໍ່ສຳເລັດ" : "ບັນທຶກສຳເລັດ");
   if (els.resultMessage) els.resultMessage.textContent = message || (isError ? "ກະລຸນາລອງໃໝ່." : "ຂໍ້ມູນຖືກບັນທຶກແລ້ວ.");
   els.resultModal?.classList.toggle("is-error", isError);
@@ -559,9 +642,18 @@ function productFreebies(product) {
   const saved = Array.isArray(product?.freebies) ? product.freebies.filter(Boolean) : [];
   if (saved.length) return saved;
   const category = (product?.category || "").toLowerCase();
-  if (category.includes("pillow")) return ["Pillow cover"];
+  if (category.includes("pillow")) return ["ປອກໝອນ"];
   if (category.includes("topper")) return ["Aroma fabric spray"];
   return ["2 pillows", "Premium bedsheet"];
+}
+
+function layerStory(product) {
+  const saved = product?.layerStory && typeof product.layerStory === "object" ? product.layerStory : {};
+  return {
+    eyebrow: String(saved.eyebrow || DEFAULT_LAYER_STORY.eyebrow).trim(),
+    title: String(saved.title || DEFAULT_LAYER_STORY.title).trim(),
+    description: String(saved.description || DEFAULT_LAYER_STORY.description).trim()
+  };
 }
 
 function parseImages(value) {
@@ -576,6 +668,7 @@ function parseImages(value) {
 
 function collectionKeyForProduct(product) {
   const category = (product?.category || "").toLowerCase();
+  if ((category.includes("mattress") || category.includes("ເສື່ອ") || category.includes("ທີ່ນອນ")) && (category.includes("bed") || category.includes("ຕຽງ"))) return "mattress-beds";
   if (category.includes("blanket") || category.includes("duvet") || category.includes("comforter")) return "blankets";
   if (category === "bed" || category.includes("bed frame") || category.includes("bedframe")) return "beds";
   if (category.includes("pillow")) return "pillows";
@@ -599,7 +692,8 @@ function isMattressCategory(category = "") {
 
 function isBedCategory(category = "") {
   const value = category.toLowerCase();
-  return value === "bed" || value.includes("bed frame") || value.includes("bedframe");
+  const isMattressBedSet = (value.includes("mattress") || value.includes("ເສື່ອ") || value.includes("ທີ່ນອນ")) && (value.includes("bed") || value.includes("ຕຽງ"));
+  return isMattressBedSet || value === "bed" || value.includes("bed frame") || value.includes("bedframe");
 }
 
 function normalizeFirmness(value = "") {
@@ -650,13 +744,17 @@ function renderBedColorAdmin() {
   const enabled = isBedCategory(category);
   const colors = currentBedColors();
   const availableCount = colors.filter((color) => color.available).length;
-  els.bedColorAdmin.classList.toggle("is-disabled", !enabled);
-  if (els.bedColorCount) els.bedColorCount.textContent = enabled ? `${availableCount}/${colors.length} available` : "Bed only";
+  els.bedColorAdmin.classList.toggle("is-hidden", !enabled);
+  if (els.bedColorCount) els.bedColorCount.textContent = enabled ? `ມີ ${availableCount}/${colors.length} ສີ` : "ສຳລັບຕຽງນອນ";
+  if (!enabled) {
+    els.bedColorGrid.innerHTML = "";
+    return;
+  }
   els.bedColorGrid.innerHTML = colors.map((color) => `
-    <button class="admin-bed-color-toggle ${color.available ? "is-available" : "is-sold-out"}" type="button" data-admin-bed-color="${color.id}" style="--swatch:${color.hex}" ${enabled ? "" : "disabled"}>
+    <button class="admin-bed-color-toggle ${color.available ? "is-available" : "is-sold-out"}" type="button" data-admin-bed-color="${color.id}" style="--swatch:${color.hex}">
       <span class="admin-bed-swatch"></span>
       <strong>${color.name}</strong>
-      <small>${color.available ? "Available" : "Sold out"}</small>
+      <small>${color.available ? "ມີສີນີ້" : "ສີນີ້ໝົດ"}</small>
     </button>
   `).join("");
 }
@@ -665,7 +763,7 @@ function updateBedColorField() {
   if (!els.bedColorValue) return;
   const enabled = isBedCategory(field("category")?.value || "");
   if (!els.bedColorValue.value) els.bedColorValue.value = JSON.stringify(normalizeBedColors());
-  els.bedColorAdmin?.classList.toggle("is-disabled", !enabled);
+  els.bedColorAdmin?.classList.toggle("is-hidden", !enabled);
   renderBedColorAdmin();
 }
 
@@ -731,14 +829,15 @@ function parseCategoryCoverValue(value) {
 }
 
 function placementLabel(product) {
-  if (!product?.name) return "Home / Category / Detail";
+  if (!product?.name) return "ໜ້າຫຼັກ / ໝວດ / ລາຍລະອຽດ";
   const labels = {
-    mattresses: "Home + Mattress category + Detail",
-    pillows: "Pillow category + Detail",
-    toppers: "Topper category + Detail",
-    blankets: "Blanket category + Detail",
-    beds: "Bed category + Detail",
-    bedding: "Bedding category + Detail"
+    mattresses: "ໜ້າຫຼັກ + ໝວດທີ່ນອນ + ລາຍລະອຽດ",
+    "mattress-beds": "ໝວດເສື່ອນອນ+ຕຽງນອນ + ລາຍລະອຽດ",
+    pillows: "ໝວດໝອນ + ລາຍລະອຽດ",
+    toppers: "ໝວດທັອບເປີ + ລາຍລະອຽດ",
+    blankets: "ໝວດຜ້າຫົ່ມ + ລາຍລະອຽດ",
+    beds: "ໝວດຕຽງນອນ + ລາຍລະອຽດ",
+    bedding: "ໝວດອຸປະກອນການນອນ + ລາຍລະອຽດ"
   };
   return labels[collectionKeyForProduct(product)] || labels.mattresses;
 }
@@ -753,7 +852,7 @@ function updateImagePreview(src) {
   const images = Array.isArray(src) ? src : src ? [src] : [];
   els.productImagePreview.classList.toggle("has-image", Boolean(images.length));
   els.productImagePreview.innerHTML = images.length
-    ? `<div class="admin-upload-grid">${images.map((image, index) => `<span><img src="${image}" alt="Product preview ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-image="${index}" aria-label="Remove image">×</button></span>`).join("")}</div>`
+    ? `<div class="admin-upload-grid">${images.map((image, index) => `<span><img src="${image}" alt="ຕົວຢ່າງຮູບສິນຄ້າ ${index + 1}" />${index === 0 ? "<b>ຮູບຫຼັກ</b>" : ""}<button type="button" data-remove-image="${index}" aria-label="ລຶບຮູບ">×</button></span>`).join("")}</div>`
     : "ຍັງບໍ່ມີຮູບສິນຄ້າ";
 }
 
@@ -783,12 +882,12 @@ function renderCategoryCoverEditor() {
   els.categoryCoverKey.value = collection.key;
   els.categoryCoverValue.value = JSON.stringify(coverImages);
   els.categoryCoverTitle.textContent = `ແກ້ໄຂໜ້າປົກ: ${collection.label}`;
-  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າ collection ຂອງ ${collection.label}. ອັບໄດ້ຫຼາຍຮູບ, ຖ້າມີຫຼາຍຮູບຈະເລື່ອນອັດຕະໂນມັດ. ຂະໜາດແນະນຳ 1920 × 520 px, ຫຼື 2400 × 650 px ສຳລັບຈໍໃຫຍ່.`;
+  els.categoryCoverHelp.textContent = `ຮູບນີ້ຈະໄປສະແດງໜ້າໝວດຂອງ ${collection.label}. ອັບໄດ້ຫຼາຍຮູບ, ຖ້າມີຫຼາຍຮູບຈະເລື່ອນອັດຕະໂນມັດ. ຂະໜາດແນະນຳ 1920 × 520 px, ຫຼື 2400 × 650 px ສຳລັບຈໍໃຫຍ່.`;
   els.categoryCoverPreview.classList.toggle("has-image", Boolean(coverImages.length));
   els.categoryCoverPreview.classList.toggle("has-multiple", coverImages.length > 1);
   els.categoryCoverPreview.innerHTML = coverImages.length
-    ? `<div class="admin-cover-slide-grid">${coverImages.map((image, index) => `<span><img src="${image}" alt="${collection.label} cover ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="Remove cover image">×</button></span>`).join("")}</div>`
-    : `<span>${collection.label} cover preview</span>`;
+    ? `<div class="admin-cover-slide-grid">${coverImages.map((image, index) => `<span><img src="${image}" alt="ຮູບປົກ ${collection.label} ${index + 1}" />${index === 0 ? "<b>ຮູບຫຼັກ</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="ລຶບຮູບປົກ">×</button></span>`).join("")}</div>`
+    : `<span>ຕົວຢ່າງຮູບປົກ ${collection.label}</span>`;
 }
 
 function renderProducts() {
@@ -805,7 +904,7 @@ function renderProducts() {
       <div>
         <h3>${product.name || "ສິນຄ້າໃໝ່"}</h3>
         <p>${product._draft ? "ລາຍການໃໝ່ • ຍັງບໍ່ໄດ້ບັນທຶກ" : `${productCollectionLabel(product)} • ${product.category} • ${productPriceLabel(product)}`}</p>
-        <p>${product._draft ? "ກອກຂໍ້ມູນດ້ານຂວາແລ້ວກົດບັນທຶກ" : `${product.badge || "No badge"} • ${product.sizes?.join(", ") || "-"}`}</p>
+        <p>${product._draft ? "ກອກຂໍ້ມູນດ້ານຂວາແລ້ວກົດບັນທຶກ" : `${product.badge || "ບໍ່ມີ Badge"} • ${product.sizes?.join(", ") || "-"}`}</p>
       </div>
       <div class="admin-actions">
         <button type="button" data-edit-product="${product.id}">ແກ້ໄຂ</button>
@@ -872,7 +971,7 @@ function formToProduct() {
   const price = Number(data.get("price") || 0);
   const salePrice = Number(data.get("salePrice") || 0);
   const manualDiscount = Number(data.get("discountPercent") || 0);
-  const finalDiscount = manualDiscount > 0 ? Math.min(100, Math.round(manualDiscount)) : discountPercent(price, salePrice);
+  const finalDiscount = manualDiscount > 0 ? clampDiscount(manualDiscount) : discountPercent(price, salePrice);
   const sizePrices = parseSizePrices(data.get("sizePrices") || "");
   const id = data.get("id") || slugify(name);
   const previous = products.find((item) => item.id === id);
@@ -895,7 +994,7 @@ function formToProduct() {
     price,
     salePrice,
     discountPercent: finalDiscount,
-    badge: data.get("badge").trim() || (finalDiscount > 0 ? `ຫຼຸດ ${finalDiscount}%` : "New"),
+    badge: data.get("badge").trim() || (finalDiscount > 0 ? `ຫຼຸດ ${finalDiscount}%` : "ໃໝ່"),
     rating: Number(data.get("rating") || 4.8),
     popular: previous?.popular || Date.now(),
     stock: data.get("stock").trim() || "ມີສິນຄ້າ",
@@ -903,6 +1002,11 @@ function formToProduct() {
     warranty: data.get("warranty").trim() || "10 ປີ",
     freebies: toList(data.get("freebies") || "2 pillows, Premium bedsheet"),
     materials: toList(data.get("materials") || "Premium fabric, Pocket spring"),
+    layerStory: {
+      eyebrow: data.get("layerEyebrow").trim() || DEFAULT_LAYER_STORY.eyebrow,
+      title: data.get("layerTitle").trim() || DEFAULT_LAYER_STORY.title,
+      description: data.get("layerDescription").trim() || DEFAULT_LAYER_STORY.description
+    },
     description: data.get("description").trim() || "ລາຍລະອຽດສິນຄ້າ Kinglike."
   };
 }
@@ -928,7 +1032,11 @@ function fillForm(product) {
   setField("bedColors", JSON.stringify(normalizeBedColors(product.bedColors)));
   setField("warranty", product.warranty || "");
   setField("freebies", product.freebies?.join(", ") || "");
-  setField("materials", product.materials?.join(", ") || "");
+  setMaterials(product.materials || []);
+  const story = layerStory(product);
+  setField("layerEyebrow", story.eyebrow);
+  setField("layerTitle", story.title);
+  setField("layerDescription", story.description);
   setField("description", product.description || "");
   els.formTitle.textContent = product._draft ? "ເພີ່ມສິນຄ້າໃໝ່" : "ແກ້ໄຂສິນຄ້າ";
   activeProductId = product.id;
@@ -955,7 +1063,7 @@ function updateFirmnessField() {
   if (!categoryInput || !firmnessInput) return;
   const enabled = isMattressCategory(categoryInput.value);
   firmnessInput.disabled = !enabled;
-  firmnessInput.closest("label")?.classList.toggle("is-disabled", !enabled);
+  firmnessInput.closest("label")?.classList.toggle("is-hidden", !enabled);
   if (!enabled) firmnessInput.value = "";
   else if (!firmnessInput.value) firmnessInput.value = "ນຸ້ມສະບາຍ";
 }
@@ -967,6 +1075,10 @@ function clearForm() {
   setField("images", "");
   setField("bedColors", JSON.stringify(normalizeBedColors()));
   setField("category", activeCollection().category);
+  setMaterials(["Premium fabric", "Pocket spring"]);
+  setField("layerEyebrow", DEFAULT_LAYER_STORY.eyebrow);
+  setField("layerTitle", DEFAULT_LAYER_STORY.title);
+  setField("layerDescription", DEFAULT_LAYER_STORY.description);
   updateFirmnessField();
   updateBedColorField();
   els.formTitle.textContent = "ເພີ່ມສິນຄ້າໃໝ່";
@@ -1001,6 +1113,7 @@ function renderPreview() {
   const previewColors = isBedCategory(product.category)
     ? normalizeBedColors(product.bedColors).filter((color) => color.available).slice(0, 8)
     : [];
+  const story = layerStory(product);
   els.preview.innerHTML = `
     <article class="product-card">
       <div class="product-art ${imageClass}">
@@ -1023,6 +1136,14 @@ function renderPreview() {
         </div>
       </div>
     </article>
+    <section class="admin-layer-preview" aria-label="ຕົວຢ່າງບລັອກວັດສະດຸໃນໜ້າລາຍລະອຽດ">
+      <span>${story.eyebrow}</span>
+      <h3>${story.title}</h3>
+      <p>${story.description}</p>
+      <div>
+        ${(product.materials || []).map((item, index) => `<article><strong>${String(index + 1).padStart(2, "0")}</strong><span>${item}</span></article>`).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -1178,7 +1299,7 @@ function renderPromoPreview() {
   els.promoPreview.classList.toggle("has-cover", Boolean(coverImage));
   els.promoPreview.innerHTML = coverImage
     ? `<img src="${coverImage}" alt="${title}" />`
-    : `<div class="promo-preview-copy"><p class="eyebrow">HOT DEAL</p><h3>${title}</h3><p>${text}</p><small>ຝັ່ງລູກຄ້າ: countdown + ກະດາດສີທອງຕອນເປີດໂປຣ</small></div>`;
+    : `<div class="promo-preview-copy"><p class="eyebrow">ໂປຣພິເສດ</p><h3>${title}</h3><p>${text}</p><small>ຝັ່ງລູກຄ້າ: ໂຕນັບຖອຍຫຼັງ + ກະດາດສີທອງຕອນເປີດໂປຣ</small></div>`;
 }
 
 function renderHeroSlideList() {
@@ -1188,11 +1309,11 @@ function renderHeroSlideList() {
     <div class="admin-upload-grid hero-slide-admin-grid">
       ${slides.map((slide, index) => `
         <span class="hero-slide-admin-pair">
-          <img src="${slide.src || slide.mobileSrc}" alt="Hero desktop slide ${index + 1}" />
-          ${slide.mobileSrc ? `<img src="${slide.mobileSrc}" alt="Hero mobile slide ${index + 1}" />` : ""}
-          <b>Slide ${index + 1}</b>
-          <em>${slide.src ? "PC ready" : "PC missing"} / ${slide.mobileSrc ? "Mobile ready" : "Mobile missing"}</em>
-          <button type="button" data-remove-hero-slide="${index}" aria-label="Remove slide">×</button>
+          <img src="${slide.src || slide.mobileSrc}" alt="ສະໄລດ໌ PC ${index + 1}" />
+          ${slide.mobileSrc ? `<img src="${slide.mobileSrc}" alt="ສະໄລດ໌ Mobile ${index + 1}" />` : ""}
+          <b>ສະໄລດ໌ ${index + 1}</b>
+          <em>${slide.src ? "PC ພ້ອມໃຊ້" : "ຍັງບໍ່ມີ PC"} / ${slide.mobileSrc ? "Mobile ພ້ອມໃຊ້" : "ຍັງບໍ່ມີ Mobile"}</em>
+          <button type="button" data-remove-hero-slide="${index}" aria-label="ລຶບສະໄລດ໌">×</button>
         </span>
       `).join("")}
     </div>
@@ -1300,7 +1421,7 @@ function renderPromoEventList() {
     <article class="promo-event-admin-item ${item.active === false ? "is-paused" : ""}">
       <div class="promo-event-admin-thumb">${item.image ? `<img src="${item.image}" alt="${item.title}" />` : ""}</div>
       <div>
-        <strong>${item.title || "Untitled promotion"}</strong>
+        <strong>${item.title || "ໂປຣໂມຊັນບໍ່ມີຫົວຂໍ້"}</strong>
         <span>${item.badge || "PROMOTION"}${item.date ? ` • ${item.date}` : ""}${item.active === false ? " • ປິດຢູ່" : ""}</span>
         <div class="admin-mini-actions">
           <button type="button" data-edit-promo-event="${item.id}">ແກ້ໄຂ</button>
@@ -1309,7 +1430,7 @@ function renderPromoEventList() {
         </div>
       </div>
     </article>
-  `).join("") : `<p class="meta">ຍັງບໍ່ມີ Promotion / Event</p>`;
+  `).join("") : `<p class="meta">ຍັງບໍ່ມີໂປຣໂມຊັນ / ອີເວັນ</p>`;
 }
 
 function savePromotionData(promotion) {
@@ -1377,7 +1498,7 @@ function exportBackup() {
   link.click();
   link.remove();
   URL.revokeObjectURL(link.href);
-  showToast("Export backup file ແລ້ວ");
+  showToast("ດາວໂຫຼດໄຟລ໌ສຳຮອງແລ້ວ");
 }
 
 function exportPublishStore() {
@@ -1394,7 +1515,7 @@ function exportPublishStore() {
   link.click();
   link.remove();
   URL.revokeObjectURL(link.href);
-  showToast("Export store.json ສຳລັບ GitHub Pages ແລ້ວ");
+  showToast("ດາວໂຫຼດ store.json ສຳລັບ GitHub Pages ແລ້ວ");
 }
 
 function importBackup(file) {
@@ -1415,9 +1536,9 @@ function importBackup(file) {
       else clearForm();
       loadPromoForm();
       renderBackupSummary();
-      showToast("Import backup file ສຳເລັດ");
+      showToast("ນຳເຂົ້າໄຟລ໌ສຳຮອງສຳເລັດ");
     } catch (error) {
-      showToast("Import ບໍ່ສຳເລັດ: file ບໍ່ຖືກຕ້ອງ");
+      showToast("ນຳເຂົ້າບໍ່ສຳເລັດ: ໄຟລ໌ບໍ່ຖືກຕ້ອງ");
     } finally {
       els.importData.value = "";
     }
@@ -1458,7 +1579,7 @@ async function addHeroSlideImages(files, target) {
     const compactedPromo = await compactPromotionForStorage({ ...promo, heroSlides: slides });
     savePromotionData(compactedPromo);
     renderHeroSlideList();
-    showToast(target === "mobile" ? "ອັບຮູບ Mobile cover ແລ້ວ" : "ອັບຮູບ PC cover ແລ້ວ");
+    showToast(target === "mobile" ? "ອັບຮູບປົກ Mobile ແລ້ວ" : "ອັບຮູບປົກ PC ແລ້ວ");
   } catch (error) {
     showResult({
       type: "error",
@@ -1485,10 +1606,32 @@ els.clearForm.addEventListener("click", clearForm);
 els.newProduct.addEventListener("click", addBlankProductDraft);
 
 els.form.addEventListener("input", (event) => {
+  syncPriceFields(event.target?.name || "");
   if (event.target?.name === "category") {
     updateFirmnessField();
     updateBedColorField();
   }
+  if (event.target?.matches("[data-material-input]")) {
+    updateMaterialsFromEditor();
+  }
+  renderPreview();
+});
+
+els.addMaterial?.addEventListener("click", () => {
+  const next = [...currentMaterials(), ""];
+  renderMaterialEditor(next);
+  requestAnimationFrame(() => {
+    const inputs = els.materialList?.querySelectorAll("[data-material-input]");
+    inputs?.[inputs.length - 1]?.focus();
+  });
+});
+
+els.materialList?.addEventListener("click", (event) => {
+  const removeIndex = event.target.closest("[data-remove-material]")?.dataset.removeMaterial;
+  if (removeIndex === undefined) return;
+  const next = currentMaterials();
+  next.splice(Number(removeIndex), 1);
+  setMaterials(next);
   renderPreview();
 });
 
@@ -1642,7 +1785,7 @@ els.resetDemo.addEventListener("click", () => {
   saveProducts();
   renderProducts();
   fillForm(products.find((item) => item.id === activeProductId) || products[0]);
-  showToast("Reset demo ແລ້ວ");
+  showToast("ລ້າງຂໍ້ມູນທົດລອງແລ້ວ");
 });
 
 els.promoForm.addEventListener("submit", async (event) => {
@@ -1658,13 +1801,13 @@ els.promoForm.addEventListener("submit", async (event) => {
   if (savePromotionData(draft)) {
     showResult({
       title: "ບັນທຶກສຳເລັດ",
-      message: "ບັນທຶກ Cover / Promotion ແລ້ວ."
+      message: "ບັນທຶກຮູບປົກ / ໂປຣໂມຊັນແລ້ວ."
     });
   } else {
     showResult({
       type: "error",
       title: "ບັນທຶກບໍ່ສຳເລັດ",
-      message: "ບໍ່ສາມາດບັນທຶກ Cover / Promotion ໄດ້."
+      message: "ບໍ່ສາມາດບັນທຶກຮູບປົກ / ໂປຣໂມຊັນໄດ້."
     });
   }
 });
@@ -1727,7 +1870,7 @@ els.categoryCoverUpload?.addEventListener("change", async (event) => {
     els.categoryCoverValue.value = JSON.stringify(images);
     els.categoryCoverPreview.classList.add("has-image");
     els.categoryCoverPreview.classList.toggle("has-multiple", images.length > 1);
-    els.categoryCoverPreview.innerHTML = `<div class="admin-cover-slide-grid">${images.map((image, index) => `<span><img src="${image}" alt="${activeCollection().label} cover ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="Remove cover image">×</button></span>`).join("")}</div>`;
+    els.categoryCoverPreview.innerHTML = `<div class="admin-cover-slide-grid">${images.map((image, index) => `<span><img src="${image}" alt="ຮູບປົກ ${activeCollection().label} ${index + 1}" />${index === 0 ? "<b>ຮູບຫຼັກ</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="ລຶບຮູບປົກ">×</button></span>`).join("")}</div>`;
   } catch (error) {
     showResult({
       type: "error",
@@ -1747,8 +1890,8 @@ els.categoryCoverPreview?.addEventListener("click", (event) => {
   els.categoryCoverPreview.classList.toggle("has-image", Boolean(images.length));
   els.categoryCoverPreview.classList.toggle("has-multiple", images.length > 1);
   els.categoryCoverPreview.innerHTML = images.length
-    ? `<div class="admin-cover-slide-grid">${images.map((image, index) => `<span><img src="${image}" alt="${activeCollection().label} cover ${index + 1}" />${index === 0 ? "<b>Main</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="Remove cover image">×</button></span>`).join("")}</div>`
-    : `<span>${activeCollection().label} cover preview</span>`;
+    ? `<div class="admin-cover-slide-grid">${images.map((image, index) => `<span><img src="${image}" alt="ຮູບປົກ ${activeCollection().label} ${index + 1}" />${index === 0 ? "<b>ຮູບຫຼັກ</b>" : ""}<button type="button" data-remove-category-cover="${index}" aria-label="ລຶບຮູບປົກ">×</button></span>`).join("")}</div>`
+    : `<span>ຕົວຢ່າງຮູບປົກ ${activeCollection().label}</span>`;
 });
 
 els.categoryCoverForm?.addEventListener("submit", async (event) => {
@@ -1789,7 +1932,7 @@ els.promoEventForm?.addEventListener("submit", async (event) => {
     showResult({
       type: "error",
       title: "ບັນທຶກບໍ່ສຳເລັດ",
-      message: "ກະລຸນາໃສ່ຫົວຂໍ້ Promotion / Event."
+      message: "ກະລຸນາໃສ່ຫົວຂໍ້ໂປຣໂມຊັນ / ອີເວັນ."
     });
     return;
   }
@@ -1803,13 +1946,13 @@ els.promoEventForm?.addEventListener("submit", async (event) => {
     fillPromoEventForm(item);
     showResult({
       title: "ບັນທຶກສຳເລັດ",
-      message: "ບັນທຶກ Promotion / Event ແລ້ວ."
+      message: "ບັນທຶກໂປຣໂມຊັນ / ອີເວັນແລ້ວ."
     });
   } else {
     showResult({
       type: "error",
       title: "ບັນທຶກບໍ່ສຳເລັດ",
-      message: "ບໍ່ສາມາດບັນທຶກ Promotion / Event ໄດ້."
+      message: "ບໍ່ສາມາດບັນທຶກໂປຣໂມຊັນ / ອີເວັນໄດ້."
     });
   }
 });
@@ -1836,14 +1979,14 @@ els.promoEventList?.addEventListener("click", (event) => {
   if (deleteId) {
     const item = promo.events.find((eventItem) => eventItem.id === deleteId);
     openConfirm({
-      title: "ລຶບ Promotion / Event ນີ້ບໍ?",
+      title: "ລຶບໂປຣໂມຊັນ / ອີເວັນນີ້ບໍ?",
       message: item ? `ທ່ານຕ້ອງການລຶບ "${item.title}" ບໍ?` : "ທ່ານຕ້ອງການລຶບຂໍ້ມູນນີ້ບໍ?",
       onConfirm: () => {
         promo.events = promo.events.filter((eventItem) => eventItem.id !== deleteId);
         savePromotionData(promo);
         renderPromoEventList();
         if (activePromoEventId === deleteId) clearPromoEventForm();
-        showToast("ລຶບ Promotion / Event ແລ້ວ");
+        showToast("ລຶບໂປຣໂມຊັນ / ອີເວັນແລ້ວ");
       }
     });
   }

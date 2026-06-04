@@ -47,6 +47,15 @@ const collections = {
       { ...product("grand-hybrid", "Kinglike Grand Hybrid", "Foam + Spring + Latex", "ນຸ່ມແນ່ນ", "13 ນິ້ວ", 9200000, 6590000, 28, "Hotel Grade"), type: "foam-spring-latex" }
     ]
   },
+  "mattress-beds": {
+    title: "ເສື່ອນອນ+ຕຽງນອນ",
+    kicker: "KINGLIKE MATTRESS + BED SETS",
+    copy: "ຊຸດເສື່ອນອນພ້ອມຕຽງນອນ ຈັບຄູ່ໃຫ້ຫ້ອງນອນເບິ່ງຄົບ ແລະໃຊ້ງານສະບາຍ.",
+    art: "topper",
+    products: [
+      product("mattress-bed-signature", "Kinglike Signature Sleep Set", "Mattress + Bed", "ນຸ່ມແນ່ນ", "12 ນິ້ວ + ຕຽງ Queen / King", 15500000, 10990000, 29, "Set")
+    ]
+  },
   pillows: {
     title: "ໝອນ",
     kicker: "KINGLIKE PILLOWS",
@@ -183,6 +192,7 @@ function productTypeFromCategory(category = "") {
 
 function collectionFromAdminProduct(product) {
   const category = (product.category || "").toLowerCase();
+  if ((category.includes("mattress") || category.includes("ເສື່ອ") || category.includes("ທີ່ນອນ")) && (category.includes("bed") || category.includes("ຕຽງ"))) return "mattress-beds";
   if (category.includes("blanket") || category.includes("duvet") || category.includes("comforter")) return "blankets";
   if (category === "bed" || category.includes("bed frame") || category.includes("bedframe")) return "beds";
   if (category.includes("pillow")) return "pillows";
@@ -431,7 +441,8 @@ function cartKey(id, size = "", color = "") {
 }
 
 function isBedProduct(product) {
-  return collectionFromAdminProduct(product) === "beds";
+  const collectionKey = collectionFromAdminProduct(product);
+  return collectionKey === "beds" || collectionKey === "mattress-beds";
 }
 
 function cartMetaLabel(item, product) {
@@ -704,26 +715,88 @@ function cartItemsWithProducts() {
     .filter(Boolean);
 }
 
-function buildOrderMessage() {
+function orderDateParts(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return {
+    display: `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`,
+    key: `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`
+  };
+}
+
+function nextOrderCode() {
+  const { key } = orderDateParts();
+  const storageKey = `kinglike-order-sequence-${key}`;
+  const next = Number(localStorage.getItem(storageKey) || 0) + 1;
+  localStorage.setItem(storageKey, String(next));
+  return `#KL${key}${String(next).padStart(3, "0")}`;
+}
+
+function customerFromChatModal({ validate = false } = {}) {
+  const modal = document.querySelector("[data-chat-order-modal]");
+  const getValue = (name) => modal?.querySelector(`[name="${name}"]`)?.value.trim() || "";
+  const customer = {
+    name: getValue("chatCustomerName"),
+    phone: getValue("chatCustomerPhone"),
+    address: getValue("chatCustomerAddress")
+  };
+  if (validate) {
+    const missing = [];
+    if (!customer.name) missing.push("ຊື່ລູກຄ້າ");
+    if (!customer.phone) missing.push("ເບີໂທ");
+    if (!customer.address) missing.push("ທີ່ຢູ່");
+    if (missing.length) {
+      const target = modal?.querySelector("[data-chat-error]");
+      if (target) {
+        target.classList.add("is-error");
+        target.textContent = "ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບ.";
+      }
+      return null;
+    }
+  }
+  return customer;
+}
+
+function buildOrderMessage(customer = {}, orderCode = nextOrderCode()) {
   const items = cartItemsWithProducts();
   const orderPrice = (value) => formatKip(value).replace("₭", "ກີບ");
-  const itemLines = items.map((item) => {
+  const { display: orderDate } = orderDateParts();
+  const itemLines = items.map((item, index) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
-    return `${item.product.name}${item.colorName ? `\nສີ: ${item.colorName}` : ""}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
+    return [
+      `${index + 1}. ${item.product.name}`,
+      item.size ? `   • ຂະໜາດ: ${item.size}` : "",
+      item.colorName ? `   • ສີ: ${item.colorName}` : "",
+      `   • ຈຳນວນ: ${item.qty}`,
+      `   • ລາຄາ: ${orderPrice(subtotal)}`
+    ].filter(Boolean).join("\n");
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   return [
-    "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike",
+    "🛏️ ໃບສັ່ງຊື້ສິນຄ້າຈາກເວບໄຊ KINGLIKE",
     "",
-    "ຊື່ສິນຄ້າ",
-    "ຈຳນວນ",
-    "ລາຄາ",
+    `📋 ລະຫັດຄຳສັ່ງ: ${orderCode}`,
+    `📅 ວັນທີ: ${orderDate}`,
+    "",
+    "━━━━━━━━━━━━━━",
+    "",
+    "🛒 ລາຍການສິນຄ້າ",
     "",
     itemLines.join("\n\n"),
     "",
-    "__________________________________",
-    `ຍອດລວມ: ${orderPrice(total)}`
+    "━━━━━━━━━━━━━━",
+    "",
+    `💰 ຍອດລວມ: ${orderPrice(total)}`,
+    "",
+    "━━━━━━━━━━━━━━",
+    "",
+    `👤 ຊື່ລູກຄ້າ: ${customer.name || ""}`,
+    "",
+    `📞 ເບີໂທ: ${customer.phone || ""}`,
+    "",
+    `📍 ທີ່ຢູ່: ${customer.address || ""}`,
+    "",
+    "━━━━━━━━━━━━━━"
   ].filter(Boolean).join("\n");
 }
 
@@ -749,8 +822,13 @@ function ensureChatModal() {
       <button class="close-btn" type="button" data-close-chat-order>×</button>
       <p class="eyebrow">ສັ່ງຜ່ານແຊັດ</p>
       <h2>ເລືອກຊ່ອງທາງຕິດຕໍ່</h2>
-      <p class="meta">ເລືອກ WhatsApp ຫຼື Messenger ລະບົບຈະສ້າງຂໍ້ຄວາມສິນຄ້າໃຫ້ອັດຕະໂນມັດ</p>
+      <p class="meta">ກອກຂໍ້ມູນລູກຄ້າ ແລ້ວເລືອກ WhatsApp ຫຼື Messenger. ລະບົບຈະສ້າງໃບສັ່ງຊື້ໃຫ້ອັດຕະໂນມັດ.</p>
       <div class="chat-order-summary" data-chat-summary></div>
+      <div class="chat-customer-form">
+        <label>ຊື່ລູກຄ້າ<input name="chatCustomerName" autocomplete="name" placeholder="ຊື່ ແລະ ນາມສະກຸນ" /></label>
+        <label>ເບີໂທ<input name="chatCustomerPhone" inputmode="tel" autocomplete="tel" placeholder="020XXXXXXXX" /></label>
+        <label>ທີ່ຢູ່<textarea name="chatCustomerAddress" rows="3" placeholder="ບ້ານ, ເມືອງ, ແຂວງ, ຈຸດສັງເກດ"></textarea></label>
+      </div>
       <p class="checkout-alert" data-chat-error></p>
       <div class="chat-channel-actions">
         ${channelButton("whatsapp", "WhatsApp")}
@@ -806,7 +884,10 @@ function showMessengerCopyNotice(copied) {
 
 async function sendChatDraft(channel) {
   const items = cartItemsWithProducts();
-  const message = items.length ? buildOrderMessage() : "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike";
+  const customer = customerFromChatModal({ validate: items.length });
+  if (!customer) return false;
+  const orderCode = items.length ? nextOrderCode() : "";
+  const message = items.length ? buildOrderMessage(customer, orderCode) : "ສະບາຍດີ ຂໍສອບຖາມສິນຄ້າ KINGLIKE";
   const url = channel === "messenger" ? MESSENGER_URL : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
   const chatWindow = window.open(url, "_blank");
   if (!chatWindow) window.location.href = url;
@@ -820,9 +901,11 @@ async function sendChatDraft(channel) {
       body: JSON.stringify({
         mode: "chat_draft",
         contactChannel: channel,
-        customerName: "Website chat customer",
-        customerPhone: "",
-        customerWhatsapp: "",
+        orderCode,
+        customerName: customer.name,
+        customerPhone: customer.phone,
+        customerWhatsapp: customer.phone,
+        customerAddress: customer.address,
         chatMessage: message,
         productLink: window.location.href,
         items: items.map((item) => ({
@@ -838,11 +921,12 @@ async function sendChatDraft(channel) {
   } catch (error) {
     // Let customer continue to chat even if local API is unavailable.
   }
+  return true;
 }
 async function submitChatDraft(channel) {
   const modal = ensureChatModal();
-  await sendChatDraft(channel);
-  if (channel !== "messenger") modal.classList.remove("is-open");
+  const sent = await sendChatDraft(channel);
+  if (sent && channel !== "messenger") modal.classList.remove("is-open");
 }
 
 function checkout() {

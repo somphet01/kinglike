@@ -285,6 +285,11 @@ let promoPopupDismissed = false;
 let bestSellerOrderIds = [];
 let heroCarouselTimer = null;
 let heroCarouselIndex = 0;
+let homeVideoAutoFrame = 0;
+let homeVideoAutoPausedUntil = 0;
+let homeVideoAutoActive = false;
+let homeVideoAutoObserver = null;
+let homeVideoAutoOffset = 0;
 const HERO_COVER_SLIDES = [
   {
     src: "assets/cover-luxury-bright.png",
@@ -772,18 +777,21 @@ function renderHomeVideos(promotion) {
     { title: "Kinglike customer clip", src: "assets/videos/kinglike-story-05.mp4" }
   ];
   const activeVideos = videos.length ? videos : defaultVideos;
+  const loopVideos = activeVideos.length > 1 ? [...activeVideos, ...activeVideos] : activeVideos;
   els.homeVideosSection.hidden = false;
-  els.homeVideos.innerHTML = activeVideos.map((item, index) => `
-    <article class="vertical-video-card" data-video-card>
+  els.homeVideos.dataset.videoLoopCount = String(activeVideos.length);
+  els.homeVideos.innerHTML = loopVideos.map((item, index) => `
+    <article class="vertical-video-card" data-video-card data-video-loop-index="${index % activeVideos.length}">
       <video src="${item.src}" muted playsinline loop autoplay preload="metadata"></video>
       <button class="video-mute-btn" type="button" data-toggle-home-video aria-label="Toggle video sound"></button>
       <div class="vertical-video-caption">
-        <span>${String(index + 1).padStart(2, "0")}</span>
+        <span>${String((index % activeVideos.length) + 1).padStart(2, "0")}</span>
         <strong>${item.title || "Kinglike video"}</strong>
       </div>
     </article>
   `).join("");
   initHomeVideoPlayback();
+  initHomeVideoAutoScroll();
 }
 
 function initHomeVideoPlayback() {
@@ -794,6 +802,109 @@ function initHomeVideoPlayback() {
     video.loop = true;
     video.play().catch(() => {});
   });
+}
+
+function pauseHomeVideoAutoScroll(delay = 2600) {
+  homeVideoAutoPausedUntil = Date.now() + delay;
+  els.homeVideos?.classList.remove("is-auto-scrolling");
+}
+
+function stopHomeVideoAutoScroll() {
+  homeVideoAutoActive = false;
+  if (homeVideoAutoFrame) window.cancelAnimationFrame(homeVideoAutoFrame);
+  homeVideoAutoFrame = 0;
+  els.homeVideos?.classList.remove("is-auto-scrolling");
+}
+
+function startHomeVideoAutoScroll() {
+  if (!els.homeVideos || homeVideoAutoActive || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  homeVideoAutoActive = true;
+  homeVideoAutoOffset = els.homeVideos.scrollLeft;
+  const step = () => {
+    if (!homeVideoAutoActive || !els.homeVideos) return;
+    const scroller = els.homeVideos;
+    const loopCount = Number(scroller.dataset.videoLoopCount || 0);
+    const shouldMove = Date.now() >= homeVideoAutoPausedUntil && scroller.scrollWidth > scroller.clientWidth + 8;
+    if (shouldMove) {
+      scroller.classList.add("is-auto-scrolling");
+      if (Math.abs(scroller.scrollLeft - homeVideoAutoOffset) > 2) homeVideoAutoOffset = scroller.scrollLeft;
+      homeVideoAutoOffset += 0.55;
+      scroller.scrollLeft = homeVideoAutoOffset;
+      if (loopCount > 1 && scroller.scrollLeft >= scroller.scrollWidth / 2) {
+        homeVideoAutoOffset -= scroller.scrollWidth / 2;
+        scroller.scrollLeft = homeVideoAutoOffset;
+      }
+    } else {
+      homeVideoAutoOffset = scroller.scrollLeft;
+      scroller.classList.remove("is-auto-scrolling");
+    }
+    homeVideoAutoFrame = window.requestAnimationFrame(step);
+  };
+  homeVideoAutoFrame = window.requestAnimationFrame(step);
+}
+
+function initHomeVideoAutoScroll() {
+  if (!els.homeVideos || !els.homeVideosSection) return;
+  stopHomeVideoAutoScroll();
+  homeVideoAutoPausedUntil = Date.now() + 900;
+  if (homeVideoAutoObserver) homeVideoAutoObserver.disconnect();
+  if (!("IntersectionObserver" in window)) {
+    startHomeVideoAutoScroll();
+    return;
+  }
+  homeVideoAutoObserver = new IntersectionObserver((entries) => {
+    const isVisible = entries.some((entry) => entry.isIntersecting);
+    if (isVisible) startHomeVideoAutoScroll();
+    else stopHomeVideoAutoScroll();
+  }, { threshold: 0.22 });
+  homeVideoAutoObserver.observe(els.homeVideosSection);
+}
+
+function ensureHomeVideoLightbox() {
+  let lightbox = document.querySelector("[data-home-video-lightbox]");
+  if (lightbox) return lightbox;
+  lightbox = document.createElement("div");
+  lightbox.className = "home-video-lightbox";
+  lightbox.dataset.homeVideoLightbox = "";
+  lightbox.innerHTML = `
+    <div class="home-video-lightbox-panel" role="dialog" aria-modal="true" aria-label="Kinglike video">
+      <button class="home-video-close" type="button" data-close-home-video aria-label="Close video">×</button>
+      <video data-home-video-player playsinline controls></video>
+      <div class="home-video-title" data-home-video-title></div>
+    </div>
+  `;
+  document.body.appendChild(lightbox);
+  return lightbox;
+}
+
+function closeHomeVideoLightbox() {
+  const lightbox = document.querySelector("[data-home-video-lightbox]");
+  const player = lightbox?.querySelector("[data-home-video-player]");
+  if (player) {
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+  }
+  lightbox?.classList.remove("is-open");
+  document.body.classList.remove("modal-open");
+}
+
+function openHomeVideoLightbox(card) {
+  const sourceVideo = card?.querySelector("video");
+  const source = sourceVideo?.currentSrc || sourceVideo?.src;
+  if (!source) return;
+  const title = card.querySelector(".vertical-video-caption strong")?.textContent?.trim() || "Kinglike video";
+  const lightbox = ensureHomeVideoLightbox();
+  const player = lightbox.querySelector("[data-home-video-player]");
+  const titleTarget = lightbox.querySelector("[data-home-video-title]");
+  pauseHomeVideoAutoScroll(9000);
+  titleTarget.textContent = title;
+  player.src = source;
+  player.muted = false;
+  player.currentTime = 0;
+  lightbox.classList.add("is-open");
+  document.body.classList.add("modal-open");
+  player.play().catch(() => {});
 }
 
 function initLineAnimations() {
@@ -1053,6 +1164,7 @@ function toggleWishlist(id, source) {
 
 function productCollectionKey(product) {
   const category = (product?.category || "").toLowerCase();
+  if ((category.includes("mattress") || category.includes("ເສື່ອ") || category.includes("ທີ່ນອນ")) && (category.includes("bed") || category.includes("ຕຽງ"))) return "mattress-beds";
   if (category.includes("blanket") || category.includes("duvet") || category.includes("comforter")) return "blankets";
   if (category === "bed" || category.includes("bed frame") || category.includes("bedframe")) return "beds";
   if (category.includes("pillow")) return "pillows";
@@ -1062,7 +1174,8 @@ function productCollectionKey(product) {
 }
 
 function isBedProduct(product) {
-  return productCollectionKey(product) === "beds";
+  const collectionKey = productCollectionKey(product);
+  return collectionKey === "beds" || collectionKey === "mattress-beds";
 }
 
 function openProductDetail(id) {
@@ -1149,35 +1262,99 @@ function cartItemsWithProducts() {
     .filter(Boolean);
 }
 
-function buildOrderMessage(productId = "") {
+function orderDateParts(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return {
+    display: `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`,
+    key: `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`
+  };
+}
+
+function nextOrderCode() {
+  const { key } = orderDateParts();
+  const storageKey = `kinglike-order-sequence-${key}`;
+  const next = Number(localStorage.getItem(storageKey) || 0) + 1;
+  localStorage.setItem(storageKey, String(next));
+  return `#KL${key}${String(next).padStart(3, "0")}`;
+}
+
+function orderItems(productId = "") {
   const focusedProduct = products.find((product) => product.id === productId);
   const focusedOption = focusedProduct ? selectedDetailSize(focusedProduct) : null;
-  const items = focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.productDetail) }] : cartItemsWithProducts();
+  return focusedProduct ? [{ product: focusedProduct, size: focusedOption.size, unitPrice: focusedOption.salePrice, qty: selectedDetailQty(els.productDetail) }] : cartItemsWithProducts();
+}
+
+function customerFromChatModal({ validate = false } = {}) {
+  const modal = document.querySelector("[data-chat-order-modal]");
+  const getValue = (name) => modal?.querySelector(`[name="${name}"]`)?.value.trim() || "";
+  const customer = {
+    name: getValue("chatCustomerName"),
+    phone: getValue("chatCustomerPhone"),
+    address: getValue("chatCustomerAddress")
+  };
+  if (validate) {
+    const missing = [];
+    if (!customer.name) missing.push("ຊື່ລູກຄ້າ");
+    if (!customer.phone) missing.push("ເບີໂທ");
+    if (!customer.address) missing.push("ທີ່ຢູ່");
+    if (missing.length) {
+      const target = modal?.querySelector("[data-chat-error]");
+      if (target) {
+        target.classList.add("is-error");
+        target.textContent = "ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບ.";
+      }
+      return null;
+    }
+  }
+  return customer;
+}
+
+function buildOrderMessage(productId = "", customer = {}, orderCode = nextOrderCode()) {
+  const items = orderItems(productId);
   const orderPrice = (value) => formatKip(value).replace("₭", "ກີບ");
-  const itemLines = items.map((item) => {
+  const { display: orderDate } = orderDateParts();
+  const itemLines = items.map((item, index) => {
     const unitPrice = item.unitPrice || productSizeOption(item.product, item.size).salePrice;
     const subtotal = unitPrice * item.qty;
-    return `${item.product.name}${item.colorName ? `\nສີ: ${item.colorName}` : ""}\nຈຳນວນ: ${item.qty}\nລາຄາ: ${orderPrice(subtotal)}`;
+    return [
+      `${index + 1}. ${item.product.name}`,
+      item.size ? `   • ຂະໜາດ: ${item.size}` : "",
+      item.colorName ? `   • ສີ: ${item.colorName}` : "",
+      `   • ຈຳນວນ: ${item.qty}`,
+      `   • ລາຄາ: ${orderPrice(subtotal)}`
+    ].filter(Boolean).join("\n");
   });
   const total = items.reduce((sum, item) => sum + (item.unitPrice || productSizeOption(item.product, item.size).salePrice) * item.qty, 0);
   return [
-    "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike",
+    "🛏️ ໃບສັ່ງຊື້ສິນຄ້າຈາກເວບໄຊ KINGLIKE",
     "",
-    "ຊື່ສິນຄ້າ",
-    "ຈຳນວນ",
-    "ລາຄາ",
+    `📋 ລະຫັດຄຳສັ່ງ: ${orderCode}`,
+    `📅 ວັນທີ: ${orderDate}`,
+    "",
+    "━━━━━━━━━━━━━━",
+    "",
+    "🛒 ລາຍການສິນຄ້າ",
     "",
     itemLines.join("\n\n"),
     "",
-    "__________________________________",
-    `ຍອດລວມ: ${orderPrice(total)}`
+    "━━━━━━━━━━━━━━",
+    "",
+    `💰 ຍອດລວມ: ${orderPrice(total)}`,
+    "",
+    "━━━━━━━━━━━━━━",
+    "",
+    `👤 ຊື່ລູກຄ້າ: ${customer.name || ""}`,
+    "",
+    `📞 ເບີໂທ: ${customer.phone || ""}`,
+    "",
+    `📍 ທີ່ຢູ່: ${customer.address || ""}`,
+    "",
+    "━━━━━━━━━━━━━━"
   ].filter(Boolean).join("\n");
 }
 
 function chatItems(productId = "") {
-  const focusedProduct = products.find((product) => product.id === productId);
-  const option = focusedProduct ? selectedDetailSize(focusedProduct) : null;
-  return focusedProduct ? [{ product: focusedProduct, size: option.size, unitPrice: option.salePrice, qty: selectedDetailQty(els.productDetail) }] : cartItemsWithProducts();
+  return orderItems(productId);
 }
 
 function selectedDetailSize(product) {
@@ -1221,8 +1398,13 @@ function ensureChatModal() {
       <button class="close-btn" type="button" data-close-chat-order>×</button>
       <p class="eyebrow">ສັ່ງຜ່ານແຊັດ</p>
       <h2>ເລືອກຊ່ອງທາງຕິດຕໍ່</h2>
-      <p class="meta">ເລືອກ WhatsApp ຫຼື Messenger ລະບົບຈະສ້າງຂໍ້ຄວາມສິນຄ້າໃຫ້ອັດຕະໂນມັດ</p>
+      <p class="meta">ກອກຂໍ້ມູນລູກຄ້າ ແລ້ວເລືອກ WhatsApp ຫຼື Messenger. ລະບົບຈະສ້າງໃບສັ່ງຊື້ໃຫ້ອັດຕະໂນມັດ.</p>
       <div class="chat-order-summary" data-chat-summary></div>
+      <div class="chat-customer-form">
+        <label>ຊື່ລູກຄ້າ<input name="chatCustomerName" autocomplete="name" placeholder="ຊື່ ແລະ ນາມສະກຸນ" /></label>
+        <label>ເບີໂທ<input name="chatCustomerPhone" inputmode="tel" autocomplete="tel" placeholder="020XXXXXXXX" /></label>
+        <label>ທີ່ຢູ່<textarea name="chatCustomerAddress" rows="3" placeholder="ບ້ານ, ເມືອງ, ແຂວງ, ຈຸດສັງເກດ"></textarea></label>
+      </div>
       <p class="checkout-alert" data-chat-error></p>
       <div class="chat-channel-actions">
         ${channelButton("whatsapp", "WhatsApp")}
@@ -1279,7 +1461,10 @@ function showMessengerCopyNotice(copied) {
 
 async function sendChatDraft(channel, productId = "") {
   const items = chatItems(productId);
-  const message = items.length ? buildOrderMessage(productId) : "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike";
+  const customer = customerFromChatModal({ validate: items.length });
+  if (!customer) return false;
+  const orderCode = items.length ? nextOrderCode() : "";
+  const message = items.length ? buildOrderMessage(productId, customer, orderCode) : "ສະບາຍດີ ຂໍສອບຖາມສິນຄ້າ KINGLIKE";
   const url = channel === "messenger"
     ? MESSENGER_URL
     : `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
@@ -1291,9 +1476,11 @@ async function sendChatDraft(channel, productId = "") {
   const payload = {
     mode: "chat_draft",
     contactChannel: channel,
-    customerName: "Website chat customer",
-    customerPhone: "",
-    customerWhatsapp: "",
+    orderCode,
+    customerName: customer.name,
+    customerPhone: customer.phone,
+    customerWhatsapp: customer.phone,
+    customerAddress: customer.address,
     chatMessage: message,
     productLink: window.location.href,
     items: items.map((item) => ({
@@ -1310,13 +1497,14 @@ async function sendChatDraft(channel, productId = "") {
   } catch (draftError) {
     // Still let the customer continue to chat if local API is unavailable.
   }
+  return true;
 }
 
 async function submitChatDraft(channel) {
   const modal = ensureChatModal();
   const productId = modal.dataset.productId || "";
-  await sendChatDraft(channel, productId);
-  if (channel !== "messenger") modal.classList.remove("is-open");
+  const sent = await sendChatDraft(channel, productId);
+  if (sent && channel !== "messenger") modal.classList.remove("is-open");
 }
 
 function checkout() {
@@ -1367,7 +1555,9 @@ document.addEventListener("click", (event) => {
   }
 
   if (lineTarget) {
-    sendChatDraft(lineTarget.dataset.lineChannel || "whatsapp", lineTarget.dataset.lineProduct || "");
+    const lineProduct = lineTarget.dataset.lineProduct || "";
+    if (lineProduct) openChatOrder(lineProduct);
+    else sendChatDraft(lineTarget.dataset.lineChannel || "whatsapp", "");
     return;
   }
   if (buyNowId) {
@@ -1415,18 +1605,24 @@ document.addEventListener("click", (event) => {
 });
 
 els.homeVideos?.addEventListener("click", (event) => {
+  pauseHomeVideoAutoScroll(4200);
   const toggle = event.target.closest("[data-toggle-home-video]");
-  if (!toggle) return;
-  const video = toggle.closest("[data-video-card]")?.querySelector("video");
-  if (!video) return;
-  video.muted = !video.muted;
-  toggle.classList.toggle("is-sound-on", !video.muted);
-  if (video.paused) video.play().catch(() => {});
+  if (toggle) {
+    const video = toggle.closest("[data-video-card]")?.querySelector("video");
+    if (!video) return;
+    video.muted = !video.muted;
+    toggle.classList.toggle("is-sound-on", !video.muted);
+    if (video.paused) video.play().catch(() => {});
+    return;
+  }
+  const card = event.target.closest("[data-video-card]");
+  if (card) openHomeVideoLightbox(card);
 });
 
 els.videoScrollButtons?.forEach((button) => {
   button.addEventListener("click", () => {
     if (!els.homeVideos) return;
+    pauseHomeVideoAutoScroll(4200);
     const direction = Number(button.dataset.videoScroll || 1);
     els.homeVideos.scrollBy({
       left: direction * Math.max(260, els.homeVideos.clientWidth * 0.72),
@@ -1435,7 +1631,17 @@ els.videoScrollButtons?.forEach((button) => {
   });
 });
 
+["pointerdown", "touchstart", "wheel"].forEach((eventName) => {
+  els.homeVideos?.addEventListener(eventName, () => pauseHomeVideoAutoScroll(4200), { passive: true });
+});
+
 document.addEventListener("click", (event) => {
+  const videoLightbox = event.target.closest("[data-home-video-lightbox]");
+  if (event.target.closest("[data-close-home-video]") || (videoLightbox && !event.target.closest(".home-video-lightbox-panel"))) {
+    closeHomeVideoLightbox();
+    return;
+  }
+
   if (event.target.closest("[data-close-chat-order]")) {
     ensureChatModal().classList.remove("is-open");
     return;
@@ -1491,6 +1697,10 @@ els.searchInput.addEventListener("input", (event) => {
 
 els.searchInput.closest(".header-search")?.addEventListener("click", () => {
   els.searchInput.focus();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeHomeVideoLightbox();
 });
 
 els.sizeFilter?.addEventListener("change", (event) => {

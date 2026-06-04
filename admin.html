@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kinglike Admin</title>
+    <title>Kinglike ແອດມິນ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260601-collection-box-dark1" />
-    <link rel="stylesheet" href="site-responsive.css?v=20260601-responsive-audit14" />
-    <link rel="stylesheet" href="admin.css?v=20260603-bed-colors1" />
+    <link rel="stylesheet" href="styles.css?v=20260604-cart-icon-clean1" />
+    <link rel="stylesheet" href="site-responsive.css?v=20260604-order-form1" />
+    <link rel="stylesheet" href="admin.css?v=20260604-admin-primary-buttons1" />
   </head>
   <body class="admin-body">
     <header class="admin-header">
@@ -18,7 +18,7 @@
       </a>
       <nav class="admin-nav">
         <a href="index.html#products">ເບິ່ງໜ້າຮ້ານ</a>
-        <button class="secondary-btn danger-soft-btn" type="button" data-reset-demo>ລ້າງ Demo</button>
+        <button class="secondary-btn danger-soft-btn" type="button" data-reset-demo>ລ້າງຂໍ້ມູນທົດລອງ</button>
       </nav>
     </header>
 
@@ -26,8 +26,8 @@
       <section class="admin-dashboard-hero">
         <div>
           <p class="eyebrow">KINGLIKE ADMIN</p>
-          <h1>Dashboard ຈັດການໜ້າຮ້ານ</h1>
-          <p>ແກ້ສິນຄ້າ ອັບຮູບ ປ່ຽນ cover ແລະເບິ່ງ preview ກ່ອນບັນທຶກ.</p>
+          <h1>ແຜງຈັດການໜ້າຮ້ານ</h1>
+          <p>ແກ້ສິນຄ້າ ອັບຮູບ ປ່ຽນຮູບປົກ ແລະເບິ່ງຕົວຢ່າງກ່ອນບັນທຶກ.</p>
         </div>
         <div class="admin-stats">
           <article>
@@ -45,7 +45,7 @@
         </div>
       </section>
 
-      <section class="admin-tabs" aria-label="Admin sections">
+      <section class="admin-tabs" aria-label="ສ່ວນຈັດການແອດມິນ">
         <button class="is-active" type="button" data-admin-tab="products">ສິນຄ້າ</button>
         <button type="button" data-admin-tab="promotion">ໜ້າຫຼັກ</button>
         <button type="button" data-admin-tab="backup">ສຳຮອງ</button>
@@ -59,7 +59,7 @@
           <input type="hidden" name="coverImage" data-category-cover-value />
           <div class="admin-card-head">
             <div>
-              <p class="eyebrow">CATEGORY COVER</p>
+              <p class="eyebrow">ໜ້າປົກໝວດ</p>
               <h2 data-category-cover-title>ແກ້ໄຂໜ້າປົກ</h2>
               <small data-category-cover-help>ເລືອກໝວດດ້ານເທິງ ແລ້ວອັບຮູບປົກຂອງໝວດນັ້ນ.</small>
             </div>
@@ -71,13 +71,13 @@
               <button class="primary-btn mini-btn" type="submit">ບັນທຶກປົກ</button>
             </div>
           </div>
-          <div class="admin-cover-preview" data-category-cover-preview>Cover preview</div>
+          <div class="admin-cover-preview" data-category-cover-preview>ຕົວຢ່າງຮູບປົກ</div>
         </form>
         <div class="admin-workspace">
           <aside class="admin-card admin-catalog">
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">CATALOG</p>
+                <p class="eyebrow">ລາຍການສິນຄ້າ</p>
                 <h2>ລາຍການສິນຄ້າ</h2>
               </div>
               <div class="admin-head-actions">
@@ -91,7 +91,7 @@
           <form class="admin-card product-form" data-product-form>
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">EDITOR</p>
+                <p class="eyebrow">ແກ້ໄຂສິນຄ້າ</p>
                 <h2 data-form-title>ເພີ່ມສິນຄ້າໃໝ່</h2>
               </div>
               <button class="secondary-btn" type="button" data-clear-form>ລ້າງຟອມ</button>
@@ -109,27 +109,27 @@
               </article>
               <article>
                 <span>ສະແດງຢູ່</span>
-                <strong data-admin-placement>Home / Category / Detail</strong>
+                <strong data-admin-placement>ໜ້າຫຼັກ / ໝວດ / ລາຍລະອຽດ</strong>
               </article>
               <a class="admin-view-product" data-view-product href="index.html#products" target="_blank" rel="noreferrer">ເບິ່ງໜ້າສິນຄ້າ</a>
             </div>
 
             <div class="admin-hint">
-              <strong>Preview:</strong> ຂໍ້ມູນດ້ານລຸ່ມຈະໄປສະແດງຢູ່ product card ແລະຫນ້າລາຍລະອຽດສິນຄ້າ.
+              <strong>ຕົວຢ່າງ:</strong> ຂໍ້ມູນດ້ານລຸ່ມຈະໄປສະແດງຢູ່ກາດສິນຄ້າ ແລະໜ້າລາຍລະອຽດສິນຄ້າ.
             </div>
 
             <label>
               ຮູບສິນຄ້າ
               <input name="imageUpload" type="file" accept="image/*" data-product-image-upload />
-              <small>ເພີ່ມຮູບທີລະຮູບໄດ້. ຮູບໃໝ່ຈະຕໍ່ທ້າຍຂອງເກົ່າ, ຮູບທຳອິດຈະສະແດງຢູ່ card.</small>
+              <small>ເພີ່ມຮູບທີລະຮູບໄດ້. ຮູບໃໝ່ຈະຕໍ່ທ້າຍຂອງເກົ່າ, ຮູບທຳອິດຈະສະແດງຢູ່ກາດສິນຄ້າ.</small>
               <small>ຂະໜາດຮູບທີ່ແນະນຳ: 1200 x 1200 px (1:1). ຮູບຈະສະແດງເຕັມກອບ ແລະບໍ່ຕັດຮູບ.</small>
             </label>
-            <div class="admin-upload-preview" data-product-image-preview>Product image preview</div>
+            <div class="admin-upload-preview" data-product-image-preview>ຕົວຢ່າງຮູບສິນຄ້າ</div>
 
             <label>
               ຊື່ສິນຄ້າ
               <input name="name" required placeholder="Kinglike Royal Cloud" />
-              <small>ສະແດງເປັນຫົວຂໍ້ໃນ card.</small>
+              <small>ສະແດງເປັນຫົວຂໍ້ໃນກາດສິນຄ້າ.</small>
             </label>
 
             <div class="form-row">
@@ -138,9 +138,9 @@
                 <input name="sku" placeholder="KL-RC-1201" />
               </label>
               <label>
-                Badge
+                Badge / ປ້າຍ
                 <input name="badge" placeholder="Best Seller / Promotion" />
-                <small>ປ້າຍສີທອງມຸມຊ້າຍ card.</small>
+                <small>ປ້າຍສີທອງມຸມຊ້າຍຂອງກາດ.</small>
               </label>
             </div>
 
@@ -148,16 +148,17 @@
               <label>
                 ປະເພດ
                 <select name="category">
-                  <option>Mattress</option>
-                  <option>Pillow</option>
-                  <option>Blanket</option>
-                  <option>Bed</option>
-                  <option>Topper</option>
-                  <option>Hybrid</option>
-                  <option>Latex</option>
-                  <option>Memory Foam</option>
-                  <option>Pocket Spring</option>
-                  <option>Bedding</option>
+                  <option value="Mattress">ທີ່ນອນ</option>
+                  <option value="Mattress + Bed">ເສື່ອນອນ+ຕຽງນອນ</option>
+                  <option value="Pillow">ໝອນ</option>
+                  <option value="Blanket">ຜ້າຫົ່ມ</option>
+                  <option value="Bed">ຕຽງນອນ</option>
+                  <option value="Topper">ທັອບເປີ</option>
+                  <option value="Hybrid">Hybrid</option>
+                  <option value="Latex">Latex</option>
+                  <option value="Memory Foam">Memory Foam</option>
+                  <option value="Pocket Spring">Pocket Spring</option>
+                  <option value="Bedding">ອຸປະກອນການນອນ</option>
                 </select>
               </label>
               <label>
@@ -205,17 +206,17 @@
 
             <label>
               ສ່ວນຫຼຸດ (%)
-              <input name="discountPercent" type="number" min="0" max="100" step="1" placeholder="32" />
-              <small>ຖ້າກຳນົດເປີເຊັນ ໜ້າຮ້ານຈະສະແດງປ້າຍສີແດງ “ຫຼຸດ xx%”. ຖ້າປ່ອຍວ່າງຈະຄິດຈາກລາຄາເຕັມ/ລາຄາຂາຍ.</small>
+              <input name="discountPercent" type="number" min="0" max="99" step="1" placeholder="32" />
+              <small>ໃສ່ລາຄາເຕັມ + ລາຄາຂາຍແລ້ວລະບົບຈະຄິດ % ໃຫ້. ຫຼືໃສ່ລາຄາຂາຍ + % ເພື່ອຄິດລາຄາເຕັມກັບຄືນ.</small>
             </label>
 
             <div class="form-row">
               <label>
-                Rating
+                ຄະແນນຣີວິວ
                 <input name="rating" type="number" min="0" max="5" step="0.1" placeholder="4.9" />
               </label>
               <label>
-                Stock
+                ສະຕັອກ
                 <input name="stock" placeholder="ມີສິນຄ້າ" />
               </label>
             </div>
@@ -223,29 +224,57 @@
             <section class="admin-bed-colors" data-bed-color-admin>
               <div class="admin-bed-color-head">
                 <div>
-                  <strong>Bed fabric colors</strong>
-                  <small>For Bed products only. Tap a color to mark available or sold out.</small>
+                  <strong>ສີຜ້າຕຽງ</strong>
+                  <small>ໃຊ້ສຳລັບສິນຄ້າຕຽງນອນເທົ່ານັ້ນ. ກົດທີ່ສີເພື່ອເປີດ/ປິດສະຕັອກ.</small>
                 </div>
-                <span data-bed-color-count>32 colors</span>
+                <span data-bed-color-count>32 ສີ</span>
               </div>
               <div class="admin-bed-color-grid" data-bed-color-grid></div>
             </section>
 
             <label>
-              Warranty
+              ຮັບປະກັນ
               <input name="warranty" placeholder="10 ປີ" />
             </label>
 
             <label>
-              ຂອງແຖມ / Free gifts
+              ຂອງແຖມ
               <textarea name="freebies" rows="3" placeholder="ຫມອນນອນ 2 ໃບ, ຜ້າຫອມ, ຜ້າປູທີ່ນອນ"></textarea>
-              <small>ຂຽນແຍກດ້ວຍ comma. ຂອງແຖມຈະສະແດງໃນ product card ແລະ detail.</small>
+              <small>ຂຽນແຍກດ້ວຍເຄື່ອງໝາຍ , ຂອງແຖມຈະສະແດງໃນກາດສິນຄ້າ ແລະໜ້າລາຍລະອຽດ.</small>
             </label>
 
-            <label>
-              Materials / ຄຸນສົມບັດ
-              <textarea name="materials" rows="3" placeholder="Premium fabric, Natural latex, Pocket spring"></textarea>
-            </label>
+            <section class="admin-material-builder">
+              <div class="admin-material-head">
+                <div>
+                  <p class="eyebrow">ຊັ້ນວັດສະດຸ</p>
+                  <h3>ຄຸນສົມບັດ / ວັດສະດຸ</h3>
+                  <small>ເພີ່ມໄດ້ 4, 5, 6 ຫຼືຫຼາຍກວ່ານັ້ນ. ລາຍການນີ້ຈະໄປສະແດງເປັນ 01, 02, 03 ໃນໜ້າລາຍລະອຽດ.</small>
+                </div>
+                <button class="secondary-btn mini-btn" type="button" data-add-material>+ ເພີ່ມຊັ້ນ</button>
+              </div>
+              <input type="hidden" name="materials" data-materials-value />
+              <div class="admin-material-list" data-material-list></div>
+            </section>
+
+            <section class="admin-detail-story">
+              <div>
+                <p class="eyebrow">ໜ້າລາຍລະອຽດ</p>
+                <h3>ບລັອກ “Inside this model”</h3>
+                <small>ຄວບຄຸມບລັອກສີດຳໃນໜ້າລາຍລະອຽດສິນຄ້າ. ລາຍການເລກ 01, 02, 03 ຈະດຶງຈາກຊັ້ນວັດສະດຸດ້ານເທິງ.</small>
+              </div>
+              <label>
+                ຂໍ້ຄວາມນ້ອຍ
+                <input name="layerEyebrow" placeholder="Inside this model" />
+              </label>
+              <label>
+                ຫົວຂໍ້
+                <textarea name="layerTitle" rows="2" placeholder="ຂ້າງໃນແຕ່ລະຊັ້ນ ຕັ້ງໃຈເລືອກມາເພື່ອການນອນທີ່ດີຂຶ້ນ"></textarea>
+              </label>
+              <label>
+                ຄຳອະທິບາຍ
+                <textarea name="layerDescription" rows="3" placeholder="ລາຍລະອຽດວັດສະດຸຊ່ວຍໃຫ້ລູກຄ້າເຂົ້າໃຈວ່າຮຸ່ນນີ້ເໝາະກັບໃຜ..."></textarea>
+              </label>
+            </section>
 
             <label>
               ລາຍລະອຽດ
@@ -258,7 +287,7 @@
           <aside class="admin-card admin-preview-card">
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">LIVE PREVIEW</p>
+                <p class="eyebrow">ຕົວຢ່າງສົດ</p>
                 <h2>ຕົວຢ່າງທີ່ລູກຄ້າເຫັນ</h2>
               </div>
             </div>
@@ -272,15 +301,15 @@
           <form class="admin-card promo-admin" data-promo-form>
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">COVER / PROMOTION</p>
+                <p class="eyebrow">ຮູບປົກ / ໂປຣໂມຊັນ</p>
                 <h2>ແກ້ໄຂແຖບໂປຣໂມຊັນ</h2>
               </div>
             </div>
             <input type="hidden" name="coverImage" data-cover-image-value />
             <label>
-              ຮູບ Cover
+              ຮູບປົກ
               <input name="coverUpload" type="file" accept="image/*" data-cover-image-upload />
-              <small>ຮູບນີ້ຈະໄປສະແດງໃນແຖບ promotion / cover.</small>
+              <small>ຮູບນີ້ຈະໄປສະແດງໃນແຖບໂປຣໂມຊັນ / ຮູບປົກ.</small>
             </label>
             <label>
               ຫົວຂໍ້
@@ -300,20 +329,20 @@
           <form class="admin-card promo-admin" data-hero-slide-form>
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">HOME SLIDER</p>
-                <h2>ຮູບໜ້າປົກ Home</h2>
+                <p class="eyebrow">ສະໄລດ໌ໜ້າຫຼັກ</p>
+                <h2>ຮູບໜ້າປົກໜ້າຫຼັກ</h2>
               </div>
             </div>
             <div class="admin-size-guide">
-              <strong>ຈຸດທີ່ແກ້: ຮູບ cover ເທິງສຸດຂອງໜ້າ Home</strong>
+              <strong>ຈຸດທີ່ແກ້: ຮູບປົກເທິງສຸດຂອງໜ້າຫຼັກ</strong>
               <span>PC: 1920 × 1080 px ຫຼື 2400 × 1350 px</span>
               <span>Mobile: 1080 × 1600 px ຫຼື 1170 × 2532 px, ແນວຕັ້ງ</span>
             </div>
             <div class="form-row">
               <label>
-                ຮູບ PC / Desktop
+                ຮູບ PC / ຄອມພິວເຕີ
                 <input name="heroDesktopUpload" type="file" accept="image/*" multiple data-hero-desktop-upload />
-                <small>ອັບຮູບແນວນອນ. ຖ້າອັບຫຼາຍຮູບຈະເປັນ slide 1, 2, 3...</small>
+                <small>ອັບຮູບແນວນອນ. ຖ້າອັບຫຼາຍຮູບຈະເປັນສະໄລດ໌ 1, 2, 3...</small>
               </label>
               <label>
                 ຮູບ Mobile
@@ -321,13 +350,13 @@
                 <small>ອັບຮູບແນວຕັ້ງ. ລຳດັບຈະຈັບຄູ່ກັບຮູບ PC.</small>
               </label>
             </div>
-            <div class="admin-upload-preview" data-hero-slide-list>Hero slides preview</div>
+            <div class="admin-upload-preview" data-hero-slide-list>ຕົວຢ່າງສະໄລດ໌ໜ້າຫຼັກ</div>
           </form>
 
           <form class="admin-card promo-admin" data-video-form>
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">VERTICAL VIDEO</p>
+                <p class="eyebrow">ວິດີໂອແນວຕັ້ງ</p>
                 <h2>ອັບຄລິບແນວຕັ້ງ</h2>
               </div>
             </div>
@@ -341,13 +370,13 @@
               <input name="videoTitle" placeholder="Kinglike Essential Review" />
             </label>
             <button class="primary-btn admin-submit" type="submit">ເພີ່ມຄລິບ</button>
-            <div class="admin-upload-preview vertical-video-admin-list" data-video-list>Video preview</div>
+            <div class="admin-upload-preview vertical-video-admin-list" data-video-list>ຕົວຢ່າງວິດີໂອ</div>
           </form>
 
           <form class="admin-card promo-admin" data-promo-event-form>
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">EVENT CARD</p>
+                <p class="eyebrow">ກາດໂປຣໂມຊັນ</p>
                 <h2>ເພີ່ມ / ແກ້ໄຂໂປຣໂມຊັນ</h2>
               </div>
               <button class="secondary-btn" type="button" data-new-promo-event>+ ໃໝ່</button>
@@ -355,13 +384,13 @@
             <input type="hidden" name="id" />
             <input type="hidden" name="image" data-promo-event-image-value />
             <label>
-              ຮູບ Promotion / Event
+              ຮູບໂປຣໂມຊັນ / ອີເວັນ
               <input name="eventImageUpload" type="file" accept="image/*" data-promo-event-image-upload />
-              <small>ຮູບນີ້ຈະສະແດງເປັນ card ໃນໜ້າຫຼັກ.</small>
+              <small>ຮູບນີ້ຈະສະແດງເປັນກາດໃນໜ້າຫຼັກ.</small>
             </label>
             <div class="form-row">
               <label>
-                Badge
+                Badge / ປ້າຍ
                 <input name="badge" placeholder="MID MONTH / EVENT / SALE" />
               </label>
               <label>
@@ -372,7 +401,7 @@
             <label>
               ໝົດໂປຣໂມຊັນ
               <input name="endsAt" type="datetime-local" />
-              <small>ຖ້າໃສ່ວັນເວລານີ້ ໜ້າລູກຄ້າຈະສະແດງ countdown ອັດຕະໂນມັດ.</small>
+              <small>ຖ້າໃສ່ວັນເວລານີ້ ໜ້າລູກຄ້າຈະສະແດງໂຕນັບຖອຍຫຼັງອັດຕະໂນມັດ.</small>
             </label>
             <label>
               ຫົວຂໍ້
@@ -380,7 +409,7 @@
             </label>
             <label>
               ຂໍ້ຄວາມ
-              <textarea name="text" rows="3" placeholder="ລາຍລະອຽດໂປຣໂມຊັນ ຫຼື Event"></textarea>
+              <textarea name="text" rows="3" placeholder="ລາຍລະອຽດໂປຣໂມຊັນ ຫຼື ອີເວັນ"></textarea>
             </label>
             <div class="form-row">
               <label>
@@ -388,7 +417,7 @@
                 <input name="button" placeholder="ເບິ່ງສິນຄ້າ" />
               </label>
               <label>
-                Link
+                Link / ລິ້ງ
                 <input name="link" placeholder="#products" />
               </label>
             </div>
@@ -396,14 +425,14 @@
               <input name="active" type="checkbox" checked />
               <span>ສະແດງໃນໜ້າຫຼັກ</span>
             </label>
-            <button class="primary-btn admin-submit" type="submit">ບັນທຶກ Event</button>
+            <button class="primary-btn admin-submit" type="submit">ບັນທຶກໂປຣໂມຊັນ</button>
           </form>
 
           <aside class="admin-card">
             <div class="admin-card-head">
               <div>
-                <p class="eyebrow">PREVIEW</p>
-                <h2>ຕົວຢ່າງ Cover</h2>
+                <p class="eyebrow">ຕົວຢ່າງ</p>
+                <h2>ຕົວຢ່າງຮູບປົກ</h2>
               </div>
             </div>
             <div class="promo-preview" data-promo-preview></div>
@@ -414,25 +443,25 @@
 
       <section class="admin-panel" data-admin-panel="backup">
         <div class="admin-card admin-backup">
-          <p class="eyebrow">DATA BACKUP</p>
-          <h2>Export / Import ຂໍ້ມູນຮ້ານ</h2>
-          <p class="admin-backup-copy">ໃຊ້ສຳລັບສຳຮອງສິນຄ້າ, ລາຄາ, ຮູບສິນຄ້າ ແລະ Cover. ເວລາຍ້າຍໄປເຄື່ອງອື່ນ ຫຼື browser ອື່ນ ໃຫ້ Import ໄຟລ໌ນີ້ກັບເຂົ້າມາ.</p>
+          <p class="eyebrow">ສຳຮອງຂໍ້ມູນ</p>
+          <h2>ສົ່ງອອກ / ນຳເຂົ້າຂໍ້ມູນຮ້ານ</h2>
+          <p class="admin-backup-copy">ໃຊ້ສຳລັບສຳຮອງສິນຄ້າ, ລາຄາ, ຮູບສິນຄ້າ ແລະຮູບປົກ. ເວລາຍ້າຍໄປເຄື່ອງອື່ນ ຫຼືເບຣາວເຊີອື່ນ ໃຫ້ນຳໄຟລ໌ນີ້ກັບເຂົ້າມາ.</p>
           <div class="backup-actions">
-            <button class="primary-btn" type="button" data-export-data>Export backup file</button>
-            <button class="secondary-btn" type="button" data-export-publish>Export for GitHub Pages</button>
+            <button class="primary-btn" type="button" data-export-data>ດາວໂຫຼດໄຟລ໌ສຳຮອງ</button>
+            <button class="secondary-btn" type="button" data-export-publish>ດາວໂຫຼດໄຟລ໌ GitHub Pages</button>
             <label class="secondary-btn backup-import">
-              Import backup file
+              ນຳເຂົ້າໄຟລ໌ສຳຮອງ
               <input type="file" accept="application/json,.json" data-import-data />
             </label>
           </div>
           <div class="backup-summary">
             <article>
               <strong data-backup-product-count>0</strong>
-              <span>Products in backup</span>
+              <span>ສິນຄ້າໃນໄຟລ໌ສຳຮອງ</span>
             </article>
             <article>
-              <strong data-backup-promo-status>Not saved</strong>
-              <span>Promotion / Cover</span>
+              <strong data-backup-promo-status>ຍັງບໍ່ມີ</strong>
+              <span>ໂປຣໂມຊັນ / ຮູບປົກ</span>
             </article>
           </div>
         </div>
@@ -440,15 +469,15 @@
 
       <section class="admin-panel" data-admin-panel="help">
         <div class="admin-card admin-map">
-          <p class="eyebrow">WHERE IT SHOWS</p>
+          <p class="eyebrow">ຈຸດທີ່ສະແດງ</p>
           <h2>ແຜນທີ່ການແກ້ໄຂ</h2>
           <div class="map-grid">
-            <article><strong>ຮູບສິນຄ້າ</strong><span>Product card + gallery detail</span></article>
-            <article><strong>Badge</strong><span>ປ້າຍສີທອງເທິງ card</span></article>
+            <article><strong>ຮູບສິນຄ້າ</strong><span>ກາດສິນຄ້າ + ກາເລີຣີໃນໜ້າລາຍລະອຽດ</span></article>
+            <article><strong>Badge / ປ້າຍ</strong><span>ປ້າຍສີທອງເທິງກາດສິນຄ້າ</span></article>
             <article><strong>ລາຄາ</strong><span>ລາຄາສີທອງ + ລາຄາເຕັມຂີດຂ້າ</span></article>
-            <article><strong>Cover</strong><span>ແຖບ promotion ໜ້າຫຼັກ</span></article>
-            <article><strong>Materials</strong><span>ຫົວຂໍ້ຄຸນສົມບັດໃນ detail</span></article>
-            <article><strong>Stock/Warranty</strong><span>ກ່ອງຊື້ ແລະຂໍ້ມູນຮັບປະກັນ</span></article>
+            <article><strong>ຮູບປົກ</strong><span>ແຖບໂປຣໂມຊັນໜ້າຫຼັກ</span></article>
+            <article><strong>ວັດສະດຸ</strong><span>ຫົວຂໍ້ຄຸນສົມບັດໃນໜ້າລາຍລະອຽດ</span></article>
+            <article><strong>ສະຕັອກ / ຮັບປະກັນ</strong><span>ກ່ອງຊື້ ແລະຂໍ້ມູນຮັບປະກັນ</span></article>
           </div>
         </div>
       </section>
@@ -458,7 +487,7 @@
       <article class="admin-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
         <span class="admin-confirm-icon">!</span>
         <div>
-          <p class="eyebrow">CONFIRM DELETE</p>
+          <p class="eyebrow">ຢືນຢັນການລຶບ</p>
           <h2 id="confirm-title" data-confirm-title>ຢືນຢັນການລຶບ</h2>
           <p data-confirm-message>ທ່ານຕ້ອງການລຶບຂໍ້ມູນນີ້ບໍ?</p>
         </div>
@@ -472,7 +501,7 @@
       <article class="admin-result-panel" role="dialog" aria-modal="true" aria-labelledby="result-title">
         <span class="admin-result-icon" data-result-icon>✓</span>
         <div>
-          <p class="eyebrow" data-result-kicker>SUCCESS</p>
+          <p class="eyebrow" data-result-kicker>ສຳເລັດ</p>
           <h2 id="result-title" data-result-title>ບັນທຶກສຳເລັດ</h2>
           <p data-result-message>ຂໍ້ມູນຖືກບັນທຶກແລ້ວ.</p>
         </div>
@@ -481,6 +510,6 @@
     </div>
     <div class="admin-toast" data-toast></div>
     <script src="ui-sounds.js?v=20260527-41"></script>
-    <script src="admin.js?v=20260603-bed-colors1"></script>
+    <script src="admin.js?v=20260604-price-sync1"></script>
   </body>
 </html>

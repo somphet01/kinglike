@@ -10344,6 +10344,13 @@ body:not(.home-intro) .cover-carousel-hero {
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  touch-action: pan-x pan-y;
+  will-change: scroll-position;
+}
+
+.vertical-video-grid.is-auto-scrolling {
+  scroll-behavior: auto;
+  scroll-snap-type: none;
 }
 
 .vertical-video-grid::-webkit-scrollbar {
@@ -10356,6 +10363,7 @@ body:not(.home-intro) .cover-carousel-hero {
   border-radius: 8px;
   box-shadow: 0 18px 44px rgba(18, 22, 26, 0.13);
   color: #ffffff;
+  cursor: pointer;
   flex: 0 0 clamp(170px, 13.8vw, 215px);
   overflow: hidden;
   position: relative;
@@ -10369,6 +10377,33 @@ body:not(.home-intro) .cover-carousel-hero {
   height: auto;
   object-fit: cover;
   width: 100%;
+}
+
+.vertical-video-card::before {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  color: #060707;
+  content: "▶";
+  display: flex;
+  font-size: 0.86rem;
+  height: 2.15rem;
+  justify-content: center;
+  left: 0.78rem;
+  opacity: 0.9;
+  pointer-events: none;
+  position: absolute;
+  top: 0.78rem;
+  transform: translateY(0);
+  transition: opacity 180ms ease, transform 180ms ease;
+  width: 2.15rem;
+  z-index: 2;
+}
+
+.vertical-video-card:hover::before,
+.vertical-video-card:focus-within::before {
+  opacity: 1;
+  transform: scale(1.04);
 }
 
 .vertical-video-caption {
@@ -10442,6 +10477,78 @@ body:not(.home-intro) .cover-carousel-hero {
 
 .video-mute-btn.is-sound-on::after {
   opacity: 0;
+}
+
+.home-video-lightbox {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  opacity: 0;
+  padding: 1.25rem;
+  pointer-events: none;
+  position: fixed;
+  transition: opacity 180ms ease;
+  z-index: 90;
+}
+
+.home-video-lightbox.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.home-video-lightbox-panel {
+  background: #050607;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.44);
+  max-height: min(88vh, 56rem);
+  max-width: min(92vw, 30rem);
+  overflow: hidden;
+  position: relative;
+  transform: translateY(10px) scale(0.98);
+  transition: transform 180ms ease;
+  width: min(92vw, 28rem);
+}
+
+.home-video-lightbox.is-open .home-video-lightbox-panel {
+  transform: translateY(0) scale(1);
+}
+
+.home-video-lightbox-panel video {
+  aspect-ratio: 9 / 16;
+  background: #000000;
+  display: block;
+  max-height: calc(88vh - 3.4rem);
+  object-fit: contain;
+  width: 100%;
+}
+
+.home-video-close {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 0;
+  border-radius: 999px;
+  color: #050607;
+  cursor: pointer;
+  display: flex;
+  font-size: 1.35rem;
+  font-weight: 800;
+  height: 2.35rem;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  width: 2.35rem;
+  z-index: 3;
+}
+
+.home-video-title {
+  color: #ffffff;
+  font-weight: 800;
+  padding: 0.75rem 1rem 0.95rem;
 }
 
 .video-scroll-btn {
@@ -11693,6 +11800,14 @@ body > .site-header.liquid-header .icon-btn[data-open-cart] span::after,
     height: 19px !important;
     width: 23px !important;
   }
+}
+
+/* Final cart icon cleanup: keep the drawn cart only, remove the emoji glyph layer. */
+body > .site-header.liquid-header .icon-btn[data-open-cart] span::before,
+.add-cart::before,
+.drawer-item [data-add-cart]::before {
+  content: "" !important;
+  text-indent: 0 !important;
 }
 
 /* Final chat brand colors and mobile sizing. */

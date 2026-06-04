@@ -113,6 +113,39 @@ body > .site-header.liquid-header.is-action-confirming {
   font-weight: 700 !important;
 }
 
+.chat-customer-form {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.chat-customer-form label {
+  color: #30333a !important;
+  display: grid !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  gap: 7px !important;
+}
+
+.chat-customer-form input,
+.chat-customer-form textarea {
+  background: #ffffff !important;
+  border: 1px solid rgba(17, 17, 19, 0.14) !important;
+  border-radius: 12px !important;
+  color: #111113 !important;
+  font: inherit !important;
+  min-height: 44px !important;
+  outline: 0 !important;
+  padding: 10px 12px !important;
+  resize: vertical !important;
+  width: 100% !important;
+}
+
+.chat-customer-form input:focus,
+.chat-customer-form textarea:focus {
+  border-color: #111113 !important;
+  box-shadow: 0 0 0 4px rgba(223, 255, 95, 0.28) !important;
+}
+
 .chat-channel-actions {
   display: grid !important;
   gap: 10px !important;
@@ -567,4 +600,11 @@ body > .site-header.liquid-header.is-action-confirming {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.94),
     0 16px 34px rgba(8, 12, 28, 0.24) !important;
+}
+
+/* Final cart glyph cleanup after responsive overrides. */
+.detail-buybox .detail-actions .add-cart::before,
+.product-card .add-cart::before,
+.drawer-item [data-add-cart]::before {
+  content: "" !important;
 }

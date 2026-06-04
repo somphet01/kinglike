@@ -1,6 +1,96 @@
 {
   "orders": [
     {
+      "id": "cec82cac-d0c2-4737-b2d1-7d76cfd63f44",
+      "orderCode": "KL260604691N",
+      "customerName": "ລອງລະບົບ",
+      "customerPhone": "02099521660",
+      "customerWhatsapp": "02099521660",
+      "customerAddress": "ນະຄອນຫລວງ",
+      "note": "",
+      "contactChannel": "whatsapp",
+      "productLink": "http://localhost:4173/product.html?id=gold-support&category=mattresses",
+      "chatMessage": "🛏️ ໃບສັ່ງຊື້ສິນຄ້າຈາກເວບໄຊ KINGLIKE\n📋 ລະຫັດຄຳສັ່ງ: #KL20260604002\n📅 ວັນທີ: 04/06/2026\n━━━━━━━━━━━━━━\n🛒 ລາຍການສິນຄ້າ\n1. THE ATHLETE\n   • ຂະໜາດ: 120cm\n   • ຈຳນວນ: 3\n   • ລາຄາ: 41,694,000 ກີບ\n━━━━━━━━━━━━━━\n💰 ຍອດລວມ: 41,694,000 ກີບ\n━━━━━━━━━━━━━━\n👤 ຊື່ລູກຄ້າ: ລອງລະບົບ\n📞 ເບີໂທ: 02099521660\n📍 ທີ່ຢູ່: ນະຄອນຫລວງ\n━━━━━━━━━━━━━━",
+      "totalAmount": 41694000,
+      "status": "draft",
+      "paymentMethod": "chat",
+      "slip": null,
+      "adminNote": "",
+      "items": [
+        {
+          "id": "ee684ea0-ec10-46e1-bdd6-564e0dffc7b4",
+          "productId": "gold-support",
+          "productName": "THE ATHLETE",
+          "size": "120cm",
+          "quantity": 3,
+          "unitPrice": 13898000,
+          "subtotal": 41694000
+        }
+      ],
+      "createdAt": "2026-06-04T07:51:17.221Z",
+      "updatedAt": "2026-06-04T07:51:17.221Z"
+    },
+    {
+      "id": "f57e8bff-bfe6-416d-9234-3d7a9c195662",
+      "orderCode": "KL260604FUSE",
+      "customerName": "ລອງລະບົບ",
+      "customerPhone": "02099521660",
+      "customerWhatsapp": "02099521660",
+      "customerAddress": "ນະຕອນຫລວງ",
+      "note": "",
+      "contactChannel": "whatsapp",
+      "productLink": "http://localhost:4173/product.html?id=gold-support&category=mattresses",
+      "chatMessage": "🛏️ ໃບສັ່ງຊື້ສິນຄ້າຈາກເວບໄຊ KINGLIKE\n📋 ລະຫັດຄຳສັ່ງ: #KL20260604001\n📅 ວັນທີ: 04/06/2026\n━━━━━━━━━━━━━━\n🛒 ລາຍການສິນຄ້າ\n1. THE ATHLETE\n   • ຂະໜາດ: 120cm\n   • ຈຳນວນ: 1\n   • ລາຄາ: 13,898,000 ກີບ\n━━━━━━━━━━━━━━\n💰 ຍອດລວມ: 13,898,000 ກີບ\n━━━━━━━━━━━━━━\n👤 ຊື່ລູກຄ້າ: ລອງລະບົບ\n📞 ເບີໂທ: 02099521660\n📍 ທີ່ຢູ່: ນະຕອນຫລວງ\n━━━━━━━━━━━━━━",
+      "totalAmount": 13898000,
+      "status": "draft",
+      "paymentMethod": "chat",
+      "slip": null,
+      "adminNote": "",
+      "items": [
+        {
+          "id": "97118fad-4825-420f-87b3-6c71b5fbb2d4",
+          "productId": "gold-support",
+          "productName": "THE ATHLETE",
+          "size": "120cm",
+          "quantity": 1,
+          "unitPrice": 13898000,
+          "subtotal": 13898000
+        }
+      ],
+      "createdAt": "2026-06-04T07:27:54.687Z",
+      "updatedAt": "2026-06-04T07:27:54.687Z"
+    },
+    {
+      "id": "31f63a34-4170-46b5-a83e-cdfc890545dc",
+      "orderCode": "KL260604CTRZ",
+      "customerName": "Website chat customer",
+      "customerPhone": "",
+      "customerWhatsapp": "",
+      "customerAddress": "",
+      "note": "",
+      "contactChannel": "whatsapp",
+      "productLink": "http://localhost:4173/product.html?id=classic-rest&category=mattresses",
+      "chatMessage": "ສະບາຍດີຂ້ອຍສັ່ງສິນຄ້າຈາກເວັບໄຊ kinglike\nຊື່ສິນຄ້າ\nຈຳນວນ\nລາຄາ\nKinglike Classic Rest\nຈຳນວນ: 1\nລາຄາ: 2,790,000 ກີບ\n__________________________________\nຍອດລວມ: 2,790,000 ກີບ",
+      "totalAmount": 2790000,
+      "status": "draft",
+      "paymentMethod": "chat",
+      "slip": null,
+      "adminNote": "",
+      "items": [
+        {
+          "id": "cf9d942c-bfb3-45aa-99e0-50c52cd40870",
+          "productId": "classic-rest",
+          "productName": "Kinglike Classic Rest",
+          "size": "3.5 ຟຸດ",
+          "quantity": 1,
+          "unitPrice": 2790000,
+          "subtotal": 2790000
+        }
+      ],
+      "createdAt": "2026-06-04T06:39:35.145Z",
+      "updatedAt": "2026-06-04T06:39:35.145Z"
+    },
+    {
       "id": "6ed5c1fc-1229-4f77-adbc-79a7f5ec8e98",
       "orderCode": "KL260603QGSS",
       "customerName": "Website chat customer",
@@ -892,6 +982,33 @@
     }
   ],
   "logs": [
+    {
+      "id": "b104c698-2edc-4f37-9656-1e0481fc307e",
+      "orderId": "cec82cac-d0c2-4737-b2d1-7d76cfd63f44",
+      "oldStatus": "",
+      "newStatus": "draft",
+      "changedBy": "customer",
+      "note": "Chat draft via whatsapp",
+      "createdAt": "2026-06-04T07:51:17.221Z"
+    },
+    {
+      "id": "982e7f39-e807-4fcf-a61e-bebf2f2d47ee",
+      "orderId": "f57e8bff-bfe6-416d-9234-3d7a9c195662",
+      "oldStatus": "",
+      "newStatus": "draft",
+      "changedBy": "customer",
+      "note": "Chat draft via whatsapp",
+      "createdAt": "2026-06-04T07:27:54.687Z"
+    },
+    {
+      "id": "bce4fbd1-b296-4888-9031-ef3c700184e1",
+      "orderId": "31f63a34-4170-46b5-a83e-cdfc890545dc",
+      "oldStatus": "",
+      "newStatus": "draft",
+      "changedBy": "customer",
+      "note": "Chat draft via whatsapp",
+      "createdAt": "2026-06-04T06:39:35.145Z"
+    },
     {
       "id": "8496c068-0351-4d9c-854b-f6f39e020d5e",
       "orderId": "6ed5c1fc-1229-4f77-adbc-79a7f5ec8e98",
